@@ -1,6 +1,8 @@
 {include file=header.html.tpl}
 <h1>{$thread->getSubject()}</h1>
 
+{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}
+
 <table>
 {foreach from=$messages item=message}
 <tr>

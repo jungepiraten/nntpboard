@@ -4,10 +4,7 @@ require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/smarty.inc.php");
 $smarty = new ViewBoardSmarty();
 
-if (!isset($_REQUEST["id"])) {
-	die("Kein Board angegeben!");
-}
-$id = stripslashes($_REQUEST["id"]);
+$id = !empty($_REQUEST["id"]) ? stripslashes($_REQUEST["id"]) : null;
 
 $smarty->assign("board", $board = $config->getBoard($id));
 if ($board === null) {

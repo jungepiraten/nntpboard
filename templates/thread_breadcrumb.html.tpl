@@ -1,0 +1,1 @@
+{include file=board_breadcrumb.html.tpl board=$board} &raquo; <a href="viewthread.php?boardid={$board->getBoardID()|escape:url}&amp;threadid={$thread->getThreadID()|escape:url}">{$thread->getSubject()}</a>

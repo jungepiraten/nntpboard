@@ -16,7 +16,7 @@ class Group {
 
 	private $threadcache = array();
 
-	public function __construct($host, $group, $username = "", $password = "") {
+	public function __construct(Host $host, $group, $username = "", $password = "") {
 		$this->host = $host;
 		$this->group = $group;
 		$this->username = $username;
@@ -93,6 +93,14 @@ class Group {
 			}
 			$this->threads[$message->getThreadID()]->addMessage($message);
 		}
+		
+		// Sortieren
+		if (!function_exists("cmpThreads")) {
+			function cmpThreads($a, $b) {
+				return $b->getLastPostDate() - $a->getLastPostDate();
+			}
+		}
+		uasort($this->threads, cmpThreads);
 	}
 	
 	public function parseMessage($h, $i) {
@@ -110,6 +118,24 @@ class Group {
 		}
 		
 		return $message;
+	}
+
+	public function getThreadCount() {
+		return count($this->threads);
+	}
+
+	public function getLastPostDate() {
+		if (empty($this->threads)) {
+			return null;
+		}
+		return array_shift(array_slice($this->threads, 0, 1))->getLastPostDate();
+	}
+
+	public function getLastPostAuthor() {
+		if (empty($this->threads)) {
+			return null;
+		}
+		return array_shift(array_slice($this->threads, 0, 1))->getLastPostAuthor();
 	}
 
 	public function getThreads() {

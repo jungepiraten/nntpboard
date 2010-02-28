@@ -4,51 +4,34 @@ require_once(dirname(__FILE__)."/host.class.php");
 require_once(dirname(__FILE__)."/board.class.php");
 
 class Config {
-	private $host = null;
-	private $username = "";
-	private $password = "";
 	private $boards = array();
-	private $rootboards = array();
+	private $rootboard = null;
 	
-	public function getHost() {
-		return $this->host;
+	public function __construct() {
+		$this->rootboard = new Board(null, "Defaultname", "Defaultdesc", null, null);
 	}
 	
-	public function setHost($host, $username = null, $password = null) {
-		if ($host !== null) {
-			$this->host = $host;
-		} else {
-			$this->host = new Host();
-		}
-		if ($username !== null) {
-			$this->username = $username;
-		}
-		if ($host !== null) {
-			$this->password = $password;
-		}
-	}
-
-	public function getUsername() {
-		return $this->username;
+	public function setName($name) {
+		$this->rootboard->setName($name);
 	}
 	
-	public function getPassword() {
-		return $this->password;
+	public function setDesc($desc) {
+		$this->rootboard->setDesc($desc);
 	}
 	
 	public function addBoard(Board $board) {
 		$this->boards[$board->getBoardID()] = $board;
 		if (!$board->hasParent()) {
-			$this->rootboards[$id] = $board;
+			$this->rootboard->addSubBoard($board);
+			$board->setParent($this->rootboard);
 		}
 	}
 
 	public function getBoard($id) {
+		if ($id === null) {
+			return $this->rootboard;
+		}
 		return $this->boards[$id];
-	}
-
-	public function getRootBoards() {
-		return $this->rootboards;
 	}
 		
 	public function getGroups() {
