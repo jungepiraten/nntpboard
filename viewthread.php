@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/smarty.inc.php");
-$smarty = new ViewThreadSmarty();
+$smarty = new ViewThreadSmarty($config);
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $threadid = stripslashes($_REQUEST["threadid"]);

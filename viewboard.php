@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/smarty.inc.php");
-$smarty = new ViewBoardSmarty();
+$smarty = new ViewBoardSmarty($config);
 
 $id = !empty($_REQUEST["id"]) ? stripslashes($_REQUEST["id"]) : null;
 

@@ -4,9 +4,11 @@ require_once(dirname(__FILE__)."/host.class.php");
 require_once(dirname(__FILE__)."/board.class.php");
 
 class Config {
+	private $datadir = null;
 	private $rootboard = null;
 	
 	public function __construct() {
+		$this->datadir = new Datadir(dirname(__PATH__)."/../groups", "./groups");
 		$this->rootboard = new Board(null, "Defaultname", "Defaultbeschreibung", null);
 	}
 	
@@ -33,6 +35,15 @@ class Config {
 			}
 		}
 		return $groups;
+	}
+	
+	
+	public function setDatadir($datadir) {
+		$this->datadir = $datadir;
+	}
+	
+	public function getDatadir() {
+		return $this->datadir;
 	}
 }
 

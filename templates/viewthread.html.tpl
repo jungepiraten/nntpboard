@@ -10,13 +10,23 @@
 {foreach from=$messages item=message}
 <tr>
  <th>{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
- <td>{foreach from=$message->getBodyParts() key=partid item=part}{if $part->isInline()}
+ <td>
+  {foreach from=$message->getBodyParts() key=partid item=part}
   <div class="bodypart">
   {assign var=messageid value=$message->getMessageID()}
-  {assign var=attachmentlink value=$group->getAttachmentlink($part)}
-  {if $part->isText()}<pre>{$part->getText("UTF-8")}</pre>
-  {elseif $part->isImage()}<img src="{$attachmentlink}" width="300px" />
-  {else}<a href="{$attachmentlink}">{$part->getFilename()}</a>{/if}{/if}</div>{/foreach}</td>
+  {assign var=attachmentlink value=$datadir->getAttachmentWebPath($group,$part)}
+  {if     $part->isInline() && $part->isText()}
+   <pre>{$part->getText("UTF-8")}</pre>
+  {elseif $part->isInline() && $part->isAttachment() && $part->isImage()}
+   <img src="{$attachmentlink}" width="300px" />
+  {elseif $part->isAttachment()}
+   <a href="{$attachmentlink}">{$part->getFilename()}</a>
+  {else}
+   Attachment vorhanden, kann aber nicht angezeigt werden. Bitte melde diesen Fehler!
+  {/if}
+  </div>
+  {/foreach}
+ </td>
 </tr>
 {/foreach}
 </table>

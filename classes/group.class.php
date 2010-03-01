@@ -1,9 +1,11 @@
 <?php
 
+require_once(dirname(__FILE__)."/config.class.php");
 require_once(dirname(__FILE__)."/message.class.php");
 require_once(dirname(__FILE__)."/thread.class.php");
 
 class Group {
+	private $config;
 	private $host = "localhost";
 	private $group;
 	private $username = "";
@@ -16,7 +18,8 @@ class Group {
 
 	private $threadcache = array();
 
-	public function __construct(Host $host, $group, $username = "", $password = "") {
+	public function __construct(Config $config, Host $host, $group, $username = "", $password = "") {
+		$this->config = $config;
 		$this->host = $host;
 		$this->group = $group;
 		$this->username = $username;
@@ -32,31 +35,13 @@ class Group {
 		// TODO
 	}
 	
-	/**
-	 * TODO: Diese funktionen gehoeren gar nicht hierher (imho)
-	 * (evtl auslagern in Config oder neue Klasse)
-	 */
-
-	public function getFilename() {
-		return dirname(__FILE__)."/../groups/".$this->group.".dat";
-	}
-	
-	public function getThreadfilename($threadid) {
-		return dirname(__FILE__)."/../groups/".$this->group."/".md5($threadid).".dat";
-	}
-	
-	public function getAttachmentfilename($part) {
-		return dirname(__FILE__)."/../groups/".$this->group."/".md5($part->getMessageID()).".".$part->getPartID().".".$part->getFilename();
-	}
-	
-	public function getAttachmentlink($part) {
-		// TODO sieht hoffentlich jeder, oder? ;)
-		return "/~prauscher/nntpboard/groups/".$this->group."/".md5($part->getMessageID()).".".$part->getPartID().".".$part->getFilename();
-	}
-	
 	// Lade Zwischenstand
 	public function load() {
-		$data = unserialize(file_get_contents($this->getFilename()));
+		if (!file_exists($this->config->getDataDir()->getGroupPath($this))) {
+			throw new Exception("Group ".$this->group." not yet initialized.");
+		}
+		
+		$data = unserialize(file_get_contents($this->config->getDataDir()->getGroupPath($this)));
 		$this->messages	= $data["messages"];
 		$this->threads	= $data["threads"];
 
@@ -71,25 +56,19 @@ class Group {
 		$data = array(
 			"messages"	=> $this->messages,
 			"threads"	=> $this->threads);
-		file_put_contents($this->getFilename(), serialize($data));
+		file_put_contents($this->config->getDatadir()->getGroupPath($this), serialize($data));
 
 		// Speichere Threads
-		foreach ($this->threadcache AS $threadid => $thread) {
-			$filename = $this->getThreadfilename($threadid);
-			if (!file_exists(dirname($filename))) {
-				mkdir(dirname($filename));
-			}
-			file_put_contents($filename, serialize($thread));
+		foreach ($this->threadcache AS $threadid => $messages) {
+			$filename = $this->config->getDatadir()->getThreadPath($this, $this->getThread($threadid));
+			file_put_contents($filename, serialize($messages));
 			
 			// Attachments hinterher!
-			foreach ($thread AS $message) {
+			foreach ($messages AS $message) {
 				foreach ($message->getBodyParts() AS $partid => $part) {
 					if ($part->isAttachment()) {
-						$filename = $this->getAttachmentfilename($part);
+						$filename = $this->config->getDataDir()->getAttachmentPath($this, $part);
 						if (!file_exists($filename)) {
-							if (!file_exists(dirname($filename))) {
-								mkdir(dirname($filename));
-							}
 							file_put_contents($filename, $part->getText());
 						}
 					}
@@ -106,6 +85,10 @@ class Group {
 		}
 		
 		$c = imap_num_msg($h);
+		// Wenn wir keine neuen Threads haben, koennen wir uns auch beenden
+		if ($c == $this->getMessagesCount()) {
+			return;
+		}
 		for ($i = 1; $i <= $c; $i++) {
 			$message = $this->parseMessage($h, $i);
 
@@ -152,6 +135,10 @@ class Group {
 		return count($this->threads);
 	}
 
+	public function getMessagesCount() {
+		return count($this->messages);
+	}
+
 	public function getLastPostDate() {
 		if (empty($this->threads)) {
 			return null;
@@ -165,6 +152,10 @@ class Group {
 		}
 		return array_shift(array_slice($this->threads, 0, 1))->getLastPostAuthor();
 	}
+	
+	public function getGroup() {
+		return $this->group;
+	}
 
 	public function getThreads() {
 		return $this->threads;
@@ -177,7 +168,14 @@ class Group {
 	public function getThreadMessages($threadid) {
 		// Kleines Caching - vermutlich manchmal sinnvoll ;)
 		if (!isset($this->threadcache[$threadid])) {
-			$this->threadcache[$threadid] = unserialize(file_get_contents($this->getThreadfilename($threadid)));
+			if ($this->getThread($threadid) === null) {
+				return null;
+			}
+			$filename = $this->config->getDataDir()->getThreadPath( $this , $this->getThread($threadid) );
+			if (!file_exists($filename)) {
+				throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
+			}
+			$this->threadcache[$threadid] = unserialize(file_get_contents($filename));
 		}
 		return $this->threadcache[$threadid];
 	}
