@@ -6,17 +6,29 @@ class BodyPart {
 			"CHARSET" => "UTF-8"
 		);
 
+	private $messageid;
+	private $partid;
 	private $struct;
 	private $text;
 	private $parameters = array();
 
-	public function __construct($struct, $text) {
+	public function __construct($message, $partid, $struct, $text) {
+		$this->messageid = $message->getMessageID();
+		$this->partid = $partid;
 		$this->struct = $struct;
 		$this->text = $text;
 		
 		foreach ($struct->parameters AS $param) {
 			$this->setParameter($param->attribute, $param->value);
 		}
+	}
+	
+	public function getMessageID() {
+		return $this->messageid;
+	}
+	
+	public function getPartID() {
+		return $this->partid;
 	}
 	
 	public function getText($charset = null) {
@@ -54,11 +66,20 @@ class BodyPart {
 	}
 
 	public function isInline() {
+		// TODO *hust*
 		return true;
 	}
 
 	public function isText() {
 		return ($this->struct->type == 0);
+	}
+	
+	public function isApplication() {
+		return ($this->struct->type == 3);
+	}
+	
+	public function isAudio() {
+		return ($this->struct->type == 4);
 	}
 	
 	public function isImage() {
@@ -67,6 +88,10 @@ class BodyPart {
 	
 	public function isVideo() {
 		return ($this->struct->type == 6);
+	}
+	
+	public function isAttachment() {
+		return ($this->getFilename() != null);
 	}
 	
 	public function getSize() {

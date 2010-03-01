@@ -56,7 +56,7 @@ class Message {
 	}
 	
 	public function addBodyPart($i, $struct, $body) {
-		$this->parts[$i] = new BodyPart($struct, $body);
+		$this->parts[$i] = new BodyPart($this, $i, $struct, $body);
 	}
 	
 	public function getBodyParts() {

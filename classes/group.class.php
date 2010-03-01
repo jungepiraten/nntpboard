@@ -31,6 +31,11 @@ class Group {
 	public function sendMessage($message) {
 		// TODO
 	}
+	
+	/**
+	 * TODO: Diese funktionen gehoeren gar nicht hierher (imho)
+	 * (evtl auslagern in Config oder neue Klasse)
+	 */
 
 	public function getFilename() {
 		return dirname(__FILE__)."/../groups/".$this->group.".dat";
@@ -38,6 +43,15 @@ class Group {
 	
 	public function getThreadfilename($threadid) {
 		return dirname(__FILE__)."/../groups/".$this->group."/".md5($threadid).".dat";
+	}
+	
+	public function getAttachmentfilename($part) {
+		return dirname(__FILE__)."/../groups/".$this->group."/".md5($part->getMessageID()).".".$part->getPartID().".".$part->getFilename();
+	}
+	
+	public function getAttachmentlink($part) {
+		// TODO sieht hoffentlich jeder, oder? ;)
+		return "/~prauscher/nntpboard/groups/".$this->group."/".md5($part->getMessageID()).".".$part->getPartID().".".$part->getFilename();
 	}
 	
 	// Lade Zwischenstand
@@ -62,11 +76,25 @@ class Group {
 		// Speichere Threads
 		foreach ($this->threadcache AS $threadid => $thread) {
 			$filename = $this->getThreadfilename($threadid);
-
 			if (!file_exists(dirname($filename))) {
 				mkdir(dirname($filename));
 			}
 			file_put_contents($filename, serialize($thread));
+			
+			// Attachments hinterher!
+			foreach ($thread AS $message) {
+				foreach ($message->getBodyParts() AS $partid => $part) {
+					if ($part->isAttachment()) {
+						$filename = $this->getAttachmentfilename($part);
+						if (!file_exists($filename)) {
+							if (!file_exists(dirname($filename))) {
+								mkdir(dirname($filename));
+							}
+							file_put_contents($filename, $part->getText());
+						}
+					}
+				}
+			}
 		}
 	}
 	

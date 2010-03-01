@@ -1,0 +1,10 @@
+Installation von NNTPBoard
+
+Vorbereitungen:
+* Apache mit PHP muss installiert sein
+* Benoetigt wird vor allem das PHP-Modul imap
+
+Installation:
+01. Entpacken der Ordnerstruktur
+02. Anpassen der config.inc.php
+03. Eintragen des Cronjobs "cron.php"
