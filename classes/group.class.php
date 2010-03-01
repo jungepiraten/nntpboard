@@ -5,7 +5,6 @@ require_once(dirname(__FILE__)."/message.class.php");
 require_once(dirname(__FILE__)."/thread.class.php");
 
 class Group {
-	private $config;
 	private $host = "localhost";
 	private $group;
 	private $username = "";
@@ -18,8 +17,7 @@ class Group {
 
 	private $threadcache = array();
 
-	public function __construct(Config $config, Host $host, $group, $username = "", $password = "") {
-		$this->config = $config;
+	public function __construct(Host $host, $group, $username = "", $password = "") {
 		$this->host = $host;
 		$this->group = $group;
 		$this->username = $username;
@@ -37,13 +35,20 @@ class Group {
 	
 	// Lade Zwischenstand
 	public function load() {
-		if (!file_exists($this->config->getDataDir()->getGroupPath($this))) {
+		global $config;
+		
+		if (!file_exists($config->getDataDir()->getGroupPath($this))) {
 			throw new Exception("Group ".$this->group." not yet initialized.");
 		}
 		
-		$data = unserialize(file_get_contents($this->config->getDataDir()->getGroupPath($this)));
+		$data = unserialize(file_get_contents($config->getDataDir()->getGroupPath($this)));
 		$this->messages	= $data["messages"];
 		$this->threads	= $data["threads"];
+		
+		// Im gespeicherten "eingefrorenen" Zustand wird die Zuordnung zur Gruppe nicht gespeichert
+		foreach ($this->threads AS &$thread) {
+			$thread->setGroup($this);
+		}
 
 		/**
 		 * Lade Threads erst nach und nach, um Weniger Last zu verursachen
@@ -53,27 +58,42 @@ class Group {
 	
 	// Speichere Zwischenstand
 	public function save() {
+		global $config;
+		
 		$data = array(
 			"messages"	=> $this->messages,
 			"threads"	=> $this->threads);
-		file_put_contents($this->config->getDatadir()->getGroupPath($this), serialize($data));
+		
+		// Objekte "einfrieren", um Platz zu sparen
+		foreach ($data["threads"] AS &$thread) {
+			$thread->setGroup(null);
+		}
+		
+		file_put_contents($config->getDatadir()->getGroupPath($this), serialize($data));
 
 		// Speichere Threads
 		foreach ($this->threadcache AS $threadid => $messages) {
-			$filename = $this->config->getDatadir()->getThreadPath($this, $this->getThread($threadid));
-			file_put_contents($filename, serialize($messages));
-			
-			// Attachments hinterher!
-			foreach ($messages AS $message) {
-				foreach ($message->getBodyParts() AS $partid => $part) {
+			// Attachments speichern (und gleichzeitig die Objekte entlasten)
+			foreach ($messages AS &$message) {
+				$parts = $message->getBodyParts();
+				foreach ($parts AS $partid => &$part) {
 					if ($part->isAttachment()) {
-						$filename = $this->config->getDataDir()->getAttachmentPath($this, $part);
+						$filename = $config->getDataDir()->getAttachmentPath($this, $part);
 						if (!file_exists($filename)) {
 							file_put_contents($filename, $part->getText());
 						}
+						// Sonst speichern wir alles doppelt
+						$part->setText(null);
 					}
 				}
+				$message->setBodyParts($parts);
+				
+				// Wenn wir schon dabei sind, komprimieren wir das Message-Objekt
+				$message->setGroup(null);
 			}
+			
+			$filename = $config->getDatadir()->getThreadPath($this, $this->getThread($threadid));
+			file_put_contents($filename, serialize($messages));
 		}
 	}
 	
@@ -86,7 +106,7 @@ class Group {
 		
 		$c = imap_num_msg($h);
 		// Wenn wir keine neuen Threads haben, koennen wir uns auch beenden
-		if ($c == $this->getMessagesCount()) {
+		if ($c == $this->getMessagesCount() && false) {
 			return;
 		}
 		for ($i = 1; $i <= $c; $i++) {
@@ -97,12 +117,16 @@ class Group {
 			$this->messages[$message->getMessageID()] = $message->getThreadID();
 			// Ist Unterpost
 			if ($message->hasParentID()) {
-				$this->getMessage($message->getParentID())->addChild($message);
-			// Ist Startpost / Threadstarter
-			} else {
-				$this->threads[$message->getThreadID()] = new Thread($message);
+				if (isset($this->messages[$message->getParentID()])) {
+					$this->getMessage($message->getParentID())->addChild($message);
+				}
 			}
-			$this->threads[$message->getThreadID()]->addMessage($message);
+			// Thread erstellen oder in Thread einordnen
+			if (!isset($this->threads[$message->getThreadID()]) || !$message->hasParentID()) {
+				$this->threads[$message->getThreadID()] = new Thread($message);
+			} else {
+				$this->threads[$message->getThreadID()]->addMessage($message);
+			}
 		}
 		
 		// Sortieren
@@ -166,16 +190,22 @@ class Group {
 	}
 
 	public function getThreadMessages($threadid) {
+		global $config;
+	
 		// Kleines Caching - vermutlich manchmal sinnvoll ;)
 		if (!isset($this->threadcache[$threadid])) {
 			if ($this->getThread($threadid) === null) {
 				return null;
 			}
-			$filename = $this->config->getDataDir()->getThreadPath( $this , $this->getThread($threadid) );
+			$filename = $config->getDataDir()->getThreadPath( $this , $this->getThread($threadid) );
 			if (!file_exists($filename)) {
 				throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
 			}
 			$this->threadcache[$threadid] = unserialize(file_get_contents($filename));
+			// Im gespeicherten "eingefrorenen" Zustand wird die Zuordnung zur Gruppe nicht gespeichert
+			foreach ($this->threadcache[$threadid] AS &$message) {
+				$message->setGroup($this);
+			}
 		}
 		return $this->threadcache[$threadid];
 	}

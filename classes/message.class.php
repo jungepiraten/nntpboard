@@ -11,13 +11,18 @@ class Message {
 	private $parts = array();
 	private $childs = array();
 	
+	private $group;
+	
 	public function __construct($group, $header) {
 		$this->messageid = $header->message_id;
 		$this->references = preg_replace("#\s+#", " ", $header->references);
 		$this->references = empty($this->references) ? array() : explode(" ", $this->references);
+		// TODO: manche subjects sind encodiert: =?UTF-8?B?QW5rw7xuZGlndW5nIFVtenVnIEphYmJlcnNlcnZlciAyMy4wMi4yMDEw?= oder auch =?utf-8?q?Petition_=22Datenschutz_-_Einstufung_von_Systemoperato?= =?utf-8?q?ren_und_Administratoren_als_Berufsgeheimnistr=C3=A4ger_per_Gese?= =?utf-8?b?dHoi?=
 		$this->subject = $header->subject;
 		$this->date = $header->udate;
-		$this->sender = $header->senderaddress;
+		list($this->sender, $domain) = explode('@', $header->senderaddress);
+		// $domain sollte nun immer gleich sein ;)
+		$this->group = $group;
 	}
 	
 	public function getMessageID() {
@@ -63,12 +68,24 @@ class Message {
 		return $this->parts;
 	}
 	
+	public function setBodyParts($parts) {
+		$this->parts = $parts;
+	}
+	
 	public function getBodyPart($i) {
 		return $this->parts[$i];
 	}
 	
 	public function addChild($msg) {
 		$this->childs[] = $msg->getMessageID();
+	}
+	
+	public function setGroup($group) {
+		$this->group = $group;
+	}
+	
+	public function getGroup() {
+		return $this->group;
 	}
 }
 

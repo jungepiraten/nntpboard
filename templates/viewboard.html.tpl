@@ -22,7 +22,7 @@
   {$subboard->getDesc()}
  </td>
  <td>{$group->getThreadCount()}</td>
- <td>{$group->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"}</td>
+ <td>{$group->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"} von {$group->getLastPostAuthor()}</td>
 </tr>
 </tr>
 {/foreach}

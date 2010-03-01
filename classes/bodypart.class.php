@@ -1,25 +1,59 @@
 <?php
 
 class BodyPart {
-	// Defaultwerte
-	private static $defaultparameters = array(
-			"CHARSET" => "UTF-8"
-		);
-
 	private $messageid;
 	private $partid;
-	private $struct;
 	private $text;
-	private $parameters = array();
+	private $size;
+	private $charset = "UTF-8";
+	private $filename = null;
+	private $disposition = null;
+	private $mimetype = null;
+	private $mimesubtype = null;
 
 	public function __construct($message, $partid, $struct, $text) {
 		$this->messageid = $message->getMessageID();
 		$this->partid = $partid;
-		$this->struct = $struct;
+		$this->size = $struct->bytes;
+		if ($struct->ifdisposition) {
+			$this->disposition = strtolower($struct->disposition);
+		}
+		
+		// See http://www.php.net/manual/en/function.imap-fetchstructure.php
+		switch ($struct->type) {
+		case 0:	$this->mimetype = "text";		break;
+		case 1:	$this->mimetype = "multitype";		break;
+		case 2:	$this->mimetype = "message";		break;
+		case 3:	$this->mimetype = "application";	break;
+		case 4:	$this->mimetype = "audio";		break;
+		case 5:	$this->mimetype = "image";		break;
+		case 6:	$this->mimetype = "video";		break;
+		case 7:	$this->mimetype = "other";		break;
+		}
+		if ($struct->ifsubtype) {
+			$this->mimesubtype = strtolower($struct->subtype);
+		}
+		
+		// See http://www.php.net/imap_fetchstructure
+		switch ($struct->encoding) {
+		case 0:	$text = $text;			break;
+		case 1:	$text = $text;			break;
+		case 2:	$text = imap_binary($text);	break;
+		case 3:	$text = imap_base64($text);	break;
+		case 4:	$text = imap_qprint($text);	break;
+		case 5:	$text = $text;			break;
+		}
 		$this->text = $text;
 		
 		foreach ($struct->parameters AS $param) {
-			$this->setParameter($param->attribute, $param->value);
+			switch (strtolower($param->attribute)) {
+			case 'charset':
+				$this->charset = $param->value;
+				break;
+			case 'name':
+				$this->filename = $param->value;
+				break;
+			}
 		}
 	}
 	
@@ -32,37 +66,24 @@ class BodyPart {
 	}
 	
 	public function getText($charset = null) {
-		$text = $this->text;
-		// See http://www.php.net/imap_fetchstructure
-		switch ($this->struct->encoding) {
-		case 0:	$text = $text;			break;
-		case 1:	$text = $text;			break;
-		case 2:	$text = imap_binary($text);	break;
-		case 3:	$text = imap_base64($text);	break;
-		case 4:	$text = imap_qprint($text);	break;
-		case 5:	$text = $text;			break;
-		}
+		// TODO aus attachment laden
+		$text = ($this->text === null ? null : $this->text);
 		if ($charset !== null) {
 			$text = iconv($this->getCharset(), $charset, $text);
 		}
 		
 		return $text;
 	}
+	
+	public function setText($text, $charset = null) {
+		$this->text = $text;
+		if ($charset !== null) {
+			$this->charset = $charset;
+		}
+	}
 
 	public function getMimeType() {
-		$mime = null;
-		// See http://www.php.net/manual/en/function.imap-fetchstructure.php
-		switch ($this->struct->type) {
-		case 0:	$mime = "text";		break;
-		case 1:	$mime = "multitype";	break;
-		case 2:	$mime = "message";	break;
-		case 3:	$mime = "application";	break;
-		case 4:	$mime = "audio";	break;
-		case 5:	$mime = "image";	break;
-		case 6:	$mime = "video";	break;
-		case 7:	$mime = "other";	break;
-		}
-		return ($mime === null ? null : $mime . ($this->struct->ifsubtype ? "/".strtolower($this->struct->subtype) : ""));
+		return ($this->mimetype === null ? null : $mime . ($this->mimesubtype !== null ? "/".$this->mimesubtype : ""));
 	}
 
 	public function isInline() {
@@ -71,57 +92,43 @@ class BodyPart {
 	}
 
 	public function isText() {
-		return ($this->struct->type == 0);
+		return (strtolower($this->mimetype) == 'text');
 	}
 	
 	public function isApplication() {
-		return ($this->struct->type == 3);
+		return (strtolower($this->mimetype) == 'application');
 	}
 	
 	public function isAudio() {
-		return ($this->struct->type == 4);
+		return (strtolower($this->mimetype) == 'audio');
 	}
 	
 	public function isImage() {
-		return ($this->struct->type == 5);
+		return (strtolower($this->mimetype) == 'image');
 	}
 	
 	public function isVideo() {
-		return ($this->struct->type == 6);
+		return (strtolower($this->mimetype) == 'video');
 	}
 	
 	public function isAttachment() {
-		return ($this->getFilename() != null);
+		return ($this->getFilename() !== null);
 	}
 	
 	public function getSize() {
-		return $this->struct->bytes;
+		return $this->size;
 	}
 	
 	public function getFilename() {
-		return $this->getParameter("name");
+		return $this->filename;
 	}
 	
 	public function getCharset() {
-		return $this->getParameter("charset");
+		return $this->charset;
 	}
 	
 	public function getDisposition() {
-		if ($this->struct->ifdisposition) {
-			return strtolower($this->struct->disposition);
-		}
-		return null;
-	}
-
-	public function setParameter($name, $value) {
-		$name = strtolower($name);
-		$this->parameters[$name] = $value;
-	}
-
-	public function getParameter($name) {
-		$name = strtolower($name);
-		return isset($this->parameters[$name]) ? $this->parameters[$name] :
-			(isset(self::$defaultparameters[$name]) ? self::$defaultparameters[$name] : null);
+		return $this->disposition;
 	}
 }
 

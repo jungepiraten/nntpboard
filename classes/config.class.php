@@ -8,6 +8,7 @@ class Config {
 	private $rootboard = null;
 	
 	public function __construct() {
+		// Default-Werte
 		$this->datadir = new Datadir(dirname(__PATH__)."/../groups", "./groups");
 		$this->rootboard = new Board(null, "Defaultname", "Defaultbeschreibung", null);
 	}
@@ -24,7 +25,7 @@ class Config {
 	}
 	
 	public function getBoards() {
-		return $this->rootboard->getBoards();
+		return $this->getBoard()->getBoards();
 	}
 	
 	public function getGroups() {

@@ -9,16 +9,18 @@ class Thread {
 	private $lastpostauthor;
 	private $messages = array();
 	
+	private $group;
+	
 	public function __construct($message) {
 		$this->threadid = $message->getMessageID();
 		$this->subject = $message->getSubject();
 		$this->date = $message->getDate();
 		$this->author = $message->getSender();
+		$this->group = $message->getGroup();
 	}
 	
 	public function getMessage($msgid) {
-		// TODO - eigentlich sollten wir ueber die Group drann kommen :/
-		//return $this->messages[$msgid];
+		return $this->getGroup()->getMessage($msgid);
 	}
 	
 	public function addMessage($message) {
@@ -55,6 +57,14 @@ class Thread {
 	
 	public function getLastPostAuthor() {
 		return $this->lastpostauthor;
+	}
+	
+	public function setGroup($group) {
+		$this->group = $group;
+	}
+	
+	public function getGroup() {
+		return $this->group;
 	}
 }
 
