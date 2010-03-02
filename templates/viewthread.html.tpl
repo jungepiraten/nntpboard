@@ -8,13 +8,13 @@
 
 <table>
 {foreach from=$messages item=message}
-<tr>
- <th>{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
- <td>
+<tr class="message">
+ <th class="meta">{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
+ <td class="body">
   {foreach from=$message->getBodyParts() key=partid item=part}
   <div class="bodypart">
   {assign var=messageid value=$message->getMessageID()}
-  {assign var=attachmentlink value=$datadir->getAttachmentWebPath($group,$part)}
+  {assign var=attachmentlink value=$DATADIR->getAttachmentWebPath($group,$part)}
   {if     $part->isInline() && $part->isText()}
    <pre>{$part->getText("UTF-8")}</pre>
   {elseif $part->isInline() && $part->isAttachment() && $part->isImage()}

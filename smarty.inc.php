@@ -7,7 +7,13 @@ abstract class NNTPBoardSmarty extends Smarty {
 	
 	public function __construct($config) {
 		$this->config = $config;
-		$this->assign("datadir", $config->getDataDir());
+		$this->register_function("getlink", array($this, getLink));
+		$this->assign("CHARSET", "UTF-8");
+		$this->assign("DATADIR", $config->getDataDir());
+	}
+	
+	function getLink($params) {
+		return $this->get_template_vars("DATADIR")->getWebPath($params["file"]);
 	}
 }
 

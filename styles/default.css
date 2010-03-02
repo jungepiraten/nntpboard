@@ -1,0 +1,6 @@
+body {
+	margin:0px; padding:0px;
+}
+.message .meta {
+	vertical-align:top; color:gray; font-weight:normal;
+}

@@ -70,7 +70,7 @@ class Group {
 		}
 		
 		file_put_contents($config->getDatadir()->getGroupPath($this), serialize($data));
-
+		
 		// Speichere Threads
 		foreach ($this->threadcache AS $threadid => $messages) {
 			// Attachments speichern (und gleichzeitig die Objekte entlasten)
@@ -106,9 +106,14 @@ class Group {
 		
 		$c = imap_num_msg($h);
 		// Wenn wir keine neuen Threads haben, koennen wir uns auch beenden
-		if ($c == $this->getMessagesCount() && false) {
+		if ($c == $this->getMessagesCount()) {
 			return;
 		}
+		
+		$this->threadcache = array();
+		$this->messages = array();
+		$this->threads = array();
+		// Jetzt alle Nachrichten abholen
 		for ($i = 1; $i <= $c; $i++) {
 			$message = $this->parseMessage($h, $i);
 
@@ -175,6 +180,13 @@ class Group {
 			return null;
 		}
 		return array_shift(array_slice($this->threads, 0, 1))->getLastPostAuthor();
+	}
+	
+	public function getLastPostThreadID() {
+		if (empty($this->threads)) {
+			return null;
+		}
+		return array_shift(array_slice($this->threads, 0, 1))->getThreadID();
 	}
 	
 	public function getGroup() {

@@ -13,20 +13,19 @@ class DataDir {
 		// Lege die Verzeichnisstrukur an, soweit noetig
 		if (!function_exists("mkdir_parents")) {
 			function mkdir_parents($dir) {
-				if (!file_exists(dirname($dir))) {
-					mkdir_parents(dirname($dir));
-				}
 				if (!file_exists($dir)) {
+					if (!file_exists(dirname($dir))) {
+						mkdir_parents(dirname($dir));
+					}
 					mkdir($dir);
 				}
 			}
 		}
-		$dir = rtrim($this->dir, "/") . "/" . ltrim(dirname($filename), "/");
-		mkdir_parents($dir);
+		mkdir_parents(rtrim($this->dir, "/") . "/" . ltrim(dirname($filename), "/"));
 		return rtrim($this->dir, "/") . "/" . ltrim($filename, "/");
 	}
 	
-	private function getWebPath($filename) {
+	public function getWebPath($filename) {
 		return rtrim($this->webdir, "/") . "/" . ltrim($filename, "/");
 	}
 	
