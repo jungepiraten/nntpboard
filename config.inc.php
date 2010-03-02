@@ -17,11 +17,16 @@ $host = new Host("news.piratenpartei.de");
 $rootboard = $config->getBoard();
 $rootboard->setName("NNTPBoard");
 
-$techtalk = new Board(3, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
-$rootboard->addSubBoard($techtalk);
+$orgaboard = new Board(100, "Organisation", null, null);
+$techtalkboard = new Board(101, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
+$orgaboard->addSubBoard($techtalkboard);
 
-$struktur = new Board(4, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
-$techtalk->addSubBoard($struktur);
+$etcboard = new Board(200, "Sonstiges", null, null);
+$strukturboard = new Board(201, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
+$etcboard->addSubBoard($strukturboard);
+
+$rootboard->addSubBoard($orgaboard);
+$rootboard->addSubBoard($etcboard);
 
 /*
 $nerdnachtde = new Board(10, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));

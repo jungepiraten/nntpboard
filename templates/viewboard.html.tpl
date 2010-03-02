@@ -4,30 +4,16 @@
 {include file=board_breadcrumb.html.tpl board=$board}
 
 {if $board->hasSubBoards()}
-<table>
-<thead>
-<tr>
- <th>Board</th>
- <th>Themen</th>
- <th>Letzte Antwort</th>
-</tr>
-</thead>
-<tbody>
+{assign var=subboardsWithGroup value=0}
 {foreach from=$board->getSubBoards() item=subboard}
-{assign var=group value=$subboard->getGroup()}
-{$group->load()}
-<tr>
- <td>
-  <a href="viewboard.php?id={$subboard->getBoardID()}">{$subboard->getName()}</a><br />
-  {$subboard->getDesc()}
- </td>
- <td>{$group->getThreadCount()}</td>
- <td>{$group->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"} von {$group->getLastPostAuthor()}</td>
-</tr>
-</tr>
+{if !$subboard->hasGroup()}
+{include file=board_boards.html.tpl boardid=$subboard->getBoardID() heading=$subboard->getName() subboards=$subboard->getSubBoards()}
+{else}
+{math equation=a+1 assign=subboardsWithGroup a=$subboardsWithGroup}
+{/if}
 {/foreach}
-</tbody>
-</table>
+
+{if $subboardsWithGroup > 0}{include file=board_boards.html.tpl subboards=$board->getSubBoards()}{/if}
 {/if}
 
 {if isset($threads)}
