@@ -19,22 +19,25 @@ if ($group === null) {
 }
 $group->load();
 
-if ($messageid != null) {
+if ($messageid !== null) {
 	$message = $group->getMessage($messageid);
+	if ($message === null) {
+		die("Message konnte nicht zugeordnet werden.");
+	}
 	$threadid = $message->getThreadID();
-	//header();
-	//exit;
 }
 $thread = $group->getThread($threadid);
+if ($thread === null) {
+	die("Thread nicht gefunden!");
+}
+if ($message !== null) {
+	$smarty->viewmessage($board, $thread, $message);
+}
 $messages = $group->getThreadMessages($thread->getThreadID());
 if (!is_array($messages) || count($messages) < 1) {
 	die("Thread ungueltig!");
 }
 
-$smarty->assign("board", $board);
-$smarty->assign("thread", $thread);
-$smarty->assign("messages", $messages);
-
-$smarty->display();
+$smarty->viewthread($board, $thread, $messages);
 
 ?>

@@ -6,16 +6,19 @@ $smarty = new ViewBoardSmarty($config);
 
 $id = !empty($_REQUEST["id"]) ? stripslashes($_REQUEST["id"]) : null;
 
-$smarty->assign("board", $board = $config->getBoard($id));
+$board = $config->getBoard($id);
 if ($board === null) {
 	die("Board nicht gefunden!");
 }
 
-if ($group = $board->getGroup()) {
+$group = $board->getGroup();
+if ($group !== null) {
 	$group->load();
-	$smarty->assign("threads", $group->getThreads());
+	$threads = $group->getThreads();
+} else {
+	$threads = null;
 }
 
-$smarty->display();
+$smarty->viewboard($board, $group, $threads);
 
 ?>
