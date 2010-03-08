@@ -5,6 +5,7 @@ class Thread {
 	private $subject;
 	private $date;
 	private $author;
+	private $lastpostmessageid;
 	private $lastpostdate;
 	private $lastpostauthor;
 	private $messages = array();
@@ -25,6 +26,7 @@ class Thread {
 	
 	public function addMessage($message) {
 		if ($message->getDate() > $this->lastpostdate) {
+			$this->lastpostmessageid = $message->getMessageID();
 			$this->lastpostdate = $message->getDate();
 			$this->lastpostauthor = $message->getSender();
 		}
@@ -49,6 +51,10 @@ class Thread {
 	
 	public function getPosts() {
 		return count($this->messages);
+	}
+	
+	public function getLastPostMessageID() {
+		return $this->lastpostmessageid;
 	}
 	
 	public function getLastPostDate() {

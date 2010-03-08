@@ -16,7 +16,7 @@
   {$subboard->getDesc()}
  </td>
  <td>{if $group !== null}{$group->getThreadCount()}{/if}</td>
- <td>{if $group !== null}{$group->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"} von {$group->getLastPostAuthor()} <a href="viewthread.php?boardid={$subboard->getBoardID()|escape:url}&amp;threadid={$group->getLastPostThreadID()|escape:url}">[X]</a>{/if}</td>
+ <td>{if $group !== null}<a href="viewthread.php?boardid={$subboard->getBoardID()}&amp;messageid={$group->getLastPostMessageID()}">{$group->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"}</a> von {$group->getLastPostAuthor()}: <a href="viewthread.php?boardid={$subboard->getBoardID()|escape:url}&amp;threadid={$group->getLastPostThreadID()|escape:url}">{$group->getLastPostSubject()}</a>{/if}</td>
 </tr>
 {/if}
 {/foreach}

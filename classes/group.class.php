@@ -168,16 +168,24 @@ class Group {
 		return count($this->messages);
 	}
 
-	private function getLastPost() {
+	private function getLastThread() {
 		if (empty($this->threads)) {
 			throw new Exception("No Thread found!");
 		}
 		return array_shift(array_slice($this->threads, 0, 1));
 	}
 
+	public function getLastPostMessageID() {
+		try {
+			return $this->getLastThread()->getLastPostMessageID();
+		} catch (Exception $e) {
+			return null;
+		}
+	}
+
 	public function getLastPostSubject() {
 		try {
-			return $this->getLastPost()->getSubject();
+			return $this->getLastThread()->getSubject();
 		} catch (Exception $e) {
 			return null;
 		}
@@ -185,7 +193,7 @@ class Group {
 
 	public function getLastPostDate() {
 		try {
-			return $this->getLastPost()->getLastPostDate();
+			return $this->getLastThread()->getLastPostDate();
 		} catch (Exception $e) {
 			return null;
 		}
@@ -193,7 +201,7 @@ class Group {
 
 	public function getLastPostAuthor() {
 		try {
-			return $this->getLastPost()->getLastPostAuthor();
+			return $this->getLastThread()->getLastPostAuthor();
 		} catch (Exception $e) {
 			return null;
 		}
@@ -201,7 +209,7 @@ class Group {
 	
 	public function getLastPostThreadID() {
 		try {
-			return $this->getLastPost()->getThreadID();
+			return $this->getLastThread()->getThreadID();
 		} catch (Exception $e) {
 			return null;
 		}
