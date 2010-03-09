@@ -6,19 +6,15 @@ require_once(dirname(__FILE__)."/config.inc.php");
  * Erstelle Caches
  **/
 foreach ($config->getGroups() as $group) {
-	// Lade eventuell vorhandene Informationen, um Zeit zu sparen
+	$connection = $group->getConnection();
 	try {
-		$group->load();
+		$connection->open();
+		$connection->loadMessages();
+		$connection->close();
 	} catch (Exception $e) {
-		// Klappt nicht? Auch nicht weiter schlimm!
+		echo "<pre>".$e->getMessage()."</pre>";
 	}
-	
-	try {
-		$group->init();
-		$group->save();
-	} catch (Exception $e) {
-		echo $e->getMessage() . "\n";
-	}
+	$group->save();
 }
 
 ?>

@@ -13,7 +13,7 @@ class Thread {
 	private $group;
 	
 	public function __construct($message) {
-		$this->threadid = $message->getMessageID();
+		$this->threadid = $message->getThreadID();
 		$this->subject = $message->getSubject();
 		$this->date = $message->getDate();
 		$this->author = $message->getSender();

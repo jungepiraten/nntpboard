@@ -5,6 +5,7 @@ require_once(dirname(__FILE__)."/bodypart.class.php");
 class Message {
 	private $messageid;
 	private $references;
+	private $charset = "UTF-8";
 	private $subject;
 	private $date;
 	private $sender;
@@ -13,16 +14,14 @@ class Message {
 	
 	private $group;
 	
-	public function __construct($group, $header) {
-		$this->messageid = $header->message_id;
-		$this->references = preg_replace("#\s+#", " ", $header->references);
-		$this->references = empty($this->references) ? array() : explode(" ", $this->references);
-		// TODO: manche subjects sind encodiert: =?UTF-8?B?QW5rw7xuZGlndW5nIFVtenVnIEphYmJlcnNlcnZlciAyMy4wMi4yMDEw?= oder auch =?utf-8?q?Petition_=22Datenschutz_-_Einstufung_von_Systemoperato?= =?utf-8?q?ren_und_Administratoren_als_Berufsgeheimnistr=C3=A4ger_per_Gese?= =?utf-8?b?dHoi?=
-		$this->subject = $header->subject;
-		$this->date = $header->udate;
-		list($this->sender, $domain) = explode('@', $header->senderaddress);
-		// $domain sollte nun immer gleich sein ;)
+	public function __construct($group, $messageid, $date, $sender, $subject, $charset, $references) {
 		$this->group = $group;
+		$this->messageid = $messageid;
+		$this->date = $date;
+		$this->sender = $sender;
+		$this->subject = $subject;
+		$this->charset = $charset;
+		$this->references = $references;
 	}
 	
 	public function getMessageID() {
@@ -60,6 +59,10 @@ class Message {
 		return $this->sender;
 	}
 	
+	public function getCharset() {
+		return $this->charset;
+	}
+	
 	public function addBodyPart($i, $struct, $body) {
 		$this->parts[$i] = new BodyPart($this, $i, $struct, $body);
 	}
@@ -74,6 +77,20 @@ class Message {
 	
 	public function getBodyPart($i) {
 		return $this->parts[$i];
+	}
+	
+	public function saveAttachments($datadir) {
+		/* Speichere alle Attachments ab */
+		foreach ($this->parts AS $partid => &$part) {
+			if ($part->isAttachment()) {
+				$filename = $datadir->getAttachmentPath($this->group, $part);
+				if (!file_exists($filename)) {
+					file_put_contents($filename, $part->getText());
+				}
+				// Sonst speichern wir alles doppelt
+				$part->setText(null);
+			}
+		}
 	}
 	
 	public function addChild($msg) {

@@ -11,29 +11,31 @@ $config->setDatadir(new Datadir(dirname(__FILE__)."/groups", "/~prauscher/nntpbo
 /**
  * Boards
  */
-//$host = new Host("news.nerdnacht.de", 119);
-$host = new Host("news.piratenpartei.de");
 
 $rootboard = $config->getBoard();
 $rootboard->setName("NNTPBoard");
 
-$orgaboard = new Board(100, "Organisation", null, null);
-$techtalkboard = new Board(101, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
-$orgaboard->addSubBoard($techtalkboard);
+if (true) {
+	$host = new Host("news.piratenpartei.de");
 
-$etcboard = new Board(200, "Sonstiges", null, null);
-$strukturboard = new Board(201, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
-$etcboard->addSubBoard($strukturboard);
+	$orgaboard = new Board(100, "Organisation", null, null);
+	$techtalkboard = new Board(101, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
+	$orgaboard->addSubBoard($techtalkboard);
 
-$rootboard->addSubBoard($orgaboard);
-$rootboard->addSubBoard($etcboard);
+	$etcboard = new Board(200, "Sonstiges", null, null);
+	$strukturboard = new Board(201, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
+	$etcboard->addSubBoard($strukturboard);
 
-/*
-$nerdnachtde = new Board(10, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));
-$rootboard->addSubBoard($nerdnachtde);
+	$rootboard->addSubBoard($orgaboard);
+	$rootboard->addSubBoard($etcboard);
+} else {
+	$host = new Host("news.nerdnacht.de", 119);
 
-$testboard = new Board(20, "Testboard", "Anderes Board", new Group($host, "nerdnacht.test"));
-$nerdnachtde->addSubBoard($testboard);
-*/
+	$nerdnachtde = new Board(10, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));
+	$rootboard->addSubBoard($nerdnachtde);
+
+	$testboard = new Board(20, "Testboard", "Anderes Board", new Group($host, "nerdnacht.test"));
+	$nerdnachtde->addSubBoard($testboard);
+}
 
 ?>

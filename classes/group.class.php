@@ -1,11 +1,11 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.class.php");
-require_once(dirname(__FILE__)."/message.class.php");
+require_once(dirname(__FILE__)."/connection.class.php");
 require_once(dirname(__FILE__)."/thread.class.php");
 
 class Group {
-	private $host = "localhost";
+	private $host;
 	private $group;
 	private $username = "";
 	private $password = "";
@@ -22,6 +22,10 @@ class Group {
 		$this->group = $group;
 		$this->username = $username;
 		$this->password = $password;
+	}
+	
+	public function getHost() {
+		return $this->host;
 	}
 
 	public function setAuth($username, $password) {
@@ -71,24 +75,12 @@ class Group {
 		
 		file_put_contents($config->getDatadir()->getGroupPath($this), serialize($data));
 		
-		// Speichere Threads
+		// Speichere die Nachrichten Threadweise
 		foreach ($this->threadcache AS $threadid => $messages) {
 			// Attachments speichern (und gleichzeitig die Objekte entlasten)
 			foreach ($messages AS &$message) {
-				$parts = $message->getBodyParts();
-				foreach ($parts AS $partid => &$part) {
-					if ($part->isAttachment()) {
-						$filename = $config->getDataDir()->getAttachmentPath($this, $part);
-						if (!file_exists($filename)) {
-							file_put_contents($filename, $part->getText());
-						}
-						// Sonst speichern wir alles doppelt
-						$part->setText(null);
-					}
-				}
-				$message->setBodyParts($parts);
-				
-				// Wenn wir schon dabei sind, komprimieren wir das Message-Objekt
+				$message->saveAttachments($config->getDataDir());
+				// Komprimiere das Message-Objekt (Speicher sparen)
 				$message->setGroup(null);
 			}
 			
@@ -97,43 +89,23 @@ class Group {
 		}
 	}
 	
-	// Lade Daten frisch vom Newsserver (ACHTUNG: Das kann eine sehr lange Zeit dauern)
-	public function init() {
-		$h = @imap_open($this->host->getGroupString($this->group), $this->username, $this->password);
-		if ($h === false) {
-			throw new Exception(imap_last_error() . " while connecting to {$this->host->getGroupString($this->group)}.");
+	public function getConnection($username = null, $password = null) {
+		if ($username === null) {
+			$username = $this->username;
 		}
-		
-		$c = imap_num_msg($h);
-		// Wenn wir keine neuen Threads haben, koennen wir uns auch beenden
-		if ($c == $this->getMessagesCount()) {
-			return;
+		if ($password === null) {
+			$password = $this->password;
 		}
-		
+		return new IMAPConnection($this, $username, $password);
+	}
+	
+	public function clear() {
 		$this->threadcache = array();
 		$this->messages = array();
 		$this->threads = array();
-		// Jetzt alle Nachrichten abholen
-		for ($i = 1; $i <= $c; $i++) {
-			$message = $this->parseMessage($h, $i);
-
-			$this->threadcache[$message->getThreadID()][$message->getMessageID()] = $message;
-
-			$this->messages[$message->getMessageID()] = $message->getThreadID();
-			// Ist Unterpost
-			if ($message->hasParentID()) {
-				if (isset($this->messages[$message->getParentID()])) {
-					$this->getMessage($message->getParentID())->addChild($message);
-				}
-			}
-			// Thread erstellen oder in Thread einordnen
-			if (!isset($this->threads[$message->getThreadID()]) || !$message->hasParentID()) {
-				$this->threads[$message->getThreadID()] = new Thread($message);
-			} else {
-				$this->threads[$message->getThreadID()]->addMessage($message);
-			}
-		}
-		
+	}
+	
+	public function sort() {
 		// Sortieren
 		if (!function_exists("cmpThreads")) {
 			function cmpThreads($a, $b) {
@@ -141,23 +113,6 @@ class Group {
 			}
 		}
 		uasort($this->threads, cmpThreads);
-	}
-	
-	public function parseMessage($h, $i) {
-		$header = imap_header($h, $i);
-		$message = new Message($this, $header);
-		
-		// Strukturanalyse
-		$struct = imap_fetchstructure($h, $i);
-		if (is_array($struct->parts)) {
-			foreach ($struct->parts AS $p => $part) {
-				$message->addBodyPart($p, $part, imap_fetchbody($h, $i, $p+1));
-			}
-		} else {
-			$message->addBodyPart(0, $struct, imap_body($h, $i));
-		}
-		
-		return $message;
 	}
 
 	public function getThreadCount() {
@@ -172,6 +127,7 @@ class Group {
 		if (empty($this->threads)) {
 			throw new Exception("No Thread found!");
 		}
+		// Wir nehmen an, dass die Threads sortiert sind ...
 		return array_shift(array_slice($this->threads, 0, 1));
 	}
 
@@ -223,6 +179,11 @@ class Group {
 		return $this->threads;
 	}
 	
+	public function addThread($thread) {
+		$this->threads[$thread->getThreadID()] = $thread;
+		$this->threadcache[$thread->getThreadID()] = array();
+	}
+	
 	public function getThread($threadid) {
 		return $this->threads[$threadid];
 	}
@@ -240,12 +201,32 @@ class Group {
 				throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
 			}
 			$this->threadcache[$threadid] = unserialize(file_get_contents($filename));
-			// Im gespeicherten "eingefrorenen" Zustand wird die Zuordnung zur Gruppe nicht gespeichert
+			// Im gespeicherten ("eingefrorenen") Zustand wird die Zuordnung zur Gruppe nicht gespeichert
 			foreach ($this->threadcache[$threadid] AS &$message) {
 				$message->setGroup($this);
 			}
 		}
 		return $this->threadcache[$threadid];
+	}
+	
+	public function addMessage($message) {
+		// Verlinkung message => thread
+		$this->messages[$message->getMessageID()] = $message->getThreadID();
+		
+		// Ist Unterpost
+		if ($message->hasParentID() && isset($this->messages[$message->getParentID()])) {
+			$this->getMessage($message->getParentID())->addChild($message);
+		}
+		
+		// Thread erstellen oder in Thread einordnen
+		if (!isset($this->threads[$message->getThreadID()])) {
+			$this->addThread(new Thread($message));
+		} else {
+			$this->getThread($message->getThreadID())->addMessage($message);
+		}
+		
+		// Trage Nachricht in den Cache ein
+		$this->threadcache[$message->getThreadID()][$message->getMessageID()] = $message;
 	}
 
 	public function getMessage($messageid) {
