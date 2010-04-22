@@ -12,6 +12,10 @@ class Config {
 		$this->datadir = new Datadir(dirname(__PATH__)."/../groups", "./groups");
 		$this->rootboard = new Board(null, "Defaultname", "Defaultbeschreibung", null);
 	}
+
+	public function getCharset() {
+		return "UTF8";
+	}
 	
 	public function getBoard($id = null) {
 		if ($id === null) {

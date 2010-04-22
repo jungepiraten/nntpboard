@@ -4,57 +4,30 @@ class BodyPart {
 	private $messageid;
 	private $partid;
 	private $text;
-	private $size;
 	private $charset = "UTF-8";
 	private $filename = null;
 	private $disposition = null;
 	private $mimetype = null;
 	private $mimesubtype = null;
 
-	public function __construct($message, $partid, $struct, $text) {
+	public function __construct($message, $partid, $disposition, $mimetype, $text, $charset = "UTF-8", $filename = null) {
 		$this->messageid = $message->getMessageID();
 		$this->partid = $partid;
-		$this->size = $struct->bytes;
-		if ($struct->ifdisposition) {
-			$this->disposition = strtolower($struct->disposition);
+		if (!empty($disposition)) {
+			$this->disposition = strtolower($disposition);
 		}
-		
-		// See http://www.php.net/manual/en/function.imap-fetchstructure.php
-		switch ($struct->type) {
-		case 0:	$this->mimetype = "text";		break;
-		case 1:	$this->mimetype = "multitype";		break;
-		case 2:	$this->mimetype = "message";		break;
-		case 3:	$this->mimetype = "application";	break;
-		case 4:	$this->mimetype = "audio";		break;
-		case 5:	$this->mimetype = "image";		break;
-		case 6:	$this->mimetype = "video";		break;
-		case 7:	$this->mimetype = "other";		break;
-		}
-		if ($struct->ifsubtype) {
-			$this->mimesubtype = strtolower($struct->subtype);
-		}
-		
-		// See http://www.php.net/imap_fetchstructure
-		switch ($struct->encoding) {
-		case 0:	$text = $text;			break;
-		case 1:	$text = $text;			break;
-		case 2:	$text = imap_binary($text);	break;
-		case 3:	$text = imap_base64($text);	break;
-		case 4:	$text = imap_qprint($text);	break;
-		case 5:	$text = $text;			break;
-		}
-		$this->text = $text;
-		
-		foreach ($struct->parameters AS $param) {
-			switch (strtolower($param->attribute)) {
-			case 'charset':
-				$this->charset = $param->value;
-				break;
-			case 'name':
-				$this->filename = $param->value;
-				break;
+		if (!empty($mimetype)) {
+			list ($this->mimetype, $this->mimesubtype) = explode("/", $mimetype, 2);
+			if (empty($this->mimetype)) {
+				$this->mimetype = null;
+			}
+			if (empty($this->mimesubtype)) {
+				$this->mimesubtype = null;
 			}
 		}
+		$this->text = $text;
+		$this->charset = $charset;
+		$this->filename = $filename;
 	}
 	
 	public function getMessageID() {
@@ -72,6 +45,12 @@ class BodyPart {
 			$text = iconv($this->getCharset(), $charset, $text);
 		}
 		
+		return $text;
+	}
+	
+	public function getHTML($charset = null) {
+		$text = $this->getText($charset);
+		// TODO $text bearbeiten :/
 		return $text;
 	}
 	
@@ -116,7 +95,7 @@ class BodyPart {
 	}
 	
 	public function getSize() {
-		return $this->size;
+		return strlen($this->text);
 	}
 	
 	public function getFilename() {

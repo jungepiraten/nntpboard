@@ -3,8 +3,10 @@
 require_once(dirname(__FILE__)."/bodypart.class.php");
 
 class Message {
+	private $articlenum;
 	private $messageid;
-	private $references;
+	private $threadid;
+	private $parentid;
 	private $charset = "UTF-8";
 	private $subject;
 	private $date;
@@ -14,14 +16,20 @@ class Message {
 	
 	private $group;
 	
-	public function __construct($group, $messageid, $date, $sender, $subject, $charset, $references) {
+	public function __construct($group, $articlenum, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid) {
 		$this->group = $group;
+		$this->articlenum = $articlenum;
 		$this->messageid = $messageid;
 		$this->date = $date;
 		$this->sender = $sender;
 		$this->subject = $subject;
 		$this->charset = $charset;
-		$this->references = $references;
+		$this->threadid = $threadid;
+		$this->parentid = $parentid;
+	}
+	
+	public function getArticleNum() {
+		return $this->articlenum;
 	}
 	
 	public function getMessageID() {
@@ -29,18 +37,18 @@ class Message {
 	}
 	
 	public function getThreadID() {
-		return empty($this->references) ? $this->getMessageID() : array_shift(array_slice($this->references,0,1));
+		return $this->threadid !== null ? $this->threadid : $this->getMessageID();
 	}
 
 	public function hasParentID() {
-		return count($this->references) > 0;
+		return $this->parentid !== null;
 	}
 
 	public function getParentID() {
 		if (! $this->hasParentID()) {
 			return null;
 		}
-		return array_shift(array_slice($this->references, -1));
+		return $this->parentid;
 	}
 
 	public function getSubject() {
@@ -63,8 +71,11 @@ class Message {
 		return $this->charset;
 	}
 	
-	public function addBodyPart($i, $struct, $body) {
-		$this->parts[$i] = new BodyPart($this, $i, $struct, $body);
+	public function addBodyPart(BodyPart $bodypart) {
+		if ($bodypart->getMessageID() != $this->getMessageID()) {
+			throw new Exception("MessageID not matching while trying to add a bodypart");
+		}
+		$this->parts[$bodypart->getPartID()] = $bodypart;
 	}
 	
 	public function getBodyParts() {
@@ -95,10 +106,6 @@ class Message {
 	
 	public function addChild($msg) {
 		$this->childs[] = $msg->getMessageID();
-	}
-	
-	public function setGroup($group) {
-		$this->group = $group;
 	}
 	
 	public function getGroup() {

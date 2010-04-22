@@ -32,7 +32,7 @@ class DataDir {
 	
 	
 	private function getGroupFilename($group) {
-		return $group->getGroup().".dat";
+		return ($group instanceof Group ? $group->getGroup() : $group).".dat";
 	}
 	
 	public function getGroupPath($group) {
@@ -42,7 +42,7 @@ class DataDir {
 	
 	
 	private function getThreadfilename($group, $thread) {
-		return $group->getGroup()."/threads/".md5($thread->getThreadID()).".dat";
+		return ($group instanceof Group ? $group->getGroup() : $group)."/threads/".md5($thread->getThreadID()).".dat";
 	}
 	
 	public function getThreadPath($group, $part) {
@@ -52,7 +52,7 @@ class DataDir {
 	
 	
 	private function getAttachmentfilename($group, $part) {
-		return $group->getGroup()."/attachments/".md5($part->getMessageID()).".".$part->getPartID()."/".$part->getFilename();
+		return ($group instanceof Group ? $group->getGroup() : $group)."/attachments/".md5($part->getMessageID()).".".$part->getPartID()."/".$part->getFilename();
 	}
 	
 	public function getAttachmentPath($group, $part) {

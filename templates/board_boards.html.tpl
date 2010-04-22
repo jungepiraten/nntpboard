@@ -9,7 +9,7 @@
 <tbody>
 {foreach from=$subboards item=subboard}
 {if $subboard->hasGroup()}
-{assign var=group value=$subboard->getGroup()}{$group->load()}
+{assign var=group value=$subboard->getGroup()}{$group->open($DATADIR)}
 <tr>
  <td>
   <a href="viewboard.php?id={$subboard->getBoardID()}">{$subboard->getName()}</a><br />

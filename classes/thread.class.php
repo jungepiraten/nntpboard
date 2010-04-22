@@ -20,17 +20,27 @@ class Thread {
 		$this->group = $message->getGroup();
 	}
 	
-	public function getMessage($msgid) {
-		return $this->getGroup()->getMessage($msgid);
+	public function getMessages($group) {
+		$messages = array();
+		foreach ($this->messages AS $messageid) {
+			$messages[$messageid] = $this->getMessage($group, $messageid);
+		}
+		return $messages;
+	}
+	
+	public function getMessage($group, $messageid) {
+		return $group->getMessage($messageid);
 	}
 	
 	public function addMessage($message) {
-		if ($message->getDate() > $this->lastpostdate) {
-			$this->lastpostmessageid = $message->getMessageID();
-			$this->lastpostdate = $message->getDate();
-			$this->lastpostauthor = $message->getSender();
+		if (!in_array($message->getMessageID(), $this->messages)) {
+			if ($message->getDate() > $this->lastpostdate) {
+				$this->lastpostmessageid = $message->getMessageID();
+				$this->lastpostdate = $message->getDate();
+				$this->lastpostauthor = $message->getSender();
+			}
+			$this->messages[] = $message->getMessageID();
 		}
-		$this->messages[] = $message->getMessageID();
 	}
 	
 	public function getThreadID() {
@@ -63,10 +73,6 @@ class Thread {
 	
 	public function getLastPostAuthor() {
 		return $this->lastpostauthor;
-	}
-	
-	public function setGroup($group) {
-		$this->group = $group;
 	}
 	
 	public function getGroup() {

@@ -9,7 +9,7 @@ abstract class NNTPBoardSmarty extends Smarty {
 		$this->config = $config;
 		$this->register_function("redirect", smarty_function_redirect);
 		$this->register_function("getlink", array($this, getLink));
-		$this->assign("CHARSET", "UTF-8");
+		$this->assign("CHARSET", $config->getCharset());
 		$this->assign("DATADIR", $config->getDataDir());
 	}
 	

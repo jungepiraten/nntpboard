@@ -17,7 +17,7 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$group->load();
+$group->open($config->getDataDir());
 
 if ($messageid !== null) {
 	$message = $group->getMessage($messageid);
@@ -33,7 +33,7 @@ if ($thread === null) {
 if ($message !== null) {
 	$smarty->viewmessage($board, $thread, $message);
 }
-$messages = $group->getThreadMessages($thread->getThreadID());
+$messages = $thread->getMessages($group);
 if (!is_array($messages) || count($messages) < 1) {
 	die("Thread ungueltig!");
 }

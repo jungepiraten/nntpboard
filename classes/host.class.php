@@ -20,13 +20,6 @@ class Host {
 	public function getPort() {
 		return $this->port;
 	}
-	
-	public function getGroupString($group) {
-		if ($group instanceof Group) {
-			$group = $group->getGroup();
-		}
-		return "{" . $this->getHost() . ":" . $this->getPort() . "/nntp}" . $group;
-	}
 }
 
 ?>

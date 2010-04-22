@@ -13,7 +13,7 @@ if ($board === null) {
 
 $group = $board->getGroup();
 if ($group !== null) {
-	$group->load();
+	$group->open($config->getDataDir());
 	$threads = $group->getThreads();
 } else {
 	$threads = null;

@@ -6,7 +6,6 @@ require_once(dirname(__FILE__)."/classes/datadir.class.php");
 
 $config = new Config;
 $config->setDatadir(new Datadir(dirname(__FILE__)."/groups", "/~prauscher/nntpboard/groups"));
-//$config->setHost("news.piratenpartei.de", "jupis_flint", "higRLd3zJ1hhhCo8");
 
 /**
  * Boards
@@ -15,27 +14,35 @@ $config->setDatadir(new Datadir(dirname(__FILE__)."/groups", "/~prauscher/nntpbo
 $rootboard = $config->getBoard();
 $rootboard->setName("NNTPBoard");
 
-if (true) {
+if (false) {
 	$host = new Host("news.piratenpartei.de");
 
-	$orgaboard = new Board(100, "Organisation", null, null);
-	$techtalkboard = new Board(101, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
+	$boardid = 1;
+
+	$orgaboard = new Board($boardid++, "Organisation", null, null);
+	$rootboard->addSubBoard($orgaboard);
+
+	$techtalkboard = new Board($boardid++, "Techtalk", "tech-bla-bla", new Group($host, "pirates.de.orga.ag.it.techtalk", "jupis_flint", "higRLd3zJ1hhhCo8"));
 	$orgaboard->addSubBoard($techtalkboard);
 
-	$etcboard = new Board(200, "Sonstiges", null, null);
-	$strukturboard = new Board(201, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
-	$etcboard->addSubBoard($strukturboard);
-
-	$rootboard->addSubBoard($orgaboard);
+	$etcboard = new Board($boardid++, "Sonstiges", null, null);
 	$rootboard->addSubBoard($etcboard);
-} else {
-	$host = new Host("news.nerdnacht.de", 119);
 
-	$nerdnachtde = new Board(10, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));
+	$strukturboard = new Board($boardid++, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
+	$etcboard->addSubBoard($strukturboard);
+} else {
+	$host = new Host("news.nerdnacht.de");
+
+	$boardid = 1;
+
+	$nerdnachtde = new Board($boardid++, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));
 	$rootboard->addSubBoard($nerdnachtde);
 
-	$testboard = new Board(20, "Testboard", "Anderes Board", new Group($host, "nerdnacht.test"));
+	$testboard = new Board($boardid++, "Testboard", "Anderes Board", new Group($host, "nerdnacht.test"));
 	$nerdnachtde->addSubBoard($testboard);
+
+	$prauschertest = new Board($boardid++, "Testbasis prauscher", "Prauschers Testbasis", new Group($host, "prauscher.test"));
+	$rootboard->addSubBoard($prauschertest);
 }
 
 ?>

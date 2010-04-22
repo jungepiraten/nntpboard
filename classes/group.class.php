@@ -10,12 +10,18 @@ class Group {
 	private $username = "";
 	private $password = "";
 
-	// Zuordnung MSGID => THREADID
+	private $datadir;
+
+	// Alle Nachrichten als Message-Objekt
 	private $messages = array();
+	// Zuordnung MSGID => THREADID
+	private $threadids = array();
+	// Zuordnung ArtikelNr => MSGID
+	private $articlenums = array();
 	// Alle Threads als Thread-Objekt (ohne Nachrichten)
 	private $threads = array();
-
-	private $threadcache = array();
+	
+	private $lastarticlenr = 0;
 
 	public function __construct(Host $host, $group, $username = "", $password = "") {
 		$this->host = $host;
@@ -32,61 +38,48 @@ class Group {
 		$this->username = $username;
 		$this->password = $password;
 	}
+	
+	public function open($datadir) {
+		$this->datadir = $datadir;
+		
+		if (file_exists($this->datadir->getGroupPath($this))) {
+			$data = unserialize(file_get_contents($this->datadir->getGroupPath($this)));
+			$this->threadids	= $data["threadids"];
+			$this->articlenums	= $data["articlenums"];
+			$this->threads		= $data["threads"];
 
-	public function sendMessage($message) {
-		// TODO
+			/**
+			 * Lade Threads erst nach und nach, um Weniger Last zu verursachen
+			 * vgl getThread($threadid)
+			 **/
+		}
 	}
 	
-	// Lade Zwischenstand
-	public function load() {
-		global $config;
-		
-		if (!file_exists($config->getDataDir()->getGroupPath($this))) {
-			throw new Exception("Group ".$this->group." not yet initialized.");
+	public function close() {
+		if ($this->datadir === null) {
+			throw new Exception("Group {$this->group} never opened.");
 		}
-		
-		$data = unserialize(file_get_contents($config->getDataDir()->getGroupPath($this)));
-		$this->messages	= $data["messages"];
-		$this->threads	= $data["threads"];
-		
-		// Im gespeicherten "eingefrorenen" Zustand wird die Zuordnung zur Gruppe nicht gespeichert
-		foreach ($this->threads AS &$thread) {
-			$thread->setGroup($this);
-		}
-
-		/**
-		 * Lade Threads erst nach und nach, um Weniger Last zu verursachen
-		 * vgl getThread($threadid)
-		 **/
-	}
-	
-	// Speichere Zwischenstand
-	public function save() {
-		global $config;
 		
 		$data = array(
-			"messages"	=> $this->messages,
+			"threadids"	=> $this->threadids,
+			"articlenums"	=> $this->articlenums,
 			"threads"	=> $this->threads);
 		
-		// Objekte "einfrieren", um Platz zu sparen
-		foreach ($data["threads"] AS &$thread) {
-			$thread->setGroup(null);
-		}
-		
-		file_put_contents($config->getDatadir()->getGroupPath($this), serialize($data));
+		file_put_contents($this->datadir->getGroupPath($this), serialize($data));
 		
 		// Speichere die Nachrichten Threadweise
-		foreach ($this->threadcache AS $threadid => $messages) {
-			// Attachments speichern (und gleichzeitig die Objekte entlasten)
-			foreach ($messages AS &$message) {
-				$message->saveAttachments($config->getDataDir());
-				// Komprimiere das Message-Objekt (Speicher sparen)
-				$message->setGroup(null);
+		foreach ($this->threads AS $threadid => $thread) {
+			$messages = $thread->getMessages($this);
+			// Attachments speichern
+			foreach ($messages AS $message) {
+				$message->saveAttachments($this->datadir);
 			}
 			
-			$filename = $config->getDatadir()->getThreadPath($this, $this->getThread($threadid));
+			$filename = $this->datadir->getThreadPath($this, $thread);
 			file_put_contents($filename, serialize($messages));
 		}
+
+		$this->datadir = null;
 	}
 	
 	public function getConnection($username = null, $password = null) {
@@ -96,13 +89,7 @@ class Group {
 		if ($password === null) {
 			$password = $this->password;
 		}
-		return new IMAPConnection($this, $username, $password);
-	}
-	
-	public function clear() {
-		$this->threadcache = array();
-		$this->messages = array();
-		$this->threads = array();
+		return new NNTPConnection($this, $username, $password);
 	}
 	
 	public function sort() {
@@ -170,6 +157,10 @@ class Group {
 			return null;
 		}
 	}
+
+	public function getLastArticleNr() {
+		return $this->lastarticlenr;
+	}
 	
 	public function getGroup() {
 		return $this->group;
@@ -181,38 +172,58 @@ class Group {
 	
 	public function addThread($thread) {
 		$this->threads[$thread->getThreadID()] = $thread;
-		$this->threadcache[$thread->getThreadID()] = array();
 	}
 	
 	public function getThread($threadid) {
 		return $this->threads[$threadid];
 	}
 
-	public function getThreadMessages($threadid) {
-		global $config;
-	
-		// Kleines Caching - vermutlich manchmal sinnvoll ;)
-		if (!isset($this->threadcache[$threadid])) {
-			if ($this->getThread($threadid) === null) {
-				return null;
-			}
-			$filename = $config->getDataDir()->getThreadPath( $this , $this->getThread($threadid) );
-			if (!file_exists($filename)) {
-				throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
-			}
-			$this->threadcache[$threadid] = unserialize(file_get_contents($filename));
-			// Im gespeicherten ("eingefrorenen") Zustand wird die Zuordnung zur Gruppe nicht gespeichert
-			foreach ($this->threadcache[$threadid] AS &$message) {
-				$message->setGroup($this);
-			}
+	public function loadThreadMessages($threadid) {
+		if ($this->getThread($threadid) === null) {
+			return;
 		}
-		return $this->threadcache[$threadid];
+
+		if ($this->datadir === null) {
+			throw new Exception("Group {$this->group} never opened.");
+		}
+		
+		$filename = $this->datadir->getThreadPath( $this , $this->getThread($threadid) );
+		if (!file_exists($filename)) {
+			throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
+		}
+		$messages = unserialize(file_get_contents($filename));
+		foreach ($messages AS $message) {
+			$this->addMessage($message);
+		}
+	}
+
+	public function getMessage($messageid) {
+		if (isset($this->messages[$messageid])) {
+			return $this->messages[$messageid];
+		}
+		$message = null;
+		if (!empty($this->threadids[$messageid])) {
+			$this->loadThreadMessages($this->threadids[$messageid]);
+			return $this->messages[$messageid];
+		}
+		// TODO Nachricht direkt vom Newsserver laden
+		$this->messages[$messageid] = $message;
+		return $message;
+	}
+	
+	public function getMessageByNum($num) {
+		if (isset($this->articlenums[$num])) {
+			return $this->getMessage($this->articlenums[$num]);
+		}
+		return null;
 	}
 	
 	public function addMessage($message) {
-		// Verlinkung message => thread
-		$this->messages[$message->getMessageID()] = $message->getThreadID();
-		
+		// Speichere die Nachricht
+		$this->messages[$message->getMessageID()] = $message;
+		$this->threadids[$message->getMessageID()] = $message->getThreadID();
+		$this->articlenums[$message->getArticleNum()] = $message->getMessageID();
+
 		// Ist Unterpost
 		if ($message->hasParentID() && isset($this->messages[$message->getParentID()])) {
 			$this->getMessage($message->getParentID())->addChild($message);
@@ -221,18 +232,13 @@ class Group {
 		// Thread erstellen oder in Thread einordnen
 		if (!isset($this->threads[$message->getThreadID()])) {
 			$this->addThread(new Thread($message));
-		} else {
-			$this->getThread($message->getThreadID())->addMessage($message);
 		}
-		
-		// Trage Nachricht in den Cache ein
-		$this->threadcache[$message->getThreadID()][$message->getMessageID()] = $message;
-	}
+		$this->getThread($message->getThreadID())->addMessage($message);
 
-	public function getMessage($messageid) {
-		// Suche Passende ThreadID
-		$thread = $this->getThreadMessages($this->messages[$messageid]);
-		return $thread[$messageid];
+		// Letzte Artikelnummer updaten
+		if ($message->getArticleNum() > $this->lastarticlenr) {
+			$this->lastarticlenr = $message->getArticleNum();
+		}
 	}
 }
 
