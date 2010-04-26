@@ -6,17 +6,17 @@ require_once(dirname(__FILE__)."/config.inc.php");
  * Erstelle Caches
  **/
 foreach ($config->getGroups() as $group) {
-	$group->open($config->getDataDir());
-	$connection = $group->getConnection();
+	$connection = $group->getConnection($config->getDataDir());
+	$directconnection = $group->getDirectConnection();
 	try {
+		$directconnection->open();
 		$connection->open();
-		$connection->loadMessages($config->getCharset());
+		$connection->loadMessages($directconnection);
 		$connection->close();
+		$directconnection->close();
 	} catch (Exception $e) {
 		echo "<pre>".$e->getMessage()."</pre>";
 	}
-	//var_dump($group);
-	$group->close();
 }
 
 ?>

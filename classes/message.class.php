@@ -51,7 +51,10 @@ class Message {
 		return $this->parentid;
 	}
 
-	public function getSubject() {
+	public function getSubject($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getSubject());
+		}
 		return $this->subject;
 	}
 
@@ -59,11 +62,10 @@ class Message {
 		return $this->date;
 	}
 
-	public function setSender($sender) {
-		$this->sender = $sender;
-	}
-
-	public function getSender() {
+	public function getSender($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getSender());
+		}
 		return $this->sender;
 	}
 	
@@ -99,7 +101,7 @@ class Message {
 					file_put_contents($filename, $part->getText());
 				}
 				// Sonst speichern wir alles doppelt
-				$part->setText(null);
+				//$part->setText(null);
 			}
 		}
 	}

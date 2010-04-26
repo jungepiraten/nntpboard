@@ -13,8 +13,9 @@ if ($board === null) {
 
 $group = $board->getGroup();
 if ($group !== null) {
-	$group->open($config->getDataDir());
-	$threads = $group->getThreads();
+	$connection = $group->getConnection($config->getDataDir());
+	$connection->open();
+	$threads = $connection->getThreads();
 } else {
 	$threads = null;
 }

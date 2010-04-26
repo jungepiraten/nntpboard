@@ -5,7 +5,7 @@ require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/datadir.class.php");
 
 $config = new Config;
-$config->setDatadir(new Datadir(dirname(__FILE__)."/groups", "/~prauscher/nntpboard/groups"));
+$config->setDatadir(new Datadir(dirname(__FILE__)."/data", "/~prauscher/nntpboard/data"));
 
 /**
  * Boards

@@ -39,26 +39,17 @@ class BodyPart {
 	}
 	
 	public function getText($charset = null) {
-		// TODO aus attachment laden
-		$text = ($this->text === null ? null : $this->text);
 		if ($charset !== null) {
-			$text = iconv($this->getCharset(), $charset, $text);
+			$text = iconv($this->getCharset(), $charset, $this->getText());
 		}
-		
-		return $text;
+		// TODO aus attachment laden
+		return ($this->text === null ? null : $this->text);
 	}
 	
 	public function getHTML($charset = null) {
 		$text = $this->getText($charset);
 		// TODO $text bearbeiten :/
 		return $text;
-	}
-	
-	public function setText($text, $charset = null) {
-		$this->text = $text;
-		if ($charset !== null) {
-			$this->charset = $charset;
-		}
 	}
 
 	public function getMimeType() {

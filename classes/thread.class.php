@@ -2,6 +2,7 @@
 
 class Thread {
 	private $threadid;
+	private $charset;
 	private $subject;
 	private $date;
 	private $author;
@@ -18,18 +19,19 @@ class Thread {
 		$this->date = $message->getDate();
 		$this->author = $message->getSender();
 		$this->group = $message->getGroup();
+		$this->charset = $message->getCharset();
 	}
 	
-	public function getMessages($group) {
+	public function getMessages($connection = null) {
+		if ($connection === null) {
+			return $this->messages;
+		}
+
 		$messages = array();
-		foreach ($this->messages AS $messageid) {
-			$messages[$messageid] = $this->getMessage($group, $messageid);
+		foreach ($this->getMessages() AS $messageid) {
+			$messages[$messageid] = $connection->getMessage($messageid);
 		}
 		return $messages;
-	}
-	
-	public function getMessage($group, $messageid) {
-		return $group->getMessage($messageid);
 	}
 	
 	public function addMessage($message) {
@@ -37,7 +39,7 @@ class Thread {
 			if ($message->getDate() > $this->lastpostdate) {
 				$this->lastpostmessageid = $message->getMessageID();
 				$this->lastpostdate = $message->getDate();
-				$this->lastpostauthor = $message->getSender();
+				$this->lastpostauthor = $message->getSender($this->getCharset());
 			}
 			$this->messages[] = $message->getMessageID();
 		}
@@ -47,7 +49,10 @@ class Thread {
 		return $this->threadid;
 	}
 	
-	public function getSubject() {
+	public function getSubject($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getSubject());
+		}
 		return $this->subject;
 	}
 	
@@ -55,7 +60,10 @@ class Thread {
 		return $this->date;
 	}
 	
-	public function getAuthor() {
+	public function getAuthor($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getAuthor());
+		}
 		return $this->author;
 	}
 	
@@ -71,8 +79,15 @@ class Thread {
 		return $this->lastpostdate;
 	}
 	
-	public function getLastPostAuthor() {
+	public function getLastPostAuthor($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getLastPostAuthor());
+		}
 		return $this->lastpostauthor;
+	}
+	
+	public function getCharset() {
+		return $this->charset;
 	}
 	
 	public function getGroup() {

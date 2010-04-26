@@ -17,23 +17,24 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$group->open($config->getDataDir());
+$connection = $group->getConnection($config->getDataDir());
+$connection->open();
 
 if ($messageid !== null) {
-	$message = $group->getMessage($messageid);
+	$message = $connection->getMessage($messageid);
 	if ($message === null) {
 		die("Message konnte nicht zugeordnet werden.");
 	}
 	$threadid = $message->getThreadID();
 }
-$thread = $group->getThread($threadid);
+$thread = $connection->getThread($threadid);
 if ($thread === null) {
 	die("Thread nicht gefunden!");
 }
 if ($message !== null) {
 	$smarty->viewmessage($board, $thread, $message);
 }
-$messages = $thread->getMessages($group);
+$messages = $thread->getMessages($connection);
 if (!is_array($messages) || count($messages) < 1) {
 	die("Thread ungueltig!");
 }
