@@ -1,5 +1,5 @@
 {assign var=boardid value=$board->getBoardID()}
 {assign var=threadid value=$thread->getThreadID()}
-{assign var=messageid value=$message->getMessageID()}
-{assign var=url value="viewthread.php?boardid=$boardid&threadid=$threadid#message$messageid"}
+{assign var=articlenum value=$message->getArticleNum()}
+{assign var=url value="viewthread.php?boardid=$boardid&threadid=$threadid#article$articlenum"}
 {redirect url=$url}

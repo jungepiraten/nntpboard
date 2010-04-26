@@ -9,7 +9,7 @@
 <table>
 {foreach from=$messages item=message}
 <tr class="message">
- <th class="meta"><a name="message{$message->getMessageID()|escape:html}"></a>{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
+ <th class="meta"><a name="article{$message->getArticleNum()|escape:html}"></a>{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
  <td class="body">
   {foreach from=$message->getBodyParts() key=partid item=part}
   <div class="bodypart">

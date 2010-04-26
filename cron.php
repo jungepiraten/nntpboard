@@ -7,6 +7,10 @@ require_once(dirname(__FILE__)."/config.inc.php");
  **/
 foreach ($config->getGroups() as $group) {
 	$connection = $group->getConnection($config->getDataDir());
+	// Nur CacheConnections zulassen
+	if (!($connection instanceof CacheConnection)) {
+		continue;
+	}
 	$directconnection = $group->getDirectConnection();
 	try {
 		$directconnection->open();

@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.class.php");
-require_once(dirname(__FILE__)."/connection.class.php");
 
 class Group {
 	private $host;
@@ -21,13 +20,17 @@ class Group {
 	}
 	
 	public function getConnection($datadir = null, $username = null, $password = null) {
-		if ($username === null && $password === null) {
+		if ($username === null && $password === null) {			
+			require_once(dirname(__FILE__)."/connection_cache.class.php");
+
 			return new CacheConnection($this, $datadir);
 		}
 		return $this->getDirectConnection($this, $username, $password);
 	}
 	
 	public function getDirectConnection($username = null, $password = null) {
+		require_once(dirname(__FILE__)."/connection_nntp.class.php");
+
 		return new NNTPConnection($this, $username, $password);
 	}
 }
