@@ -23,6 +23,7 @@ class CacheConnection extends AbstractConnection {
 	// Alle Threads als Thread-Objekt (ohne Nachrichten)
 	private $threads = array();
 	
+	private $queue = array();
 	private $lastarticlenr = 0;
 	
 	public function __construct($group, $datadir) {
@@ -33,9 +34,18 @@ class CacheConnection extends AbstractConnection {
 	public function open() {
 		if (file_exists($this->datadir->getGroupPath($this->group))) {
 			$data = unserialize(file_get_contents($this->datadir->getGroupPath($this->group)));
+			if ( !is_array($data["threadids"])
+			  || !is_array($data["articlenums"])
+			  || !is_array($data["threads"])
+			  || !is_array($data["queue"])
+			  || !is_numeric($data["lastarticlenr"]) )
+			{
+				throw new DataDirException("Invalid Datafile for {$this->group->getGroup()}!");
+			}
 			$this->threadids	= $data["threadids"];
 			$this->articlenums	= $data["articlenums"];
 			$this->threads		= $data["threads"];
+			$this->queue		= $data["queue"];
 			$this->lastarticlenr	= $data["lastarticlenr"];
 
 			/**
@@ -50,6 +60,7 @@ class CacheConnection extends AbstractConnection {
 			"threadids"	=> $this->threadids,
 			"articlenums"	=> $this->articlenums,
 			"threads"	=> $this->threads,
+			"queue"		=> $this->queue,
 			"lastarticlenr"	=> $this->lastarticlenr);
 		
 		file_put_contents($this->datadir->getGroupPath($this->group), serialize($data));
@@ -70,11 +81,19 @@ class CacheConnection extends AbstractConnection {
 		}
 	}
 
+	public function hasMessageNum($num) {
+		return (isset($this->articlenums[$num]) && $this->hasMessage($this->articlenums[$num]));
+	}
+	
 	public function getMessageByNum($num) {
 		if (isset($this->articlenums[$num])) {
 			return $this->getMessage($this->articlenums[$num]);
 		}
 		return null;
+	}
+
+	public function hasMessage($messageid) {
+		return isset($this->messages[$messageid]);
 	}
 
 	public function getMessage($messageid) {
@@ -92,6 +111,10 @@ class CacheConnection extends AbstractConnection {
 
 	public function getThreads() {
 		return $this->threads;
+	}
+
+	public function hasThread($threadid) {
+		return isset($this->threads[$threadid]);
 	}
 
 	public function getThread($threadid) {
@@ -118,12 +141,29 @@ class CacheConnection extends AbstractConnection {
 		return array_keys($this->articlenums);
 	}
 
+	public function post($message) {
+		// TODO Zugriffskontrolle
+		$this->addQueueMessage($message);
+		$this->sort();
+		return true;
+	}
+
 	/* ****** */
+
+	public function sendMessages($connection) {
+		foreach ($this->getQueueMessages() AS $messageid) {
+			$message = $this->getMessage($messageid);
+			// Nachricht posten und hier Löschen
+			$connection->post($message);
+			$this->removeMessage($message->getMessageID());
+		}
+	}
 	
 	public function loadMessages($connection) {
 		$articles = $connection->getArticleNums();
 		
 		foreach ($articles as $articlenr) {
+			// Lade nur neue Nachrichten
 			if ($articlenr > $this->getLastArticleNr()) {
 				$this->addMessage($connection->getMessage($articlenr));
 			}
@@ -131,7 +171,9 @@ class CacheConnection extends AbstractConnection {
 		$this->sort();
 	}
 	
-	public function sort() {
+	/* ****** */
+	
+	private function sort() {
 		// Sortieren
 		if (!function_exists("cmpThreads")) {
 			function cmpThreads($a, $b) {
@@ -141,8 +183,11 @@ class CacheConnection extends AbstractConnection {
 		uasort($this->threads, cmpThreads);
 	}
 
+	/**
+	 * Lade Nachrichten eines Threads aus einer Datei
+	 **/
 	private function loadThreadMessages($threadid) {
-		if ($this->getThread($threadid) === null) {
+		if (!$this->hasThread($threadid)) {
 			return;
 		}
 		
@@ -151,39 +196,74 @@ class CacheConnection extends AbstractConnection {
 			throw new Exception("Thread {$threadid} in Group {$this->getGroup} not yet initialized!");
 		}
 		$messages = unserialize(file_get_contents($filename));
+		if (!is_array($messages)) {
+			throw new DataDirException("Invalid Threadfile for {$threadid}!");
+		}
 		foreach ($messages AS $message) {
 			$this->addMessage($message);
 		}
 	}
 	
-	public function addMessage($message) {
-		// Speichere die Nachricht
+	private function addMessage($message) {
+		// Speichere die Nachricht (und Verweise auf selbige)
 		$this->messages[$message->getMessageID()] = $message;
 		$this->threadids[$message->getMessageID()] = $message->getThreadID();
 		$this->articlenums[$message->getArticleNum()] = $message->getMessageID();
 
-		// Ist Unterpost
-		if ($message->hasParentID() && isset($this->messages[$message->getParentID()])) {
+		// Letzte Artikelnummer updaten
+		if (is_numeric($message->getArticleNum())
+		  && $message->getArticleNum() > $this->lastarticlenr) {
+			$this->lastarticlenr = $message->getArticleNum();
+		}
+
+		// Ist Unterpost (und Bezugspost auch vorhanden?)
+		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
 			$this->getMessage($message->getParentID())->addChild($message);
 		}
 		
-		// Thread erstellen oder in Thread einordnen
-		if (!isset($this->threads[$message->getThreadID()])) {
+		// Thread erstellen und Nachricht in Thread einordnen
+		if (!$this->hasThread($message->getThreadID())) {
 			$this->addThread(new Thread($message));
 		}
 		$this->getThread($message->getThreadID())->addMessage($message);
+	}
 
-		// Letzte Artikelnummer updaten
-		if ($message->getArticleNum() > $this->lastarticlenr) {
-			$this->lastarticlenr = $message->getArticleNum();
+	private function removeMessage($message) {
+		// Entferne die Nachricht und Verlinkungen auf selbige
+		unset($this->messages[$message->getMessageID()]);
+		unset($this->threadids[$message->getMessageID()]);
+		unset($this->articlenums[$message->getArticleNum()]);
+
+		// TODO Entferne Verweise innerhalb der Threads und Nachrichten
+		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+			$this->getMessage($message->getParentID())->removeChild($message);
 		}
+		
+		if ($this->hasThread($message->getThreadID())) {
+			$this->getThread();
+		}
+		// TODO u.U. Letzte Artikelnummer updaten
+	}
+
+	private function getQueueMessages() {
+		return array_keys($this->queue);
+	}
+
+	private function addQueueMessage($message) {
+		$this->addMessage($message);
+		$this->queue[$message->getMessageID()] = true;
+	}
+
+	private function removeQueueMessage($message) {
+		$this->removeMessage($message);
+		unset($this->queue[$message->getMessageID()]);
 	}
 	
 	private function addThread($thread) {
 		$this->threads[$thread->getThreadID()] = $thread;
 	}
 
-	public function getLastArticleNr() {
+	private function getLastArticleNr() {
 		return $this->lastarticlenr;
 	}
 }

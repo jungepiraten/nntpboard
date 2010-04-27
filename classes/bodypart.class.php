@@ -48,17 +48,44 @@ class BodyPart {
 	
 	public function getHTML($charset = null) {
 		$text = $this->getText($charset);
-		// TODO $text bearbeiten :/
+		if (in_array(strtolower($this->getMimeType()), array("text/html", "application/xhtml+xml"))) {
+			// Erlaube kein HTML! (TODO: Auswahlmoeglichkeit einbauen)
+			$text = strip_tags($text);
+		} else {
+			$text = htmlentities($text, ENT_QUOTES, $charset);
+		}
+		// TODO Links ersetzen - Eventuell 
 		return $text;
 	}
+	
+	public function getLength() {
+		return strlen($this->text);
+	}
 
-	public function getMimeType() {
-		return ($this->mimetype === null ? null : $mime . ($this->mimesubtype !== null ? "/".$this->mimesubtype : ""));
+	/* Content-Disposition */
+	public function getDisposition() {
+		return $this->disposition;
 	}
 
 	public function isInline() {
-		// TODO *hust*
-		return true;
+		return (strtolower($this->disposition) == 'inline');
+	}
+	
+	public function isAttachment() {
+		return (strtolower($this->disposition) == 'attachment' || $this->getFilename() !== null);
+	}
+	
+	public function hasFilename() {
+		return ($this->filename !== null);
+	}
+	
+	public function getFilename() {
+		return $this->filename;
+	}
+
+	/* Content-Type */
+	public function getMimeType() {
+		return ($this->mimetype === null ? null : $this->mimetype . ($this->mimesubtype !== null ? "/".$this->mimesubtype : ""));
 	}
 
 	public function isText() {
@@ -81,24 +108,8 @@ class BodyPart {
 		return (strtolower($this->mimetype) == 'video');
 	}
 	
-	public function isAttachment() {
-		return ($this->getFilename() !== null);
-	}
-	
-	public function getSize() {
-		return strlen($this->text);
-	}
-	
-	public function getFilename() {
-		return $this->filename;
-	}
-	
 	public function getCharset() {
 		return $this->charset;
-	}
-	
-	public function getDisposition() {
-		return $this->disposition;
 	}
 }
 

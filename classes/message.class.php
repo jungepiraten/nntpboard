@@ -6,26 +6,30 @@ class Message {
 	private $articlenum;
 	private $messageid;
 	private $threadid;
-	private $parentid;
+	private $parentid = null;
+	private $parentartnum = null;
 	private $charset = "UTF-8";
 	private $subject;
 	private $date;
-	private $sender;
+	private $author;
+	private $mime = null;
 	private $parts = array();
 	private $childs = array();
 	
 	private $group;
 	
-	public function __construct($group, $articlenum, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid) {
+	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $threadid, $parentid, $parentartnum) {
 		$this->group = $group;
 		$this->articlenum = $articlenum;
 		$this->messageid = $messageid;
 		$this->date = $date;
-		$this->sender = $sender;
+		$this->author = $author;
 		$this->subject = $subject;
 		$this->charset = $charset;
 		$this->threadid = $threadid;
 		$this->parentid = $parentid;
+		$this->parentartnum = $parentartnum;
+		$this->mime = $mime;
 	}
 	
 	public function getArticleNum() {
@@ -40,15 +44,22 @@ class Message {
 		return $this->threadid !== null ? $this->threadid : $this->getMessageID();
 	}
 
-	public function hasParentID() {
+	public function hasParent() {
 		return $this->parentid !== null;
 	}
 
 	public function getParentID() {
-		if (! $this->hasParentID()) {
+		if (! $this->hasParent()) {
 			return null;
 		}
 		return $this->parentid;
+	}
+
+	public function getParentArtNum() {
+		if (! $this->hasParent()) {
+			return null;
+		}
+		return $this->parentartnum;
 	}
 
 	public function getSubject($charset = null) {
@@ -62,11 +73,11 @@ class Message {
 		return $this->date;
 	}
 
-	public function getSender($charset = null) {
+	public function getAuthor($charset = null) {
 		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getSender());
+			return iconv($this->getCharset(), $charset, $this->getAuthor());
 		}
-		return $this->sender;
+		return $this->author;
 	}
 	
 	public function getCharset() {
@@ -106,12 +117,73 @@ class Message {
 		}
 	}
 	
+	public function isMime() {
+		return ($this->mime !== null);
+	}
+
+	public function getMimeType() {
+		return $this->mime;
+	}
+	
 	public function addChild($msg) {
 		$this->childs[] = $msg->getMessageID();
 	}
 	
 	public function getGroup() {
 		return $this->group;
+	}
+
+	public function getPlain($charset = null) {
+		if ($charset === null) {
+			$charset = $this->getCharset();
+		}
+		mb_internal_encoding($charset);
+		
+		$crlf = "\r\n";
+		
+		$data  = "Message-ID: " . $this->getMessageID() . $crlf;
+		$data .= "From: " . $this->getAuthor()->getIMFString() . $crlf;
+		$data .= "Date: " . date("r", $this->getDate()) . $crlf;
+		$data .= "Subject: " . mb_encode_mimeheader($this->getSubject($charset), $charset) . $crlf;
+		$data .= "Newsgroups: " . $this->getGroup() . $crlf;
+		if ($this->hasParent()) {
+			$data .= "References: " . $this->getParentID() . $crlf;
+		}
+		$data .= "User-Agent: " . "NNTPBoard" . $crlf;
+		if ($this->isMime()) {
+			// TODO boundary generieren
+			$boundary = rand(1000,9999) . "~" . microtime(true) . "~NNTPBoard";
+			$data .= "Content-Type: multipart/" . $this->getMimeType() . "; boundary=\"" . addcslashes($boundary, "\"") . "\"" . $crlf;
+			$data .= $crlf;
+			$data .= "This is a MIME-Message." . $crlf;
+
+			$parts = $this->getBodyParts();
+		} else {
+			$parts = array( array_shift($this->getBodyParts()) );
+		}
+		
+		$disposition = false;
+		foreach ($parts AS $part) {
+			if (!empty($boundary)) {
+				$data .= "--" . $boundary . $crlf;
+			}
+			$data .= "Content-Type: " . $part->getMimeType() . "; Charset=\"" . addcslashes($charset, "\"") . "\"" . $crlf;
+			if ($disposition) {
+				$data .= "Content-Disposition: " . $part->getDisposition() . ($part->hasFilename() ? "; filename=\"".addcslashes($part->getFilename(), "\"")."\"" : "") . $crlf;
+			}
+			$disposition = true;
+			// TODO base64 ist kein allheilmittel :P
+			$data .= "Content-Transfer-Encoding: " . "base64" . $crlf;
+			$data .= $crlf;
+
+			$data .= rtrim(chunk_split(base64_encode($part->getText($content)), 76, $crlf), $crlf) . $crlf;
+			$data .= $crlf;
+		}
+		if ($this->isMime()) {
+			$data .= "--" . $boundary . "--";
+		}
+
+		return $data;
 	}
 }
 

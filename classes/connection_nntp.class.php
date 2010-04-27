@@ -71,8 +71,16 @@ class NNTPConnection extends AbstractConnection {
 		$this->nntpclient->disconnect();
 	}
 
+	public function hasMessage($msgid) {
+		return $this->hasMessageNum($msgid);
+	}
+
 	public function getMessage($msgid) {
 		return $this->getMessageByNum($msgid);
+	}
+
+	public function hasMessageNum($num) {
+		return (isset($this->messages[$num]) || true);
 	}
 	
 	public function getMessageByNum($i) {
@@ -100,14 +108,16 @@ class NNTPConnection extends AbstractConnection {
 		// Default: Neuer Thread
 		$threadid = $messageid;
 		$parentid = null;
+		$parendnum = null;
 
 		// Zuerst via References-Header
 		if (isset($header["references"]) && trim($header["references"]->getValue()) != "") {
 			$references = explode(" ", preg_replace("#\s+#", " ", $header["references"]->getValue()));
-			$parentid = array_pop($references);
-			$message = $this->getMessage($parentid);
+			$message = $this->getMessage(array_pop($references));
 			if ($message != null) {
 				$threadid = $message->getThreadID();
+				$parentid = $message->getMessageID();
+				$parentnum = $message->getArticleNum();
 			}
 		}
 
@@ -118,22 +128,28 @@ class NNTPConnection extends AbstractConnection {
 			if ($message != null) {
 				$threadid = $message->getThreadID();
 				$parentid = $message->getMessageID();
+				$parentnum = $message->getArticleNum();
 			}
 		}
 		
-		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid);
+		$mimetype = null;
+		if (isset($header["content-type"])
+		 && substr($header["content-type"]->getValue(),0,9) == "multipart") {
+			$mimetype = substr($header["content-type"]->getValue(),10);
+		}
+		
+		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid, $parentnum, $mimetype);
 		
 		/** Strukturanalyse des Bodys **/
 		$body = implode("\n", $this->nntpclient->getBody($messageid));
 		/** MIME-Handling (RFC 1341) **/
-		if (isset($header["content-type"])
-		 && substr($header["content-type"]->getValue(),0,9) == "multipart"
-		 && $header["content-type"]->hasExtra("boundary"))
+		if ($mimetype != null && $header["content-type"]->hasExtra("boundary"))
 		{
 			$parts = explode("--" . $header["content-type"]->getExtra("boundary"), $body);
 			// Der erste (This is an multipart ...) und letzte Teil (--) besteht nur aus Sinnlosem Inhalt
 			array_pop($parts);
 			array_shift($parts);
+			
 			foreach ($parts AS $p => $part) {
 				list($part_header,$part_body) = preg_split("$\r?\n\r?\n$", $part, 2);
 				$message->addBodyPart($this->parseBodyPart($message, $p, $part_header, $part_body));
@@ -165,6 +181,13 @@ class NNTPConnection extends AbstractConnection {
 		return $this->threads;
 	}
 
+	public function hasThread($threadid) {
+		if (!isset($this->threads)) {
+			return false;
+		}
+		return isset($this->threads[$threadid]);
+	}
+
 	public function getThread($threadid) {
 		if (!isset($this->threads)) {
 			$this->initThreads();
@@ -185,6 +208,14 @@ class NNTPConnection extends AbstractConnection {
 
 	public function getArticleNums() {
 		return $this->articles;
+	}
+
+	public function post($message) {
+		$ret = $this->nntpclient->post($message->getPlain());
+		if ($ret instanceof PEAR_Error) {
+			throw new Exception($ret->getMessage());
+		}
+		return $ret;
 	}
 
 	/* *** */

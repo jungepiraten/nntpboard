@@ -31,15 +31,30 @@ abstract class NNTPBoardSmarty extends Smarty {
 	}
 	
 	public function viewmessage($board, $thread, $message) {
+		header("Location: viewthread.php?boardid={$board->getBoardID()}&threadid={$message->getThreadID()}#article{$message->getArticleNum()}");
+		exit;
+	}
+
+	public function viewpostform($board, $reference = null) {
+		$subject = "";
+		if ($reference !== null) {
+			$subject = $reference->getSubject();
+			$this->assign("reference", $reference->getMessageID());
+			$this->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
+		}
+		
 		$this->assign("board", $board);
-		$this->assign("thread", $thread);
-		$this->assign("message", $message);
-		$this->display("viewmessage.html.tpl");
+		$this->display("postform.html.tpl");
+	}
+
+	public function viewpostsuccess($board, $message) {
+		$this->viewmessage($board, null, $message);
 	}
 }
 
 class ViewBoardSmarty extends NNTPBoardSmarty {}
 class ViewThreadSmarty extends NNTPBoardSmarty {}
+class PostSmarty extends NNTPBoardSmarty {}
 
 /**
 * Smarty {redirect} function plugin

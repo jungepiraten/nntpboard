@@ -9,8 +9,11 @@ interface iConnection {
 
 	public function getThreads();
 	public function getArticleNums();
+	public function hasMessageNum($num);
 	public function getMessageByNum($num);
+	public function hasMessage($msgid);
 	public function getMessage($msgid);
+	public function hasThread($threadid);
 	public function getThread($threadid);
 	
 	public function getLastPostMessageID();
@@ -18,6 +21,8 @@ interface iConnection {
 	public function getLastPostDate();
 	public function getLastPostAuthor($charset = null);
 	public function getLastPostThreadID();
+
+	public function post($message);
 }
 
 abstract class AbstractConnection implements iConnection {

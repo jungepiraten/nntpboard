@@ -31,10 +31,11 @@ $disposition = $part->getDisposition();
 $filename = $part->getFilename();
 $charset = $part->getCharset();
 
+// see RFC 2616 for these Headers
 header("Content-Type: ".$part->getMimeType() . (empty($charset) ? "" : "; Charset=".$charset));
+header("Content-Length: ".$part->getLength());
 if (!empty($disposition)) {
-	// TODO "quoted string" http://www.faqs.org/rfcs/rfc2616
-	header("Content-Disposition: " . $disposition . (empty($filename) ? "" : "; filename=".$filename));
+	header("Content-Disposition: " . $disposition . (empty($filename) ? "" : "; filename=\"".addslashes($filename)."\""));
 }
 
 print($part->getText());

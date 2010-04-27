@@ -6,10 +6,12 @@
 {assign var=boardid value=$board->getBoardID()}
 {assign var=group value=$board->getGroup()}
 
+<a href="post.php?boardid={$boardid}&amp;reference={$thread->getThreadID()}">Antworten</a>
+
 <table>
 {foreach from=$messages item=message}
 <tr class="message">
- <th class="meta"><a name="article{$message->getArticleNum()|escape:html}"></a>{$message->getSender()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
+ <th class="meta"><a name="article{$message->getArticleNum()|escape:html}"></a>{$message->getAuthor()}<br />{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</th>
  <td class="body">
   {foreach from=$message->getBodyParts() key=partid item=part}
   <div class="bodypart">
@@ -17,12 +19,10 @@
   {assign var=attachmentlink value=$DATADIR->getAttachmentWebPath($group,$part)}
   {if     $part->isInline() && $part->isText()}
    <pre>{$part->getHTML("UTF-8")}</pre>
-  {elseif $part->isInline() && $part->isAttachment() && $part->isImage()}
+  {elseif $part->isInline() && $part->isImage()}
    <img src="{$attachmentlink}" width="300px" />
-  {elseif $part->isAttachment()}
-   <a href="{$attachmentlink}">{$part->getFilename()}</a>
   {else}
-   Attachment vorhanden, kann aber nicht angezeigt werden. Bitte melde diesen Fehler!
+   <a href="{$attachmentlink}">{$part->getFilename()}</a>
   {/if}
   </div>
   {/foreach}

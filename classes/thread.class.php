@@ -17,7 +17,7 @@ class Thread {
 		$this->threadid = $message->getThreadID();
 		$this->subject = $message->getSubject();
 		$this->date = $message->getDate();
-		$this->author = $message->getSender();
+		$this->author = $message->getAuthor();
 		$this->group = $message->getGroup();
 		$this->charset = $message->getCharset();
 	}
@@ -39,7 +39,7 @@ class Thread {
 			if ($message->getDate() > $this->lastpostdate) {
 				$this->lastpostmessageid = $message->getMessageID();
 				$this->lastpostdate = $message->getDate();
-				$this->lastpostauthor = $message->getSender($this->getCharset());
+				$this->lastpostauthor = $message->getAuthor($this->getCharset());
 			}
 			$this->messages[] = $message->getMessageID();
 		}

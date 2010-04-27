@@ -1,5 +1,7 @@
 <?php
 
+class DataDirException extends Exception {}
+
 class DataDir {
 	private $dir;
 	private $webdir;
@@ -62,9 +64,6 @@ class DataDir {
 	public function getAttachmentWebpath($group, $part) {
 		return $this->getWebPath($this->getAttachmentfilename($group, $part));
 	}
-}
-
-class WebDataDir extends DataDir {
 }
 
 ?>
