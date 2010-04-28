@@ -28,7 +28,10 @@ if ($reference !== null) {
 	$reference = $connection->getMessage($reference);
 }
 
+$connection->close();
+
 if (isset($_REQUEST["post"])) {
+	// TODO Sperre gegen F5
 	// Die Artikelnummer wird erst durch den Newsserver zugewiesen
 	$articlenum = null;
 	// TODO MessageID generieren
@@ -56,15 +59,15 @@ if (isset($_REQUEST["post"])) {
 	$bodypart = new BodyPart($message, 0, $disposition, $mimetype, $text, $charset);
 	$message->addBodyPart($bodypart);
 	
-	$connection->open();
 	try {
+		$connection->open();
 		$connection->post($message);
+		$connection->close();
+		$smarty->viewpostsuccess($board, $message);
 	} catch (Exception $e) {
 		// TODO Fehler anzeigen
 		var_dump($e);
 	}
-	$connection->close();
-	$smarty->viewpostsuccess($board, $message);
 }
 
 $smarty->viewpostform($board, $reference);

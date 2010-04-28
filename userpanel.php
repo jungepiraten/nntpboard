@@ -15,7 +15,7 @@ if (isset($_REQUEST["login"])) {
 		$auth = $config->getAuth($user, $pass);
 		$session->login($auth);
 		$smarty->viewloginsuccess($auth);
-	} catch (LoginException $e) {
+	} catch (AuthException $e) {
 		$smarty->viewloginfailed();
 		exit;
 	}

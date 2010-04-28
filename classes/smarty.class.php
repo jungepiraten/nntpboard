@@ -68,13 +68,19 @@ abstract class NNTPBoardSmarty extends Smarty {
 	}
 
 	public function viewloginsuccess($auth) {
+		// Da sich nach einem erfolgreichen Login das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->assign("auth", $auth);
-		echo "Login erfolgreich! Back dir nen eis!";
+		
+		header("Location: userpanel.php");
+		exit;
 	}
 
 	public function viewlogoutsuccess() {
+		// Da sich nach einem erfolgreichen Logout das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->assign("auth", null);
-		echo "Du wurdest abgemeldet! Freu dich!";
+		
+		header("Location: userpanel.php");
+		exit;
 	}
 	
 	public function viewuserpanel() {

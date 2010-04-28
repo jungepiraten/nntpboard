@@ -4,6 +4,9 @@ interface Connection {
 	public function open();
 	public function close();
 
+	public function mayRead();
+	public function mayPost();
+
 	public function getThreadCount();
 	public function getMessagesCount();
 
@@ -22,11 +25,32 @@ interface Connection {
 	public function getLastPostAuthor($charset = null);
 	public function getLastPostThreadID();
 
-	public function mayPost();
 	public function post($message);
 }
 
 abstract class AbstractConnection implements Connection {
+	private $mayRead = false;
+	private $mayPost = false;
+
+	public function __construct($mayread, $maypost, $moderated) {
+		$this->mayRead = $mayread;
+		$this->mayPost = $maypost;
+		$this->moderated = $moderated;
+	}
+	
+	public function mayRead() {
+		return $this->mayRead;
+	}
+
+	public function mayPost() {
+		return $this->mayPost;
+	}
+	
+	public function isModerated() {
+		return $this->moderated;
+	}
+	
+	
 	abstract protected function getLastThread();
 
 	public function getLastPostMessageID() {

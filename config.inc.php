@@ -12,17 +12,17 @@ class Config extends DefaultConfig {
 		$this->boards[null] = new Board(null, "NNTPBoard", "Description", null);
 
 		$board = new Board(1, "Nerdnacht DE", "Zum testen halt ;)",
-		                   new Group(new Host("news.nerdnacht.de"), "nerdnacht.de"));
+		    new Group(new Host("news.nerdnacht.de"), "nerdnacht.de", Group::READMODE_OPEN, Group::POSTMODE_AUTH));
 		$this->boards[null]->addSubBoard($board);
 		$this->boards[$board->getBoardID()] = $board;
 
 		$board = new Board(2, "Testboard", "Anderes Board",
-		                   new Group(new Host("news.nerdnacht.de"), "nerdnacht.test"));
+		    new Group(new Host("news.nerdnacht.de"), "nerdnacht.test", Group::READMODE_OPEN, Group::POSTMODE_AUTH));
 		$this->boards[1]->addSubBoard($board);
 		$this->boards[$board->getBoardID()] = $board;
 
-		$board = new Board(3, "Testbasis prauscher", "Prauschers Testbasis",
-		                   new Group(new Host("news.nerdnacht.de"), "prauscher.test"));
+		$board = new Board(3, "Testbasis prauscher", "Prauschers Testbasis. MODERIERT!",
+		    new Group(new Host("news.nerdnacht.de"), "prauscher.test", Group::READMODE_OPEN, Group::POSTMODE_MODERATED_AUTH));
 		$this->boards[null]->addSubBoard($board);
 		$this->boards[$board->getBoardID()] = $board;
 	}

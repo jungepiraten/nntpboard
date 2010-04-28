@@ -9,6 +9,6 @@ interface Auth {
 
 abstract class AbstractAuth implements Auth {}
 
-class LoginException extends Exception {}
+class AuthException extends Exception {}
 
 ?>

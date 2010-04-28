@@ -39,6 +39,13 @@ class BodyPart {
 		return $this->partid;
 	}
 	
+	/**
+	 * getText()
+	 * @param	$charset	String
+	 * 	Zu verwendender Zeichensatz im Rueckgabewert. vgl. iconv
+	 * @return	String
+	 *	Body der Nachricht im Zeichensatz $charset
+	 **/
 	public function getText($charset = null) {
 		if ($charset !== null) {
 			return iconv($this->getCharset(), $charset, $this->getText());
@@ -48,10 +55,20 @@ class BodyPart {
 		return $this->text;
 	}
 	
+	/**
+	 * getHTML()
+	 * @param	$charset	String
+	 * 	Zu benutzender Zeichensatz. vgl. getText()
+	 * @param	$allowhtml	boolean, String
+	 *	HTML erlauben (nur falls Body HTML enthaelt)? false fuer nein,
+	 * 	true fuer ja, beliebiger String fuer erlaubte tags, vgl. strip_tags
+	 * @return
+	 * 	Body der Nachricht im Zeichensatz $charset mit HTML-Tags
+	 **/
 	public function getHTML($charset = null, $allowhtml = false) {
 		$text = $this->getText($charset);
 		if (in_array(strtolower($this->getMimeType()), array("text/html", "application/xhtml+xml"))) {
-			// Erlaube kein HTML! (TODO: 2. Parameter benutzen ;) )
+			// Erlaube kein HTML!
 			if (is_string($allowhtml)) {
 				$text = strip_tags($text, $allowhtml);
 			} elseif ($allowhtml !== true) {

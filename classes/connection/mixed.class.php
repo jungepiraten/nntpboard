@@ -21,6 +21,7 @@ class MixedConnection extends AbstractConnection {
 	private function getConnection($use) {
 		if (isset($this->connections[$use])) {
 			$connection = $this->connections[$use];
+			// Verbindung oeffnen, falls noch nicht geschehen
 			if (!in_array($use, $this->openconnections)) {
 				$connection->open();
 				$this->openconnections[] = $use;
@@ -36,9 +37,19 @@ class MixedConnection extends AbstractConnection {
 	/** Wir oeffnen die Verbindung bei bedarf **/
 	public function open() {}
 	public function close() {
-		foreach ($this->openconnections AS $use) {
+		while (count($this->openconnections) > 0) {
+			$use = array_shift($this->openconnections);
 			$this->connections[$use]->close();
 		}
+	}
+
+	// TODO mayRead & mayPost ohne getConnection ausstatten
+	public function mayRead() {
+		return $this->getConnection(self::USE_READ)->mayRead();
+	}
+
+	public function mayPost() {
+		return $this->getConnection(self::USE_POST)->mayPost();
 	}
 
 	public function getThreadCount() {
@@ -77,13 +88,17 @@ class MixedConnection extends AbstractConnection {
 		return $this->getConnection(self::USE_READ)->getLastThread();
 	}
 
-	public function mayPost() {
-		return $this->getConnection(self::USE_POST)->mayPost();
-	}
-
 	public function post($message) {
-		// TODO wenn auf einer Direkten Verbindung gepostet wird, steht die neue nachricht noch nicht im cache
-		return $this->getConnection(self::USE_POST)->post($message);
+		// Mache die eigentliche Post-Leitung zuerst, um Sync-Fehler zu verhindern
+		$ret = $this->getConnection(self::USE_POST)->post($message);
+		foreach (array_keys($this->connections) AS $use) {
+			// USE_POST haben wir ja schon gemacht
+			if ($use != self::USE_POST) {
+				$connection = $this->getConnection($use);
+				$connection->post($message);
+			}
+		}
+		return $ret;
 	}
 }
 

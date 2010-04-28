@@ -13,7 +13,6 @@ require_once(dirname(__FILE__)."/../bodypart.class.php");
 class CacheConnection extends AbstractConnection {
 	private $group;
 	private $datadir;
-	private $isreadonly = false;
 
 	// MessageID => Message
 	private $messages = array();
@@ -25,13 +24,13 @@ class CacheConnection extends AbstractConnection {
 	private $threads = array();
 	// MessageID => true
 	private $queue = array();
-
+	
 	private $lastarticlenr = 0;
 	
-	public function __construct($group, $datadir, $isreadonly = false) {
+	public function __construct($group, $datadir, $mayread = false, $maypost = false, $moderated = false) {
+		parent::__construct($mayread, $maypost, $moderated);
 		$this->group = $group;
 		$this->datadir = $datadir;
-		$this->isreadonly = $isreadonly;
 	}
 	
 	public function open() {
@@ -110,16 +109,16 @@ class CacheConnection extends AbstractConnection {
 		return null;
 	}
 
-	public function getThreads() {
-		return $this->threads;
-	}
-
 	public function hasThread($threadid) {
 		return isset($this->threads[$threadid]);
 	}
 
 	public function getThread($threadid) {
 		return $this->threads[$threadid];
+	}
+
+	public function getThreads() {
+		return $this->threads;
 	}
 
 	public function getThreadCount() {
@@ -142,13 +141,13 @@ class CacheConnection extends AbstractConnection {
 		return array_keys($this->articlenums);
 	}
 
-	public function mayPost() {
-		return !$this->isreadonly;
-	}
-
 	public function post($message) {
 		if (!$this->mayPost()) {
 			throw new Exception("Read-Only Newsgroup");
+		}
+		// Moderierte Nachrichten kommen via NNTP rein (direkt ueber addMessage)
+		if ($this->isModerated()) {
+			throw new Exception("Moderated Newsgroup - Please wait for Moderation");
 		}
 		$this->addQueueMessage($message);
 		$this->sort();
@@ -157,7 +156,7 @@ class CacheConnection extends AbstractConnection {
 	/* ****** */
 
 	public function sendMessages($connection) {
-		foreach ($this->getQueueMessages() AS $messageid) {
+		foreach ($this->getQueue() AS $messageid) {
 			$message = $this->getMessage($messageid);
 			// Nachricht posten und hier Löschen
 			$connection->post($message);
@@ -171,7 +170,7 @@ class CacheConnection extends AbstractConnection {
 		foreach ($articles as $articlenr) {
 			// Lade nur neue Nachrichten
 			if ($articlenr > $this->getLastArticleNr()) {
-				$this->addMessage($connection->getMessage($articlenr));
+				$this->addMessage($connection->getMessageByNum($articlenr));
 			}
 		}
 		$this->sort();
@@ -232,37 +231,73 @@ class CacheConnection extends AbstractConnection {
 			$this->addThread(new Thread($message));
 		}
 		$this->getThread($message->getThreadID())->addMessage($message);
+
+		/**
+		 * Wenn wir die Nachricht vom NNTP bekommen haben, koennen wir ihn aus der Queue streichen
+		 * Wenn diese Nachricht aus der Queue kommt, wird sie gleich in die Queue eingetragen
+		 */
+		if (!$queue && $this->hasQueued($message->getMessageID())) {
+			$this->removeQueue($message->getMessageID());
+		}
 	}
 
-	private function removeMessage($message) {
+	private function removeMessage($messageid) {
+		$message = $this->getMessage($messageid);
 		// Entferne die Nachricht und Verlinkungen auf selbige
 		unset($this->messages[$message->getArticleNum()]);
 		unset($this->threadids[$message->getArticleNum()]);
 		unset($this->articlenums[$message->getMessageID()]);
 
-		// TODO Entferne Verweise innerhalb der Threads und Nachrichten
+		// u.U. die neueste LastArticleNr suchen
+		if (is_numeric($message->getArticleNum())
+		  && $message->getArticleNum() >= $this->lastarticlenr) {
+			$this->lastarticlenr = 0;
+			foreach ($this->getArticleNums() AS $anum) {
+				if ($anum > $this->lastarticlenr) {
+					$this->lastarticlenr = $anum;
+				}
+			}
+		}
+
+		// TODO was passiert mit den Kindelementen von $message?
+		/*foreach ($message->getChilds() AS $messageid) {
+			$this->getMessage($messageid)->setParentID($messsage->hasParentID() ? $message->getParentID() : null);
+		}*/
+		// Verlinkungen der Vaterelemente loesen
 		if ($message->hasParent() && $this->hasMessageNum($message->getParentID())) {
 			$this->getMessage($message->getParentID())->removeChild($message);
 		}
 		
+		// Nachricht aus dem Thread haengen
 		if ($this->hasThread($message->getThreadID())) {
-			$this->getThread();
+			$this->getThread($message->getThreadID())->removeMessage($message);
 		}
-		// TODO u.U. Letzte Artikelnummer updaten
-	}
-
-	private function getQueueMessages() {
-		return array_keys($this->queue);
 	}
 
 	private function addQueueMessage($message) {
 		$this->addMessage($message);
+		$this->addQueue($message);
+	}
+
+	private function removeQueueMessage($messageid) {
+		$this->removeMessage($messageid);
+		$this->removeQueue($messageid);
+	}
+
+	private function getQueue() {
+		return array_keys($this->queue);
+	}
+	
+	private function hasQueued($messageid) {
+		return isset($this->queue[$messageid]);
+	}
+
+	private function addQueue($message) {
 		$this->queue[$message->getMessageID()] = true;
 	}
 
-	private function removeQueueMessage($message) {
-		$this->removeMessage($message);
-		unset($this->queue[$message->getMessageID()]);
+	private function removeQueue($messageid) {
+		unset($this->queue[$messageid]);
 	}
 	
 	private function addThread($thread) {

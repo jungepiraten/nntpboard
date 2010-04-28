@@ -1,5 +1,6 @@
 <?php
 
+// http://pear.php.net/package/Net_NNTP
 require_once("Net/NNTP/Client.php");
 
 require_once(dirname(__FILE__)."/../connection.class.php");
@@ -35,13 +36,20 @@ class NNTPConnection extends AbstractConnection {
 	private $username;
 	private $password;
 
+	// ThreadID => Thread | Muss null sein - wird erst spaeter initialisiert (vgl. initThreads())
 	private $threads = null;
+	// ArtikelNum => MessageID
+	private $articlenums = array();
+	// MessageID => ArtikelNum
+	private $messageids = array();
+	// MessageID => Message
 	private $messages = array();
-	private $articles = array();
 
 	private $nntpclient;
 	
-	public function __construct($group, $auth) {
+	public function __construct($group, $auth, $mayread = false, $maypost = false, $moderated = false) {
+		parent::__construct($mayread, $maypost, $moderated);
+
 		$this->group = $group;
 		if ($auth instanceof Auth) {
 			$this->username = $auth->getNNTPUsername();
@@ -66,7 +74,16 @@ class NNTPConnection extends AbstractConnection {
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
-		$this->articles = $ret["articles"];
+		// Warning: Non Standard!
+		$articles = $this->nntpclient->getOverview($ret["first"]."-".$ret["last"]);
+		if (PEAR::isError($articles)) {
+			throw new Exception($ret);
+		} else {
+			foreach ($articles AS $article) {
+				$this->articlenums[$article["Number"]] = $article["Message-ID"];
+				$this->messageids[$article["Message-ID"]] = $article["Number"];
+			}
+		}
 	}
 	
 	public function close() {
@@ -74,95 +91,36 @@ class NNTPConnection extends AbstractConnection {
 	}
 
 	public function hasMessage($msgid) {
-		return $this->hasMessageNum($msgid);
+		return isset($this->messageids[$msgid]);
 	}
 
 	public function getMessage($msgid) {
-		return $this->getMessageByNum($msgid);
+		if (isset($this->messages[$msgid])) {
+			return $this->messages[$msgid];
+		}
+		if (isset($this->articlenums[$msgid])) {
+			return $this->getMessageByNum($this->articlenums[$msgid]);
+		}
+		return null;
 	}
 
-	public function hasMessageNum($num) {
-		return (isset($this->messages[$num]) || true);
+	public function hasMessageNum($artnr) {
+		return isset($this->messageids[$artnr]);
 	}
 	
-	public function getMessageByNum($i) {
-		if (isset($this->messages[$i])) {
-			return $this->messages[$i];
+	public function getMessageByNum($artnr) {
+		/* Nachricht im Cache vorhanden? */
+		if (isset($this->messageids[$artnr]) && isset($this->messages[$this->messageids[$artnr]])) {
+			return $this->getMessage($this->messageids[$artnr]);
 		}
 		
-		// TODO Versuche, die ArtikelNummer herauszufinden, wenn $i eine MessageID war
-		$artnr = $i;
-
-		$header_lines = $this->nntpclient->getHeader($artnr);
-		$header = $this->parseHeaderLines($header_lines);
-
-		$messageid = isset($header["message-id"]) ? $header["message-id"]->getValue() : null;
-		$subject = isset($header["subject"]) ? $header["subject"]->getValue() : null;
-		$date = isset($header["date"]) ? strtotime($header["date"]->getValue()) : null;
-		$sender = isset($header["from"]) ? $this->parseAddress(array_shift(explode(",", $header["from"]->getValue()))) : null;
-		$charset = isset($header["content-type"]) && $header["content-type"]->hasExtra("charset") ? $header["content-type"]->getExtra("charset") : "UTF-8";
-
-		// Sperre die Cache-Eintraege, um Endlos-Schleifen zu verhindern
-		$this->messages[$artnr] = false;
-		$this->messages[$messageid] = false;
-
-		/** Thread finden **/
-		// Default: Neuer Thread
-		$threadid = $messageid;
-		$parentid = null;
-		$parendnum = null;
-
-		// Zuerst via References-Header
-		if (isset($header["references"]) && trim($header["references"]->getValue()) != "") {
-			$references = explode(" ", preg_replace("#\s+#", " ", $header["references"]->getValue()));
-			$message = $this->getMessage(array_pop($references));
-			if ($message != null) {
-				$threadid = $message->getThreadID();
-				$parentid = $message->getMessageID();
-				$parentnum = $message->getArticleNum();
-			}
-		}
-
-		/* Der XRef-Header kann die Daten jetzt noch mal ueberschreiben
-		 * Eigentlich sollte XRef was ganz anderes bewirken (vgl. RFC 1036 / 2.2.13)
-		$xref = isset($header["xref"]) ? preg_match("#^(.*) (.*):([0-9]*)$#U", $header["xref"]->getValue(), $m) : null;
-		if ($xref != null) {
-			$message = $this->getMessageByNum($m[3]);
-			if ($message != null) {
-				$threadid = $message->getThreadID();
-				$parentid = $message->getMessageID();
-				$parentnum = $message->getArticleNum();
-			}
-		}*/
+		$message = $this->parseMessage($this->nntpclient->getHeader($artnr), implode("\n", $this->nntpclient->getBody($artnr)));
 		
-		$mimetype = null;
-		if (isset($header["content-type"])
-		 && substr($header["content-type"]->getValue(),0,9) == "multipart") {
-			$mimetype = substr($header["content-type"]->getValue(),10);
-		}
-		
-		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid, $parentnum, $mimetype);
-		
-		/** Strukturanalyse des Bodys **/
-		$body = implode("\n", $this->nntpclient->getBody($messageid));
-		/** MIME-Handling (RFC 1341) **/
-		if ($mimetype != null && $header["content-type"]->hasExtra("boundary"))
-		{
-			$parts = explode("--" . $header["content-type"]->getExtra("boundary"), $body);
-			// Der erste (This is an multipart ...) und letzte Teil (--) besteht nur aus Sinnlosem Inhalt
-			array_pop($parts);
-			array_shift($parts);
-			
-			foreach ($parts AS $p => $part) {
-				list($part_header,$part_body) = preg_split("$\r?\n\r?\n$", $part, 2);
-				$message->addBodyPart($this->parseBodyPart($message, $p, $part_header, $part_body));
-			}
-		} else {
-			$message->addBodyPart($this->parseBodyPart($message, 0, $header_lines, $body));
-		}
-		
-		$this->messages[$artnr] = $message;
+		/* Nachricht im Kurzzeit-Cache unterbringen */
+		$this->artikelnums[$message->getMessageID()] = $artnr;
+		$this->messageids[$artnr] = $message->getMessageID();
 		$this->messages[$message->getMessageID()] = $message;
+
 		return $message;
 	}
 
@@ -210,17 +168,13 @@ class NNTPConnection extends AbstractConnection {
 	}
 
 	public function getArticleNums() {
-		return $this->articles;
-	}
-
-	public function mayPost() {
-		// TODO wie kann ich sowas unter NNTP rauskriegen? *kopfkratz*
-		return true;
+		return array_keys($this->articlenums);
 	}
 
 	public function post($message) {
 		$ret = $this->nntpclient->post($message->getPlain());
 		if ($ret instanceof PEAR_Error) {
+			// TODO eigene fehlerexceptions schreiben und hier werfen
 			throw new Exception("Could not Post Message to {$this->group->getGroup()}: " . $ret->getMessage() . " / " . $ret->getUserInfo());
 		}
 		return $ret;
@@ -230,7 +184,7 @@ class NNTPConnection extends AbstractConnection {
 
 	private function initThreads() {
 		$this->threads = array();
-		foreach ($this->articles AS $artnr) {
+		foreach ($this->getArticleNums() AS $artnr) {
 			$message = $this->getMessage($artnr);
 
 			if (isset($this->threads[$message->getThreadID()])) {
@@ -240,12 +194,73 @@ class NNTPConnection extends AbstractConnection {
 			}
 		}
 	}
+	
+	private function parseMessage($header_lines, $body) {
+		/* Nachricht  */
+		$header = $this->parseHeaderLines($header_lines);
+
+		/* Lese Header */
+		$messageid = isset($header["message-id"]) ? $header["message-id"]->getValue() : null;
+		$subject = isset($header["subject"]) ? $header["subject"]->getValue() : null;
+		$date = isset($header["date"]) ? strtotime($header["date"]->getValue()) : null;
+		$sender = isset($header["from"]) ? $this->parseAddress(array_shift(explode(",", $header["from"]->getValue()))) : null;
+		$charset = isset($header["content-type"]) && $header["content-type"]->hasExtra("charset") ? $header["content-type"]->getExtra("charset") : "UTF-8";
+
+		// Sperre den Cache-Eintrag, um eine Endlosschleife zu vermeiden
+		$this->messages[$messageid] = false;
+
+		/* Thread finden */
+
+		// Default: Neuer Thread
+		$threadid = $messageid;
+		$parentid = null;
+		$parendnum = null;
+
+		// References
+		if (isset($header["references"]) && trim($header["references"]->getValue()) != "") {
+			$references = explode(" ", preg_replace("#\s+#", " ", $header["references"]->getValue()));
+			$message = $this->getMessage(array_pop($references));
+			if ($message != null) {
+				$threadid = $message->getThreadID();
+				$parentid = $message->getMessageID();
+				$parentnum = $message->getArticleNum();
+			}
+		}
+		
+		/* MIME-Nachrichten */
+		$mimetype = null;
+		if (isset($header["content-type"])
+		 && substr($header["content-type"]->getValue(),0,9) == "multipart") {
+			$mimetype = substr($header["content-type"]->getValue(),10);
+		}
+		
+		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid, $parentnum, $mimetype);
+		
+		/* Strukturanalyse des Bodys */
+		if ($mimetype != null && $header["content-type"]->hasExtra("boundary")) {
+			$parts = explode("--" . $header["content-type"]->getExtra("boundary"), $body);
+			// Der erste (This is an multipart ...) und letzte Teil (--) besteht nur aus Sinnlosem Inhalt
+			array_pop($parts);
+			array_shift($parts);
+			
+			foreach ($parts AS $p => $part) {
+				list($part_header,$part_body) = preg_split("$\r?\n\r?\n$", $part, 2);
+				$message->addBodyPart($this->parseBodyPart($message, $p, $part_header, $part_body));
+			}
+		} else {
+			$message->addBodyPart($this->parseBodyPart($message, 0, $header_lines, $body));
+		}
+		
+		return $message;
+	}
 
 	private function parseHeaderLines($header_data) {
 		if (!is_array($header_data)) {
 			$header_data = preg_split("$\r?\n$", $header_data);
 		}
-		// Wir nehmen einfach mal UTF-8 an
+		/* Wir nehmen einfach mal UTF-8 an (Im Header darf eigentlich
+		 * nur 7-Byte-Code vorkommen, weshalb UTF-8 keine schlechte Annahme sein wird ;) )
+		 **/
 		$charset = "UTF-8";
 		$header = array();
 		for ($i=0; $i<count($header_data); $i++) {
@@ -270,6 +285,9 @@ class NNTPConnection extends AbstractConnection {
 		return $header;
 	}
 
+	/**
+	 * Parse die Adresse nach "Name <mailadresse> (Kommentar)"
+	 **/
 	private function parseAddress($addr) {
 		if (preg_match('/^(.*) \((.*?)\)\s*$/', $addr, $m)) {
 			array_shift($m);
@@ -281,13 +299,14 @@ class NNTPConnection extends AbstractConnection {
 			$name = trim(array_shift($m)," \"'\t");
 			$addr = trim(array_shift($m));
 		}
-		return new Address($name, $addr, $comment);
+		return new Address($name, trim($addr, "<>"), $comment);
 	}
 	
 	private function parseBodyPart($message, $partid, $header, $body) {
 		$header = $this->parseHeaderLines($header, $charset);
 
-		$charset = "UTF8";
+		// Per default nehmen wir UTF-8 (warum auch was anderes?)
+		$charset = "UTF-8";
 		if (isset($header["content-type"]) && $header["content-type"]->hasExtra("charset")) {
 			$charset = $header["content-type"]->getExtra("charset");
 		}

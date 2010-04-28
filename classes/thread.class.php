@@ -24,7 +24,7 @@ class Thread {
 	
 	public function getMessages($connection = null) {
 		if ($connection === null) {
-			return $this->messages;
+			return array_keys($this->messages);
 		}
 
 		$messages = array();
@@ -35,14 +35,19 @@ class Thread {
 	}
 	
 	public function addMessage($message) {
-		if (!in_array($message->getMessageID(), $this->messages)) {
+		if (!in_array($message->getMessageID(), $this->getMessages())) {
 			if ($message->getDate() > $this->lastpostdate) {
 				$this->lastpostmessageid = $message->getMessageID();
 				$this->lastpostdate = $message->getDate();
 				$this->lastpostauthor = $message->getAuthor($this->getCharset());
 			}
-			$this->messages[] = $message->getMessageID();
+			$this->messages[$message->getMessageID()] = true;
 		}
+	}
+
+	public function removeMessage($message) {
+		unset($this->messages[$message->getMessageID()]);
+		// TODO ggf. lastpost* zuruecksetzen
 	}
 	
 	public function getThreadID() {
