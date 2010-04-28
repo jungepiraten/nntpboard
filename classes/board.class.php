@@ -8,7 +8,6 @@ class Board {
 	private $name = "";
 	private $desc = "";
 	private $group;
-	private $boards = array();
 	private $subboards = array();
 
 	public function __construct($boardid, $name, $desc, $group) {
@@ -44,10 +43,6 @@ class Board {
 
 	public function setParent($parent) {
 		$this->parent = $parent;
-		// Mache routen zu Untergeordneten Boards den uebergeordneten Boards bekannt
-		foreach ($this->boards AS $boardid => $child) {
-			$parent->registerBoard($this, $this->getBoard($boardid));
-		}
 	}
 
 	public function getParent() {
@@ -57,7 +52,6 @@ class Board {
 	public function addSubBoard($board) {
 		$board->setParent($this);
 		$this->subboards[$board->getBoardID()] = $board;
-		$this->registerBoard(null, $board);
 	}
 	
 	public function getSubBoard($id) {
@@ -72,39 +66,12 @@ class Board {
 		return $this->subboards;
 	}
 	
-	public function registerBoard($child, $board) {
-		// Pfad fuer uns merken (bei null sind wir selbst das Vaterelement)
-		$this->boards[$board->getBoardID()] = $child === null ? null : $child->getBoardID();
-		// Pfad zum Board nach oben durchgeben
-		if ($this->hasParent()) {
-			$this->getParent()->registerBoard($this, $board);
-		}
-	}
-	
 	public function getBoards() {
 		$boards = array($this);
 		foreach ($this->getSubBoards() AS $subboard) {
 			$boards = array_merge($boards, $subboard->getBoards());
 		}
 		return $boards;
-	}
-	
-	public function getBoard($id) {
-		// durchsuche die Untergeordneten Ebenen
-		if (in_array($id, array_keys($this->boards))) {
-			// es ist direkt Untergeordnet
-			if ($this->boards[$id] === null) {
-				return $this->getSubBoard($id);
-			}
-			// ansonsten laufen wir den Weg tiefer hinein
-			return $this->getSubBoard($this->boards[$id])->getBoard($id);
-		}
-		// jetzt nach oben durchfragen
-		if ($this->hasParent()) {
-			return $this->getParent()->getBoard($id);
-		}
-		// und wenn wir da nichts finden, gibts das nicht!
-		return null;
 	}
 
 	public function hasGroup() {

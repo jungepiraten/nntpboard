@@ -1,8 +1,10 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.inc.php");
-require_once(dirname(__FILE__)."/smarty.inc.php");
-$smarty = new ViewBoardSmarty($config);
+require_once(dirname(__FILE__)."/classes/smarty.class.php");
+require_once(dirname(__FILE__)."/classes/session.class.php");
+$session = new Session($config);
+$smarty = new ViewBoardSmarty($config, $session->getAuth());
 
 $id = !empty($_REQUEST["id"]) ? stripslashes($_REQUEST["id"]) : null;
 
@@ -13,13 +15,13 @@ if ($board === null) {
 
 $group = $board->getGroup();
 if ($group !== null) {
-	$connection = $group->getConnection($config->getDataDir());
+	$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
 	$connection->open();
-	$threads = $connection->getThreads();
+	$smarty->viewboard($board, $group, $connection->getThreads(), $connection->mayPost());
+	$connection->close();
 } else {
-	$threads = null;
+	$smarty->viewboard($board, $group);
 }
 
-$smarty->viewboard($board, $group, $threads);
 
 ?>

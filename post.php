@@ -1,11 +1,13 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.inc.php");
-require_once(dirname(__FILE__)."/smarty.inc.php");
+require_once(dirname(__FILE__)."/classes/smarty.class.php");
+require_once(dirname(__FILE__)."/classes/session.class.php");
 require_once(dirname(__FILE__)."/classes/address.class.php");
 require_once(dirname(__FILE__)."/classes/message.class.php");
 require_once(dirname(__FILE__)."/classes/bodypart.class.php");
-$smarty = new PostSmarty($config);
+$session = new Session($config);
+$smarty = new PostSmarty($config, $session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $reference = !empty($_REQUEST["reference"]) ? stripslashes($_REQUEST["reference"]) : null;
@@ -19,7 +21,7 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$connection = $group->getConnection($config->getDataDir());
+$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
 $connection->open();
 
 if ($reference !== null) {
@@ -27,11 +29,12 @@ if ($reference !== null) {
 }
 
 if (isset($_REQUEST["post"])) {
-	// TODO MessageID generieren
+	// Die Artikelnummer wird erst durch den Newsserver zugewiesen
 	$articlenum = null;
-	$messageid = "<".md5($subject."-".microtime(true)."-".rand(1000,9999))."@nntpboard.".$_SERVER["HTTP_HOST"].">";
+	// TODO MessageID generieren
+	$messageid = "<".md5($subject."-".microtime(true)."-".rand(1000,9999))."@nntpboard>";
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
-	$autor = new Address("Testuser", "test@prauscher.homeip.net");
+	$autor = $session->getAuth()->getAddress();
 	$charset = $config->getCharSet();
 	
 	if ($reference !== null) {

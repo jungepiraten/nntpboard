@@ -1,18 +1,55 @@
 <?php
 
+require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/datadir.class.php");
 
+class Config extends DefaultConfig {
+	private $boards;
+
+	public function __construct() {
+		$this->boards[null] = new Board(null, "NNTPBoard", "Description", null);
+
+		$board = new Board(1, "Nerdnacht DE", "Zum testen halt ;)",
+		                   new Group(new Host("news.nerdnacht.de"), "nerdnacht.de"));
+		$this->boards[null]->addSubBoard($board);
+		$this->boards[$board->getBoardID()] = $board;
+
+		$board = new Board(2, "Testboard", "Anderes Board",
+		                   new Group(new Host("news.nerdnacht.de"), "nerdnacht.test"));
+		$this->boards[1]->addSubBoard($board);
+		$this->boards[$board->getBoardID()] = $board;
+
+		$board = new Board(3, "Testbasis prauscher", "Prauschers Testbasis",
+		                   new Group(new Host("news.nerdnacht.de"), "prauscher.test"));
+		$this->boards[null]->addSubBoard($board);
+		$this->boards[$board->getBoardID()] = $board;
+	}
+
+	public function getBoard($id = null) {
+		return $this->boards[$id];
+	}
+
+	public function getBoards() {
+		return $this->boards;
+	}
+
+	public function getAuth($user, $pass) {
+		return JuPisAuth::authenticate($user, $pass);
+	}
+
+	public function getDataDir() {
+		return new Datadir(dirname(__FILE__)."/data", "/~prauscher/nntpboard/data");
+	}
+
+	public function getAnonymousAuth() {
+		return JuPisAuth::getAnonymousAuth();
+	}
+}
+
 $config = new Config;
-$config->setDatadir(new Datadir(dirname(__FILE__)."/data", "/~prauscher/nntpboard/data"));
-
-/**
- * Boards
- */
-
-$rootboard = $config->getBoard();
-$rootboard->setName("NNTPBoard");
+//var_dump($config->getBoard(2)->getGroup()->getConnection());
 
 if (false) {
 	$host = new Host("news.piratenpartei.de");
@@ -30,19 +67,6 @@ if (false) {
 
 	$strukturboard = new Board($boardid++, "Struktur", "hihi", new Group($host, "pirates.de.etc.struktur", "jupis_flint", "higRLd3zJ1hhhCo8"));
 	$etcboard->addSubBoard($strukturboard);
-} else {
-	$host = new Host("news.nerdnacht.de");
-
-	$boardid = 1;
-
-	$nerdnachtde = new Board($boardid++, "Nerdnacht DE", "Zum testen halt ;)", new Group($host, "nerdnacht.de"));
-	$rootboard->addSubBoard($nerdnachtde);
-
-	$testboard = new Board($boardid++, "Testboard", "Anderes Board", new Group($host, "nerdnacht.test"));
-	$nerdnachtde->addSubBoard($testboard);
-
-	$prauschertest = new Board($boardid++, "Testbasis prauscher", "Prauschers Testbasis", new Group($host, "prauscher.test"));
-	$rootboard->addSubBoard($prauschertest);
 }
 
 ?>

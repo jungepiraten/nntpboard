@@ -2,12 +2,12 @@
 
 require_once("Net/NNTP/Client.php");
 
-require_once(dirname(__FILE__)."/connection.abstract.class.php");
-require_once(dirname(__FILE__)."/address.class.php");
-require_once(dirname(__FILE__)."/thread.class.php");
-require_once(dirname(__FILE__)."/message.class.php");
-require_once(dirname(__FILE__)."/header.class.php");
-require_once(dirname(__FILE__)."/bodypart.class.php");
+require_once(dirname(__FILE__)."/../connection.class.php");
+require_once(dirname(__FILE__)."/../address.class.php");
+require_once(dirname(__FILE__)."/../thread.class.php");
+require_once(dirname(__FILE__)."/../message.class.php");
+require_once(dirname(__FILE__)."/../header.class.php");
+require_once(dirname(__FILE__)."/../bodypart.class.php");
 
 if (!function_exists("decodeRFC2045")) {
 	function decodeRFC2045($text, $charset) {
@@ -41,10 +41,12 @@ class NNTPConnection extends AbstractConnection {
 
 	private $nntpclient;
 	
-	public function __construct($group, $username, $password) {
+	public function __construct($group, $auth) {
 		$this->group = $group;
-		$this->username = $username;
-		$this->password = $password;
+		if ($auth instanceof Auth) {
+			$this->username = $auth->getNNTPUsername();
+			$this->password = $auth->getNNTPPassword();
+		}
 
 		$this->nntpclient = new Net_NNTP_Client;
 	}
@@ -121,7 +123,8 @@ class NNTPConnection extends AbstractConnection {
 			}
 		}
 
-		// Der XRef-Header kann die Daten jetzt noch mal ueberschreiben
+		/* Der XRef-Header kann die Daten jetzt noch mal ueberschreiben
+		 * Eigentlich sollte XRef was ganz anderes bewirken (vgl. RFC 1036 / 2.2.13)
 		$xref = isset($header["xref"]) ? preg_match("#^(.*) (.*):([0-9]*)$#U", $header["xref"]->getValue(), $m) : null;
 		if ($xref != null) {
 			$message = $this->getMessageByNum($m[3]);
@@ -130,7 +133,7 @@ class NNTPConnection extends AbstractConnection {
 				$parentid = $message->getMessageID();
 				$parentnum = $message->getArticleNum();
 			}
-		}
+		}*/
 		
 		$mimetype = null;
 		if (isset($header["content-type"])
@@ -210,10 +213,15 @@ class NNTPConnection extends AbstractConnection {
 		return $this->articles;
 	}
 
+	public function mayPost() {
+		// TODO wie kann ich sowas unter NNTP rauskriegen? *kopfkratz*
+		return true;
+	}
+
 	public function post($message) {
 		$ret = $this->nntpclient->post($message->getPlain());
 		if ($ret instanceof PEAR_Error) {
-			throw new Exception($ret->getMessage());
+			throw new Exception("Could not Post Message to {$this->group->getGroup()}: " . $ret->getMessage() . " / " . $ret->getUserInfo());
 		}
 		return $ret;
 	}

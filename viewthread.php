@@ -1,8 +1,10 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.inc.php");
-require_once(dirname(__FILE__)."/smarty.inc.php");
-$smarty = new ViewThreadSmarty($config);
+require_once(dirname(__FILE__)."/classes/smarty.class.php");
+require_once(dirname(__FILE__)."/classes/session.class.php");
+$session = new Session($config);
+$smarty = new ViewThreadSmarty($config, $session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $threadid = isset($_REQUEST["threadid"]) ? stripslashes($_REQUEST["threadid"]) : null;
@@ -17,7 +19,7 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$connection = $group->getConnection($config->getDataDir());
+$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
 $connection->open();
 
 if ($messageid !== null) {
@@ -31,14 +33,17 @@ $thread = $connection->getThread($threadid);
 if ($thread === null) {
 	die("Thread nicht gefunden!");
 }
+
 if ($message !== null) {
-	$smarty->viewmessage($board, $thread, $message);
+	$smarty->viewmessage($board, $thread, $message, $connection->mayPost());
 }
 $messages = $thread->getMessages($connection);
 if (!is_array($messages) || count($messages) < 1) {
 	die("Thread ungueltig!");
 }
 
-$smarty->viewthread($board, $thread, $messages);
+$smarty->viewthread($board, $thread, $messages, $connection->mayPost());
+
+$connection->close();
 
 ?>

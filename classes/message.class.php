@@ -41,7 +41,7 @@ class Message {
 	}
 	
 	public function getThreadID() {
-		return $this->threadid !== null ? $this->threadid : $this->getMessageID();
+		return $this->threadid !== null ? $this->threadid : $this->getArticleNum();
 	}
 
 	public function hasParent() {
@@ -109,10 +109,8 @@ class Message {
 			if ($part->isAttachment()) {
 				$filename = $datadir->getAttachmentPath($this->group, $part);
 				if (!file_exists($filename)) {
-					file_put_contents($filename, $part->getText());
+					$part->saveAsFile($filename);
 				}
-				// Sonst speichern wir alles doppelt
-				//$part->setText(null);
 			}
 		}
 	}
@@ -152,7 +150,7 @@ class Message {
 		$data .= "User-Agent: " . "NNTPBoard" . $crlf;
 		if ($this->isMime()) {
 			// TODO boundary generieren
-			$boundary = rand(1000,9999) . "~" . microtime(true) . "~NNTPBoard";
+			$boundary = md5(rand(1000,9999) . "~" . microtime(true)) . "~NNTPBoard";
 			$data .= "Content-Type: multipart/" . $this->getMimeType() . "; boundary=\"" . addcslashes($boundary, "\"") . "\"" . $crlf;
 			$data .= $crlf;
 			$data .= "This is a MIME-Message." . $crlf;

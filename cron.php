@@ -8,23 +8,33 @@ require_once(dirname(__FILE__)."/config.inc.php");
  *  - Nachrichten in den Cache herunterladen
  **/
 foreach ($config->getGroups() as $group) {
-	$connection = $group->getConnection($config->getDataDir());
+	$cache = $group->getConnection($config->getDataDir(), null, Group::CONNECTION_CACHE);
 	// Nur CacheConnections zulassen
-	if (!($connection instanceof CacheConnection)) {
+	if (!($cache instanceof CacheConnection)) {
 		continue;
 	}
-	// TODO try-catch-Block neu aufbauen
-	$directconnection = $group->getDirectConnection();
+
+	$connection = $group->getConnection($config->getDataDir(), null, Group::CONNECTION_DIRECT);
 	try {
-		$directconnection->open();
 		$connection->open();
+		$cache->open();
 
-		$connection->sendMessages($directconnection);
+		// Versuche lokale Nachrichten zu posten
+		try {
+			$cache->sendMessages($connection);
+		} catch (Exception $e) {
+			echo "<pre>" . $e->getMessage() . "</pre>";
+		}
 
-		$connection->loadMessages($directconnection);
+		// Versuche neue Nachrichten zu ergattern
+		try {
+			$cache->loadMessages($connection);
+		} catch (Exception $e) {
+			echo "<pre>" . $e->getMessage() . "</pre>";
+		}
 
+		$cache->close();
 		$connection->close();
-		$directconnection->close();
 	} catch (Exception $e) {
 		echo "<pre>".$e->getMessage()."</pre>";
 	}

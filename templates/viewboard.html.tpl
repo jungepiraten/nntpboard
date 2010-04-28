@@ -16,7 +16,7 @@
 {if $subboardsWithGroup > 0}{include file=board_boards.html.tpl subboards=$board->getSubBoards()}{/if}
 {/if}
 
-{if $board->hasGroup()}
+{if $board->hasGroup() && $mayPost}
 <a href="post.php?boardid={$board->getBoardID()|escape:url}">Neuer Thread</a>
 {/if}
 

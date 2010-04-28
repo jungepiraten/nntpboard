@@ -1,34 +1,37 @@
 <?php
 
-require_once(dirname(__FILE__)."/connection.abstract.class.php");
+require_once(dirname(__FILE__)."/../connection.class.php");
 /* Die Klassen müssen vor dem unserialize eingebunden sein, da PHP sonst
  * incomplete Objekte erstellt.
  * vgl. http://mrfoo.de/archiv/120-The-script-tried-to-execute-a-method-or-access-a-property-of-an-incomplete-object.html
  **/
-require_once(dirname(__FILE__)."/address.class.php");
-require_once(dirname(__FILE__)."/thread.class.php");
-require_once(dirname(__FILE__)."/message.class.php");
-require_once(dirname(__FILE__)."/bodypart.class.php");
+require_once(dirname(__FILE__)."/../address.class.php");
+require_once(dirname(__FILE__)."/../thread.class.php");
+require_once(dirname(__FILE__)."/../message.class.php");
+require_once(dirname(__FILE__)."/../bodypart.class.php");
 
 class CacheConnection extends AbstractConnection {
 	private $group;
 	private $datadir;
+	private $isreadonly = false;
 
-	// Alle Nachrichten als Message-Objekt
+	// MessageID => Message
 	private $messages = array();
-	// Zuordnung MSGID => THREADID
+	// MessageID => ThreadID
 	private $threadids = array();
-	// Zuordnung ArtikelNr => MSGID
+	// ArtikelNum => MessageID
 	private $articlenums = array();
-	// Alle Threads als Thread-Objekt (ohne Nachrichten)
+	// ThreadID => Thread
 	private $threads = array();
-	
+	// MessageID => true
 	private $queue = array();
+
 	private $lastarticlenr = 0;
 	
-	public function __construct($group, $datadir) {
+	public function __construct($group, $datadir, $isreadonly = false) {
 		$this->group = $group;
 		$this->datadir = $datadir;
+		$this->isreadonly = $isreadonly;
 	}
 	
 	public function open() {
@@ -100,13 +103,11 @@ class CacheConnection extends AbstractConnection {
 		if (isset($this->messages[$messageid])) {
 			return $this->messages[$messageid];
 		}
-		$message = null;
 		if (!empty($this->threadids[$messageid])) {
 			$this->loadThreadMessages($this->threadids[$messageid]);
-			$message = $this->messages[$messageid];
+			return $this->messages[$messageid];
 		}
-		$this->messages[$messageid] = $message;
-		return $message;
+		return null;
 	}
 
 	public function getThreads() {
@@ -141,11 +142,16 @@ class CacheConnection extends AbstractConnection {
 		return array_keys($this->articlenums);
 	}
 
+	public function mayPost() {
+		return !$this->isreadonly;
+	}
+
 	public function post($message) {
-		// TODO Zugriffskontrolle
+		if (!$this->mayPost()) {
+			throw new Exception("Read-Only Newsgroup");
+		}
 		$this->addQueueMessage($message);
 		$this->sort();
-		return true;
 	}
 
 	/* ****** */
@@ -155,7 +161,7 @@ class CacheConnection extends AbstractConnection {
 			$message = $this->getMessage($messageid);
 			// Nachricht posten und hier Löschen
 			$connection->post($message);
-			$this->removeMessage($message->getMessageID());
+			$this->removeMessage($message);
 		}
 	}
 	
@@ -218,7 +224,7 @@ class CacheConnection extends AbstractConnection {
 
 		// Ist Unterpost (und Bezugspost auch vorhanden?)
 		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$this->getMessage($message->getParentID())->addChild($message);
+			$this->getMessage($message->getMessageID())->addChild($message);
 		}
 		
 		// Thread erstellen und Nachricht in Thread einordnen
@@ -230,12 +236,12 @@ class CacheConnection extends AbstractConnection {
 
 	private function removeMessage($message) {
 		// Entferne die Nachricht und Verlinkungen auf selbige
-		unset($this->messages[$message->getMessageID()]);
-		unset($this->threadids[$message->getMessageID()]);
-		unset($this->articlenums[$message->getArticleNum()]);
+		unset($this->messages[$message->getArticleNum()]);
+		unset($this->threadids[$message->getArticleNum()]);
+		unset($this->articlenums[$message->getMessageID()]);
 
 		// TODO Entferne Verweise innerhalb der Threads und Nachrichten
-		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+		if ($message->hasParent() && $this->hasMessageNum($message->getParentID())) {
 			$this->getMessage($message->getParentID())->removeChild($message);
 		}
 		

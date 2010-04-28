@@ -8,6 +8,7 @@
   <input type="hidden" name="boardid" value="{$board->getBoardID()|escape:html}" />
   <input type="hidden" name="reference" value="{$reference|escape:html}" />
 
+  Benutzer: {$auth->getAddress()}
   <label for="subject">Betreff:</label>
   <input type="text" name="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|escape:html}{else}{$subject|escape:html}{/if}" />
   <label for="body">Text:</label>

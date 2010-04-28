@@ -6,7 +6,9 @@
 {assign var=boardid value=$board->getBoardID()}
 {assign var=group value=$board->getGroup()}
 
+{if ($mayPost)}
 <a href="post.php?boardid={$boardid}&amp;reference={$thread->getThreadID()}">Antworten</a>
+{/if}
 
 <table>
 {foreach from=$messages item=message}

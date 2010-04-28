@@ -1,6 +1,6 @@
 <?php
 
-interface iConnection {
+interface Connection {
 	public function open();
 	public function close();
 
@@ -22,10 +22,11 @@ interface iConnection {
 	public function getLastPostAuthor($charset = null);
 	public function getLastPostThreadID();
 
+	public function mayPost();
 	public function post($message);
 }
 
-abstract class AbstractConnection implements iConnection {
+abstract class AbstractConnection implements Connection {
 	abstract protected function getLastThread();
 
 	public function getLastPostMessageID() {

@@ -5,32 +5,37 @@ require_once("/usr/share/php/Smarty/Smarty.class.php");
 abstract class NNTPBoardSmarty extends Smarty {
 	private $config;
 	
-	public function __construct($config) {
+	public function __construct($config, $auth) {
 		$this->config = $config;
 		$this->register_function("redirect", smarty_function_redirect);
 		$this->register_function("getlink", array($this, getLink));
 		$this->assign("CHARSET", $config->getCharset());
 		$this->assign("DATADIR", $config->getDataDir());
+		$this->assign("auth", $auth);
 	}
 	
 	function getLink($params) {
-		return $this->get_template_vars("DATADIR")->getWebPath($params["file"]);
+		return $this->config->getDataDir()->getWebPath($params["file"]);
 	}
 	
-	public function viewboard($board, $group, $threads) {
+	public function viewboard($board, $group, $threads = null, $mayPost = false) {
 		$this->assign("board", $board);
 		$this->assign("threads", $threads);
+		$this->assign("mayPost", $mayPost);
 		$this->display("viewboard.html.tpl");
+		exit;
 	}
 	
-	public function viewthread($board, $thread, $messages) {
+	public function viewthread($board, $thread, $messages, $mayPost = false) {
 		$this->assign("board", $board);
 		$this->assign("thread", $thread);
 		$this->assign("messages", $messages);
+		$this->assign("mayPost", $mayPost);
 		$this->display("viewthread.html.tpl");
+		exit;
 	}
 	
-	public function viewmessage($board, $thread, $message) {
+	public function viewmessage($board, $thread, $message, $mayPost = false) {
 		header("Location: viewthread.php?boardid={$board->getBoardID()}&threadid={$message->getThreadID()}#article{$message->getArticleNum()}");
 		exit;
 	}
@@ -45,16 +50,42 @@ abstract class NNTPBoardSmarty extends Smarty {
 		
 		$this->assign("board", $board);
 		$this->display("postform.html.tpl");
+		exit;
 	}
 
 	public function viewpostsuccess($board, $message) {
-		$this->viewmessage($board, null, $message);
+		$this->viewmessage($board, null, $message, true);
+	}
+	
+	public function viewloginform($loginfailed = false) {
+		$this->assign("loginfailed", $loginfailed);
+		$this->display("loginform.html.tpl");
+		exit;
+	}
+
+	public function viewloginfailed() {
+		$this->viewloginform(true);
+	}
+
+	public function viewloginsuccess($auth) {
+		$this->assign("auth", $auth);
+		echo "Login erfolgreich! Back dir nen eis!";
+	}
+
+	public function viewlogoutsuccess() {
+		$this->assign("auth", null);
+		echo "Du wurdest abgemeldet! Freu dich!";
+	}
+	
+	public function viewuserpanel() {
+		$this->display("userpanel.html.tpl");
 	}
 }
 
 class ViewBoardSmarty extends NNTPBoardSmarty {}
 class ViewThreadSmarty extends NNTPBoardSmarty {}
 class PostSmarty extends NNTPBoardSmarty {}
+class UserPanelSmarty extends NNTPBoardSmarty {}
 
 /**
 * Smarty {redirect} function plugin

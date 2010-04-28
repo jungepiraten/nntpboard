@@ -9,6 +9,7 @@ class BodyPart {
 	private $disposition = null;
 	private $mimetype = null;
 	private $mimesubtype = null;
+	private $location = null;
 
 	public function __construct($message, $partid, $disposition, $mimetype, $text, $charset = "UTF-8", $filename = null) {
 		$this->messageid = $message->getMessageID();
@@ -40,26 +41,33 @@ class BodyPart {
 	
 	public function getText($charset = null) {
 		if ($charset !== null) {
-			$text = iconv($this->getCharset(), $charset, $this->getText());
+			return iconv($this->getCharset(), $charset, $this->getText());
+		}		if ($this->text === null && $this->location !== null) {
+			return file_get_contents($this->location);
 		}
-		// TODO aus attachment laden
-		return ($this->text === null ? null : $this->text);
+		return $this->text;
 	}
 	
-	public function getHTML($charset = null) {
+	public function getHTML($charset = null, $allowhtml = false) {
 		$text = $this->getText($charset);
 		if (in_array(strtolower($this->getMimeType()), array("text/html", "application/xhtml+xml"))) {
-			// Erlaube kein HTML! (TODO: Auswahlmoeglichkeit einbauen)
-			$text = strip_tags($text);
+			// Erlaube kein HTML! (TODO: 2. Parameter benutzen ;) )
+			if (is_string($allowhtml)) {
+				$text = strip_tags($text, $allowhtml);
+			} elseif ($allowhtml !== true) {
+				$text = strip_tags($text);
+			}
 		} else {
 			$text = htmlentities($text, ENT_QUOTES, $charset);
 		}
-		// TODO Links ersetzen - Eventuell 
+
+		// TODO Links ersetzen und weitere Formatierung einbauen
+
 		return $text;
 	}
 	
 	public function getLength() {
-		return strlen($this->text);
+		return strlen($this->getText());
 	}
 
 	/* Content-Disposition */
@@ -110,6 +118,13 @@ class BodyPart {
 	
 	public function getCharset() {
 		return $this->charset;
+	}
+
+	public function saveAsFile($filename) {
+		if ($this->location === null) {
+			$this->location = $filename;
+		}
+		file_put_contents($filename, $this->getText());
 	}
 }
 
