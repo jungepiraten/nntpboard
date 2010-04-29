@@ -105,7 +105,7 @@ class Group {
 			return false;
 		}
 
-		throw new Exception("Ungueltiger WriteMode!");
+		throw new Exception("Ungueltiger PostMode!");
 	}
 
 	public function isModerated() {
@@ -129,23 +129,6 @@ class Group {
 
 	private function getCacheConnection($datadir, $auth) {
 		return new CacheConnection($this, $auth, $datadir);
-	}
-
-	private function isModerated() {
-		switch ($this->postmode) {
-		case self::POSTMODE_MODERATED_OPEN:
-		case self::POSTMODE_MODERATED_AUTH:
-			return true;
-		}
-		return false;
-	}
-
-	private function getDirectConnection($datadir, $auth) {
-		return new NNTPConnection($this, $auth, $this->mayRead($auth), $this->mayPost($auth), $this->isModerated());
-	}
-
-	private function getCacheConnection($datadir, $auth) {
-		return new CacheConnection($this, $datadir, $this->mayRead($auth), $this->mayPost($auth), $this->isModerated());
 	}
 }
 

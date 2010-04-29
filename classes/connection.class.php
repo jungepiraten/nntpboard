@@ -4,9 +4,6 @@ interface Connection {
 	public function open();
 	public function close();
 
-	public function mayRead();
-	public function mayPost();
-
 	public function getThreadCount();
 	public function getMessagesCount();
 
