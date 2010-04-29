@@ -9,9 +9,11 @@ require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
 require_once(dirname(__FILE__)."/../bodypart.class.php");
+require_once(dirname(__FILE__)."/../exceptions/post.exception.php");
 
 class CacheConnection extends AbstractConnection {
 	private $group;
+	private $auth;
 	private $datadir;
 
 	// MessageID => Message
@@ -27,9 +29,10 @@ class CacheConnection extends AbstractConnection {
 	
 	private $lastarticlenr = 0;
 	
-	public function __construct($group, $datadir, $mayread = false, $maypost = false, $moderated = false) {
-		parent::__construct($mayread, $maypost, $moderated);
+	public function __construct($group, $auth, $datadir) {
+		parent::__construct();
 		$this->group = $group;
+		$this->auth = $auth;
 		$this->datadir = $datadir;
 	}
 	
@@ -142,12 +145,12 @@ class CacheConnection extends AbstractConnection {
 	}
 
 	public function post($message) {
-		if (!$this->mayPost()) {
-			throw new Exception("Read-Only Newsgroup");
+		if (!$this->group->mayPost($this->auth)) {
+			throw new PostingNotAllowedException();
 		}
 		// Moderierte Nachrichten kommen via NNTP rein (direkt ueber addMessage)
-		if ($this->isModerated()) {
-			throw new Exception("Moderated Newsgroup - Please wait for Moderation");
+		if ($this->group->isModerated()) {
+			return false;
 		}
 		$this->addQueueMessage($message);
 		$this->sort();

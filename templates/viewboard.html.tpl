@@ -24,6 +24,7 @@
 <table>
 <thead>
 <tr>
+ <th>&nbsp;</th>
  <th>Thema</th>
  <th>Posts</th>
  <th>Geschrieben</th>
@@ -33,6 +34,7 @@
 <tbody>
 {foreach from=$threads item=thread}
 <tr>
+ <td>{if isset($auth) && $auth->isUnreadThread($thread)}O{/if}</td>
  <td><a href="viewthread.php?boardid={$board->getBoardID()|escape:url}&amp;threadid={$thread->getThreadID()|escape:url}">{$thread->getSubject()}</a></td>
  <td>{$thread->getPosts()}</td>
  <td>{$thread->getDate()|date_format:"%d.%m.%Y %H:%M"}<br />von {$thread->getAuthor()}</td>

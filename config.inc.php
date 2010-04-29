@@ -46,6 +46,10 @@ class Config extends DefaultConfig {
 	public function getAnonymousAuth() {
 		return JuPisAuth::getAnonymousAuth();
 	}
+
+	public function getMessageIDHost() {
+		return "testwebserver.prauscher.homelinux.net";
+	}
 }
 
 $config = new Config;

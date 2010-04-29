@@ -17,7 +17,7 @@ $group = $board->getGroup();
 if ($group !== null) {
 	$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
 	$connection->open();
-	$smarty->viewboard($board, $group, $connection->getThreads(), $connection->mayPost());
+	$smarty->viewboard($board, $group, $connection->getThreads(), $group->mayPost($session->getAuth()));
 	$connection->close();
 } else {
 	$smarty->viewboard($board, $group);

@@ -9,27 +9,7 @@ require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
 require_once(dirname(__FILE__)."/../header.class.php");
 require_once(dirname(__FILE__)."/../bodypart.class.php");
-
-if (!function_exists("decodeRFC2045")) {
-	function decodeRFC2045($text, $charset) {
-		preg_match_all('#=\?([-a-zA-Z0-9_]+)\?([QqBb])\?(.*)\?=(\s|$)#U', $text, $matches, PREG_SET_ORDER);
-		foreach ($matches AS $m) {
-			switch (strtolower($m[2])) {
-			case 'b':
-				$m[3] = base64_decode($m[3]);
-				break;
-			case 'q':
-				$m[3] = str_replace("_", " ", quoted_printable_decode($m[3]));
-				break;
-			default:
-				// prohibited by RFC2045
-				continue;
-			}
-			$text = str_replace($m[0], iconv($m[1], $charset, $m[3]), $text);
-		}
-		return $text;
-	}
-}
+require_once(dirname(__FILE__)."/../exceptions/post.exception.php");
 
 class NNTPConnection extends AbstractConnection {
 	private $group;
@@ -47,8 +27,8 @@ class NNTPConnection extends AbstractConnection {
 
 	private $nntpclient;
 	
-	public function __construct($group, $auth, $mayread = false, $maypost = false, $moderated = false) {
-		parent::__construct($mayread, $maypost, $moderated);
+	public function __construct($group, $auth) {
+		parent::__construct();
 
 		$this->group = $group;
 		if ($auth instanceof Auth) {
@@ -60,16 +40,32 @@ class NNTPConnection extends AbstractConnection {
 	}
 	
 	public function open() {
+		/* Verbinden */
 		$ret = $this->nntpclient->connect($this->group->getHost()->getHost(), false, $this->group->getHost()->getPort());
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
+		
+		/* Authentifizieren */
 		if (!empty($this->username) && !empty($this->password)) {
 			$ret = $this->nntpclient->authenticate($this->username, $this->password);
 			if (PEAR::isError($ret)) {
 				throw new Exception($ret);
 			}
 		}
+
+		/* Gruppeninfos laden */
+		$ret = $this->nntpclient->getGroups($this->group->getGroup());
+		if (PEAR::isError($ret)) {
+			throw new Exception($ret);
+		}
+		if (!isset($ret[$this->group->getGroup()])) {
+			// No reading!
+		}
+		// y, n or m / TODO: benutze diese informationen irgendwie sinnvoll
+		$posting = $ret[$this->group->getGroup()]["posting"];
+		
+		/* Zuordnungen zwischen MessageID und ArtikelNum laden */
 		$ret = $this->nntpclient->selectGroup($this->group->getGroup(), true);
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
@@ -172,12 +168,15 @@ class NNTPConnection extends AbstractConnection {
 	}
 
 	public function post($message) {
-		$ret = $this->nntpclient->post($message->getPlain());
-		if ($ret instanceof PEAR_Error) {
-			// TODO eigene fehlerexceptions schreiben und hier werfen
-			throw new Exception("Could not Post Message to {$this->group->getGroup()}: " . $ret->getMessage() . " / " . $ret->getUserInfo());
+		if ($this->nntpclient->post($message->getPlain()) instanceof PEAR_Error) {
+			/* Bekannte Fehler */
+			switch ($ret->getCode()) {
+			case 440:
+				throw new PostingNotAllowedException();
+			}
+			// Ein unerwarteter Fehler - wie spannend *g*
+			throw new PostException("Could not Post Message to {$this->group->getGroup()}: #{$ret->getCode()} / " . $ret->getMessage() . " / " . $ret->getUserInfo());
 		}
-		return $ret;
 	}
 
 	/* *** */
@@ -262,6 +261,7 @@ class NNTPConnection extends AbstractConnection {
 		 * nur 7-Byte-Code vorkommen, weshalb UTF-8 keine schlechte Annahme sein wird ;) )
 		 **/
 		$charset = "UTF-8";
+		mb_internal_encoding($charset);
 		$header = array();
 		for ($i=0; $i<count($header_data); $i++) {
 			$line = $header_data[$i];
@@ -272,11 +272,11 @@ class NNTPConnection extends AbstractConnection {
 
 			list($name, $value) = explode(":", $line, 2);
 			$extras = explode(";", $value);
-			$h = new Header(trim($name), decodeRFC2045(trim(array_shift($extras)), $charset), $charset);
+			$h = new Header(trim($name), mb_decode_mimeheader(trim(array_shift($extras))), $charset);
 			foreach ($extras AS $extra) {
 				list($name, $value) = explode("=", $extra, 2);
-				$name = decodeRFC2045(trim($name), $h->getCharset());
-				$value = decodeRFC2045(trim($value, "\"\' \t"), $h->getCharset());
+				$name = mb_decode_mimeheader(trim($name));
+				$value = mb_decode_mimeheader(trim($value, "\"\' \t"));
 				$h->addExtra($name, $value);
 			}
 
@@ -321,7 +321,7 @@ class NNTPConnection extends AbstractConnection {
 		case "7bit":
 		case "8bit":
 		case "binary":
-			// No encoding
+			// No encoding => Do nothing
 			break;
 		case "quoted-printable":
 			$body = quoted_printable_decode($body);

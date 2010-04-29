@@ -4,8 +4,42 @@
 require_once("Net/LDAP2.php");
 
 require_once(dirname(__FILE__)."/../auth.class.php");
+require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 
-class JuPisAuth extends AbstractAuth implements Auth {
+class JuPisAnonAuth extends AbstractAuth implements Auth {
+	public function __construct() {
+		
+	}
+
+	public function getAddress() {
+		// TODO bessere adresse ausdenken *g*
+		return new Address("Bernd", "bernd@example.com");
+	}
+
+	public function isUnreadThread($thread) {
+		// TODO einfacher timestamp-check
+		return false;
+	}
+
+	public function isUnreadGroup($group) {
+		// TODO einfacher timestamp-check
+		return false;
+	}
+
+	public function isAnonymous() {
+		return true;
+	}
+
+	public function getNNTPUsername() {
+		return null;
+	}
+
+	public function getNNTPPassword() {
+		return null;
+	}
+}
+
+class JuPisAuth extends JuPisAnonAuth {
 	public static function authenticate($user, $pass) {
 		$auth = new JuPisAuth($user, $pass);
 		// fetchUserDetails() wirft eine AuthException, wenn es Probleme gab
@@ -21,6 +55,7 @@ class JuPisAuth extends AbstractAuth implements Auth {
 	private $password;
 
 	public function __construct($username, $password) {
+		parent::__construct();
 		$this->username = $username;
 		$this->password = $password;
 	}
@@ -35,10 +70,12 @@ class JuPisAuth extends AbstractAuth implements Auth {
 
 	public function isUnreadThread($thread) {
 		// TODO wie ueberpruefen, ob ein Thread ungelesen ist? *kopfkratz*
+		return false;
 	}
 
 	public function isUnreadGroup($group) {
 		// TODO wie ueberpruefen, ob eine Gruppe ungelesen ist? *kopfkratz*
+		return false;
 	}
 
 	public function getNNTPUsername() {
@@ -66,20 +103,6 @@ class JuPisAuth extends AbstractAuth implements Auth {
 			throw new AuthException("Login failed!");
 		}
 		return $link;
-	}
-}
-
-class JuPisAnonAuth extends JuPisAuth {
-	public function isAnonymous() {
-		return true;
-	}
-
-	public function getNNTPUsername() {
-		return null;
-	}
-
-	public function getNNTPPassword() {
-		return null;
 	}
 }
 

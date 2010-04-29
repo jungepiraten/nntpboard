@@ -6,6 +6,7 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 require_once(dirname(__FILE__)."/classes/address.class.php");
 require_once(dirname(__FILE__)."/classes/message.class.php");
 require_once(dirname(__FILE__)."/classes/bodypart.class.php");
+require_once(dirname(__FILE__)."/classes/exceptions/post.exception.php");
 $session = new Session($config);
 $smarty = new PostSmarty($config, $session->getAuth());
 
@@ -32,10 +33,10 @@ $connection->close();
 
 if (isset($_REQUEST["post"])) {
 	// TODO Sperre gegen F5
+
 	// Die Artikelnummer wird erst durch den Newsserver zugewiesen
 	$articlenum = null;
-	// TODO MessageID generieren
-	$messageid = "<".md5($subject."-".microtime(true)."-".rand(1000,9999))."@nntpboard>";
+	$messageid = "<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">";
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->getAddress();
 	$charset = $config->getCharSet();
@@ -52,6 +53,7 @@ if (isset($_REQUEST["post"])) {
 
 	$message = new Message($group->getGroup(), $articlenum, $messageid, time(), $autor, $subject, $charset, $threadid, $parentid, $parentnum, $mime = null);
 
+	/* Wir nutzen vorerst nur text/plain -Nachrichten */
 	$disposition = "inline";
 	$mimetype = "text/plain";
 	$text = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
@@ -63,8 +65,12 @@ if (isset($_REQUEST["post"])) {
 		$connection->open();
 		$connection->post($message);
 		$connection->close();
-		$smarty->viewpostsuccess($board, $message);
-	} catch (Exception $e) {
+		if ($group->isModerated()) {
+			// TODO bestaetigung anzeigen oder so
+		} else {
+			$smarty->viewpostsuccess($board, $message);
+		}
+	} catch (PostingNotAllowedException $e) {
 		// TODO Fehler anzeigen
 		var_dump($e);
 	}

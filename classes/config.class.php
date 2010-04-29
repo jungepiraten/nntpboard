@@ -13,6 +13,7 @@ abstract class DefaultConfig {
 	abstract public function getBoard($id = null);
 	abstract public function getBoards();
 	abstract public function getDatadir();
+	abstract public function getMessageIDHost();
 	
 	public function getGroups() {
 		$groups = array();

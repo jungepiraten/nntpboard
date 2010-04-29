@@ -44,6 +44,7 @@ class Group {
 	public function __construct(Host $host, $group, $readmode = self::READMODE_OPEN, $postmode = self::POSTMODE_AUTH, $cachemode = self::CACHEMODE_READONLY) {
 		$this->host = $host;
 		$this->group = $group;
+		
 		$this->readmode = $readmode;
 		$this->postmode = $postmode;
 		$this->cachemode = $cachemode;
@@ -71,9 +72,7 @@ class Group {
 		case self::CACHEMODE_NOCACHE:
 			return $this->getDirectConnection($datadir, $auth);
 		case self::CACHEMODE_READONLY:
-			$connection = new MixedConnection( $this->getCacheConnection($datadir, $auth) );
-			$connection->addConnection( MixedConnection::USE_POST, $this->getDirectConnection($datadir, $auth) );
-			return $connection;
+			return $this->getMixedConnection($datadir, $auth);
 		case self::CACHEMODE_CACHEONLY:
 			return $this->getCacheConnection($datadir, $auth);
 		}
@@ -81,7 +80,7 @@ class Group {
 		throw new Exception("Ungueltiger CacheMode!");
 	}
 
-	private function mayRead($auth) {
+	public function mayRead($auth) {
 		switch ($this->readmode) {
 		case self::READMODE_OPEN:
 			return true;
@@ -94,7 +93,7 @@ class Group {
 		throw new Exception("Ungueltiger ReadMode!");
 	}
 
-	private function mayPost($auth) {
+	public function mayPost($auth) {
 		switch ($this->postmode) {
 		case self::POSTMODE_OPEN:
 		case self::POSTMODE_MODERATED_OPEN:
@@ -107,6 +106,29 @@ class Group {
 		}
 
 		throw new Exception("Ungueltiger WriteMode!");
+	}
+
+	public function isModerated() {
+		switch ($this->postmode) {
+		case self::POSTMODE_MODERATED_OPEN:
+		case self::POSTMODE_MODERATED_AUTH:
+			return true;
+		}
+		return false;
+	}
+
+	private function getMixedConnection($datadir, $auth) {
+		$connection = new MixedConnection($this->getCacheConnection($datadir, $auth));
+		$connection->addConnection( MixedConnection::USE_POST, $this->getDirectConnection($datadir, $auth) );
+		return $connection;
+	}
+
+	private function getDirectConnection($datadir, $auth) {
+		return new NNTPConnection($this, $auth);
+	}
+
+	private function getCacheConnection($datadir, $auth) {
+		return new CacheConnection($this, $auth, $datadir);
 	}
 
 	private function isModerated() {

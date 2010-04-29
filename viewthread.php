@@ -35,14 +35,14 @@ if ($thread === null) {
 }
 
 if ($message !== null) {
-	$smarty->viewmessage($board, $thread, $message, $connection->mayPost());
+	$smarty->viewmessage($board, $thread, $message, $group->mayPost($session->getAuth()));
 }
 $messages = $thread->getMessages($connection);
 if (!is_array($messages) || count($messages) < 1) {
 	die("Thread ungueltig!");
 }
 
-$smarty->viewthread($board, $thread, $messages, $connection->mayPost());
+$smarty->viewthread($board, $thread, $messages, $group->mayPost($session->getAuth()));
 
 $connection->close();
 

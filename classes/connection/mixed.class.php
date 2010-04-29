@@ -11,6 +11,7 @@ class MixedConnection extends AbstractConnection {
 	private $connections = array();
 	
 	public function __construct($defaultconnection) {
+		parent::__construct();
 		$this->addConnection(self::USE_DEFAULT, $defaultconnection);
 	}
 	
@@ -37,19 +38,11 @@ class MixedConnection extends AbstractConnection {
 	/** Wir oeffnen die Verbindung bei bedarf **/
 	public function open() {}
 	public function close() {
+		// Verbindungen schliessen und gleichzeitig aus dem Array loeschen
 		while (count($this->openconnections) > 0) {
 			$use = array_shift($this->openconnections);
 			$this->connections[$use]->close();
 		}
-	}
-
-	// TODO mayRead & mayPost ohne getConnection ausstatten
-	public function mayRead() {
-		return $this->getConnection(self::USE_READ)->mayRead();
-	}
-
-	public function mayPost() {
-		return $this->getConnection(self::USE_POST)->mayPost();
 	}
 
 	public function getThreadCount() {

@@ -2,6 +2,15 @@
 
 require_once(dirname(__FILE__)."/bodypart.class.php");
 
+if (!function_exists("quoted_printable_encode")) {
+	// aus http://de.php.net/quoted_printable_decode
+	function quoted_printable_encode($string) {
+		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
+		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
+		return $string;
+	}
+}
+
 class Message {
 	private $articlenum;
 	private $messageid;
@@ -139,6 +148,7 @@ class Message {
 		return $this->group;
 	}
 
+	// TODO methode umlagern (zur NNTPConnection ?)
 	public function getPlain($charset = null) {
 		if ($charset === null) {
 			$charset = $this->getCharset();
@@ -164,8 +174,8 @@ class Message {
 		$data .= "User-Agent: " . "NNTPBoard" . $crlf;
 		if ($this->isMime()) {
 			/* MIME-Header */
-			// TODO boundary generieren
-			$boundary = md5(rand(1000,9999) . "~" . microtime(true)) . "~NNTPBoard";
+			// Generiere den Boundary - er sollte _nicht_ im Text vorkommen
+			$boundary = "--" . md5(uniqid());
 			$data .= "Content-Type: multipart/" . $this->getMimeType() . "; boundary=\"" . addcslashes($boundary, "\"") . "\"" . $crlf;
 			$data .= $crlf;
 			$data .= "This is a MIME-Message." . $crlf;
@@ -189,12 +199,31 @@ class Message {
 				$data .= "Content-Disposition: " . $part->getDisposition() . ($part->hasFilename() ? "; filename=\"".addcslashes($part->getFilename(), "\"")."\"" : "") . $crlf;
 				$disposition = true;
 			}
-			// TODO base64 ist kein allheilmittel :P
-			$data .= "Content-Transfer-Encoding: " . "base64" . $crlf;
+			/* Waehle das Encoding aus - Base64 geht immer, aber fuer Text ist quoted-printable doch schoener */
+			$encoding = "base64";
+			if ($part->isText()) {
+				$encoding = "quoted-printable";
+			}
+			$data .= "Content-Transfer-Encoding: " . $encoding . $crlf;
 			$data .= $crlf;
 
 			/* Body */
-			$data .= rtrim(chunk_split(base64_encode($part->getText($content)), 76, $crlf), $crlf) . $crlf;
+			$body = $part->getText($charset);
+			switch ($encoding) {
+			case "base64":
+				$body = chunk_split(base64_encode($body), 76, $crlf);
+				break;
+			case "quoted-printable":
+				$body = quoted_printable_encode($body);
+				break;
+			case "7bit":
+			case "8bit":
+			case "binary":
+				// Do nothing!
+				break;
+			}
+			
+			$data .= rtrim($body, $crlf) . $crlf;
 			$data .= $crlf;
 		}
 		// MIME-Abschluss einbringen

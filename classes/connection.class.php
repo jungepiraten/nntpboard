@@ -29,28 +29,9 @@ interface Connection {
 }
 
 abstract class AbstractConnection implements Connection {
-	private $mayRead = false;
-	private $mayPost = false;
-
-	public function __construct($mayread, $maypost, $moderated) {
-		$this->mayRead = $mayread;
-		$this->mayPost = $maypost;
-		$this->moderated = $moderated;
-	}
-	
-	public function mayRead() {
-		return $this->mayRead;
+	public function __construct() {
 	}
 
-	public function mayPost() {
-		return $this->mayPost;
-	}
-	
-	public function isModerated() {
-		return $this->moderated;
-	}
-	
-	
 	abstract protected function getLastThread();
 
 	public function getLastPostMessageID() {
