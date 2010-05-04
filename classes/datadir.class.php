@@ -1,7 +1,8 @@
 <?php
 
-class DataDirException extends Exception {}
+require_once(dirname(__FILE__) . "/exceptions/datadir.exception.php");
 
+// TODO Konzept der DataDir ueberdenken
 class DataDir {
 	private $dir;
 	private $webdir;
@@ -19,11 +20,16 @@ class DataDir {
 					if (!file_exists(dirname($dir))) {
 						mkdir_parents(dirname($dir));
 					}
-					mkdir($dir);
+					if (!@mkdir($dir)) {
+						return false;
+					}
 				}
 			}
 		}
-		mkdir_parents(rtrim($this->dir, "/") . "/" . ltrim(dirname($filename), "/"));
+		$dirname = rtrim($this->dir, "/") . "/" . ltrim(dirname($filename), "/");
+		if (!file_exists($dirname) && !mkdir_parents($dirname)) {
+			throw new CreationFailedDataDirException(dirname($filename));
+		}
 		return rtrim($this->dir, "/") . "/" . ltrim($filename, "/");
 	}
 	

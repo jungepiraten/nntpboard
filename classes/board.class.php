@@ -10,7 +10,7 @@ class Board {
 	private $group;
 	private $subboards = array();
 
-	public function __construct($boardid, $name, $desc, $group) {
+	public function __construct($boardid, $name, $desc, $group = null) {
 		$this->boardid = $boardid;
 		$this->name = $name;
 		$this->desc = $desc;
@@ -31,10 +31,6 @@ class Board {
 	
 	public function getDesc() {
 		return $this->desc;
-	}
-	
-	public function setDesc($desc) {
-		$this->desc = $desc;
 	}
 
 	public function hasParent() {

@@ -4,6 +4,9 @@
 <link rel="stylesheet" href="styles/default.css" type="text/css" />
 </head>
 <body>
-<a href="index.php">Start</a>
-| <a href="userpanel.php">{if !isset($auth) || $auth->isAnonymous()}Anmelden{else}{$auth->getAddress()}{/if}</a>
-{if isset($auth) && !$auth->isAnonymous()} | <a href="userpanel.php?logout">Abmelden</a>{/if}
+<ul class="navigation global">
+ <li class="start"><a href="index.php" class="start">Start</a></li>
+ <li class="userpanel"><a href="userpanel.php" class="userpanel">{if !isset($auth) || $auth->isAnonymous()}Anmelden{else}{$auth->getAddress()}{/if}</a></li>
+ {if isset($auth) && !$auth->isAnonymous()}<li class="logout"><a class="logout" href="userpanel.php?logout">Abmelden</a></li>{/if}
+</ul>
+<div class="body">

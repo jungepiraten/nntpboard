@@ -1,6 +1,112 @@
 body {
-	margin:0px; padding:0px;
+	margin:0px; padding:0px; font-family:sans-serif;
 }
-.message .meta {
-	vertical-align:top; color:gray; font-weight:normal;
+
+ul.navigation.global {
+	list-style:none;
+	float:right;
+	margin-right:30px;
+}
+ul.navigation.global li {
+	float:left;
+	margin-left: 20px;
+}
+ul.navigation.global a {
+	text-decoration:none;
+	font-size:1.1em;
+	color:#004fa8;
+}
+ul.navigation.global a:hover {
+	color:#002754;
+}
+
+/* Breadcrumb-Navigation */
+
+ul.breadcrumb {
+	list-style:none;
+	padding:0px;
+}
+ul.breadcrumb li {
+	float:left;
+	margin-left:0px;
+}
+ul.breadcrumb li+li {
+	margin-left:15px;
+}
+ul.breadcrumb+* {
+	clear:left;
+}
+
+/* Unterforen */
+
+div.subboards>ul.subboards {
+	list-style:none;
+	padding:0px;
+}
+div.subboards>ul.subboards>li {
+	margin:5px;
+	padding:5px;
+	border:2px solid black;
+	margin-bottom:10px;
+	background:#004fa8;
+}
+div.subboards>ul.subboards>li>.name {
+	color:white;
+	text-decoration:none;
+	font-weight:bold;
+}
+div.subboards>ul.subboards>li>.desc {
+	color:white;
+	display:block;
+}
+div.subboards>ul.subboards>li>span>a {
+	color:white;
+}
+div.subboards>ul.subboards>li ul.subboards {
+	margin-top:2px;
+	background:white;
+}
+
+div.subboards>ul.subboards ul.subboards {
+	list-style:none;
+	padding:5px 10px;
+}
+
+/* Thread-Ansicht */
+
+.message {
+	border:2px solid black;
+	margin:5px;
+	padding:5px;
+}
+.message.odd {
+	background-color:#0077ff;
+	border-color:#002754;
+}
+.message.even {
+	background-color:#004fa8;
+	border-color:#002754;
+}
+.message .author {
+	display:block;
+	text-decoration:underline;
+}
+.message .date {
+	display:block;
+}
+.message .subject {
+	margin-left:200px;
+	font-weight:bold;
+}
+.message .body {
+	margin:0px;
+	margin-left:200px;
+}
+.message p.body {
+	background-color:white;
+}
+.message a.body {
+	color:white;
+	font-weight:bold;
+	text-decoration:none;
 }

@@ -5,14 +5,14 @@
 <p class="error">Login fehlgeschlagen!</p>
 {/if}
 
-<form action="userpanel.php" method="post">
+<form action="userpanel.php" method="post" class="login">
  <fieldset>
-  <label for="username">Benutzername:</label>
-  <input type="text" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|escape:html}{/if}" />
-  <label for="password">Passwort:</label>
-  <input type="password" name="password" />
+  <label for="username" class="username">Benutzername:</label>
+  <input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|escape:html}{/if}" />
+  <label for="password" class="password">Passwort:</label>
+  <input type="password" class="password" name="password" />
 
-  <input type="submit" name="login" />
+  <input type="submit" class="submit" name="login" value="Login" />
  </fieldset>
 </form>
 {include file=footer.html.tpl}

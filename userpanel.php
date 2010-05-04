@@ -1,11 +1,9 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.inc.php");
-require_once(dirname(__FILE__)."/classes/auth.class.php");
-require_once(dirname(__FILE__)."/classes/smarty.class.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
 $session = new Session($config);
-$smarty = new UserPanelSmarty($config, $session->getAuth());
+$template = $config->getTemplate($session->getAuth());
 
 if (isset($_REQUEST["login"])) {
 	$user = isset($_REQUEST["username"]) ? stripslashes($_REQUEST["username"]) : null;
@@ -14,23 +12,23 @@ if (isset($_REQUEST["login"])) {
 	try {
 		$auth = $config->getAuth($user, $pass);
 		$session->login($auth);
-		$smarty->viewloginsuccess($auth);
+		$template->viewloginsuccess($auth);
 	} catch (AuthException $e) {
-		$smarty->viewloginfailed();
+		$template->viewloginfailed();
 		exit;
 	}
 }
 
 if (isset($_REQUEST["logout"])) {
 	$session->logout();
-	$smarty->viewlogoutsuccess();
+	$template->viewlogoutsuccess();
 }
 
 if ($session->getAuth()->isAnonymous()) {
-	$smarty->viewloginform();
+	$template->viewloginform();
 	exit;
 }
 
-$smarty->viewuserpanel();
+$template->viewuserpanel();
 
 ?>

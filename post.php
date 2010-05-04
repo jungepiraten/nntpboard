@@ -1,35 +1,33 @@
 <?php
 
-require_once(dirname(__FILE__)."/config.inc.php");
-require_once(dirname(__FILE__)."/classes/smarty.class.php");
-require_once(dirname(__FILE__)."/classes/session.class.php");
 require_once(dirname(__FILE__)."/classes/address.class.php");
 require_once(dirname(__FILE__)."/classes/message.class.php");
 require_once(dirname(__FILE__)."/classes/bodypart.class.php");
-require_once(dirname(__FILE__)."/classes/exceptions/post.exception.php");
+
+require_once(dirname(__FILE__)."/config.inc.php");
+require_once(dirname(__FILE__)."/classes/session.class.php");
 $session = new Session($config);
-$smarty = new PostSmarty($config, $session->getAuth());
+$template = $config->getTemplate($session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $reference = !empty($_REQUEST["reference"]) ? stripslashes($_REQUEST["reference"]) : null;
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
-	die("Board nicht gefunden!");
+	$template->showexception(new Exception("Board nicht gefunden!"));
 }
 
 $group = $board->getGroup();
 if ($group === null) {
-	die("Board enthaelt keine Group!");
+	$template->showexception(new Exception("Board enthaelt keine Group!"));
 }
 $connection = $group->getConnection($config->getDataDir(), $session->getAuth());
-$connection->open();
 
 if ($reference !== null) {
+	$connection->open();
 	$reference = $connection->getMessage($reference);
+	$connection->close();
 }
-
-$connection->close();
 
 if (isset($_REQUEST["post"])) {
 	// TODO Sperre gegen F5
@@ -39,7 +37,7 @@ if (isset($_REQUEST["post"])) {
 	$messageid = "<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">";
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->getAddress();
-	$charset = $config->getCharSet();
+	$charset = (!empty($_REQUEST["charset"]) ? trim(stripslashes($_REQUEST["charset"])) : $config->getCharSet());
 	
 	if ($reference !== null) {
 		$threadid = $reference->getThreadID();
@@ -68,14 +66,13 @@ if (isset($_REQUEST["post"])) {
 		if ($group->isModerated()) {
 			// TODO bestaetigung anzeigen oder so
 		} else {
-			$smarty->viewpostsuccess($board, $message);
+			$template->viewpostsuccess($board, $message);
 		}
 	} catch (PostingNotAllowedException $e) {
-		// TODO Fehler anzeigen
-		var_dump($e);
+		$template->viewexception($e);
 	}
 }
 
-$smarty->viewpostform($board, $reference);
+$template->viewpostform($board, $reference);
 
 ?>

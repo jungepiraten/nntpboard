@@ -1,47 +1,28 @@
 {include file=header.html.tpl}
-<h1>{$board->getName()}</h1>
+<h1>{$board->getName()|escape:html}</h1>
 
-{include file=board_breadcrumb.html.tpl board=$board}
+<ul class="breadcrumb navigation">{include file=board_breadcrumb.html.tpl board=$board}</ul>
 
-{if $board->hasSubBoards()}
-{assign var=subboardsWithGroup value=0}
-{foreach from=$board->getSubBoards() item=subboard}
-{if !$subboard->hasGroup()}
-{include file=board_boards.html.tpl boardid=$subboard->getBoardID() heading=$subboard->getName() subboards=$subboard->getSubBoards()}
-{else}
-{math equation=a+1 assign=subboardsWithGroup a=$subboardsWithGroup}
-{/if}
-{/foreach}
+<p class="desc">{$board->getDesc()}</p>
 
-{if $subboardsWithGroup > 0}{include file=board_boards.html.tpl subboards=$board->getSubBoards()}{/if}
-{/if}
-
-{if $board->hasGroup() && $mayPost}
-<a href="post.php?boardid={$board->getBoardID()|escape:url}">Neuer Thread</a>
-{/if}
+{if $board->hasSubBoards()}<div class="subboards">{include file=board_boards.html.tpl subboards=$board->getSubBoards()}</div>{/if}
 
 {if isset($threads)}
-<table>
-<thead>
-<tr>
- <th>&nbsp;</th>
- <th>Thema</th>
- <th>Posts</th>
- <th>Geschrieben</th>
- <th>Letzte Antwort</th>
-</tr>
-</thead>
-<tbody>
+<ul class="threads">
 {foreach from=$threads item=thread}
-<tr>
- <td>{if isset($auth) && $auth->isUnreadThread($thread)}O{/if}</td>
- <td><a href="viewthread.php?boardid={$board->getBoardID()|escape:url}&amp;threadid={$thread->getThreadID()|escape:url}">{$thread->getSubject()}</a></td>
- <td>{$thread->getPosts()}</td>
- <td>{$thread->getDate()|date_format:"%d.%m.%Y %H:%M"}<br />von {$thread->getAuthor()}</td>
- <td><a href="viewthread.php?boardid={$board->getBoardID()}&amp;messageid={$thread->getLastPostMessageID()}">{$thread->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"}</a><br />von {$thread->getLastpostAuthor()}</td>
-</tr>
+ <li class="thread {cycle values="odd,even"}{if isset($auth) && $auth->isUnreadThread($thread)} unread{/if}">
+  <a class="subject" href="viewthread.php?boardid={$board->getBoardID()|escape:url}&amp;threadid={$thread->getThreadID()|escape:url}">{$thread->getSubject()}</a>
+  <span class="posts">{$thread->getPosts()}</span>
+  <span class="thread">
+   <span class="date">{$thread->getDate()|date_format:"%d.%m.%Y %H:%M"}</span>
+   von <span class="author">{$thread->getAuthor()}</span>
+  </span>
+  <span class="lastpost">
+   <a class="date" href="viewthread.php?boardid={$board->getBoardID()}&amp;messageid={$thread->getLastPostMessageID()}">{$thread->getLastPostDate()|date_format:"%d.%m.%Y %H:%M"}</a>
+   von <span class="author">{$thread->getLastpostAuthor()}</span>
+  </span>
+ </li>
 {/foreach}
-</tbody>
-</table>
+</ul>
 {/if}
 {include file=footer.html.tpl}

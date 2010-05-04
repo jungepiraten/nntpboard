@@ -1,13 +1,19 @@
 <?php
 
+require_once(dirname(__FILE__) . "/../template.class.php");
+
 require_once("/usr/share/php/Smarty/Smarty.class.php");
 
-abstract class NNTPBoardSmarty extends Smarty {
+/**
+ * NOTE: _all_ view* functions quit execution!
+ */
+
+class NNTPBoardSmarty extends Smarty implements Template {
 	private $config;
 	
 	public function __construct($config, $auth) {
+		parent::__construct();
 		$this->config = $config;
-		$this->register_function("redirect", smarty_function_redirect);
 		$this->register_function("getlink", array($this, getLink));
 		$this->assign("CHARSET", $config->getCharset());
 		$this->assign("DATADIR", $config->getDataDir());
@@ -16,6 +22,14 @@ abstract class NNTPBoardSmarty extends Smarty {
 	
 	function getLink($params) {
 		return $this->config->getDataDir()->getWebPath($params["file"]);
+	}
+
+
+
+	public function viewexception($exception) {
+		$this->assign("message", $exception->getMessage());
+		$this->display("exception.html.tpl");
+		exit;
 	}
 	
 	public function viewboard($board, $group, $threads = null, $mayPost = false) {
@@ -55,16 +69,18 @@ abstract class NNTPBoardSmarty extends Smarty {
 
 	public function viewpostsuccess($board, $message) {
 		$this->viewmessage($board, null, $message, true);
+		exit;
 	}
 	
-	public function viewloginform($loginfailed = false) {
-		$this->assign("loginfailed", $loginfailed);
+	public function viewloginform() {
 		$this->display("loginform.html.tpl");
 		exit;
 	}
 
 	public function viewloginfailed() {
-		$this->viewloginform(true);
+		$this->assign("loginfailed", true);
+		$this->display("loginform.html.tpl");
+		exit;
 	}
 
 	public function viewloginsuccess($auth) {
@@ -85,38 +101,8 @@ abstract class NNTPBoardSmarty extends Smarty {
 	
 	public function viewuserpanel() {
 		$this->display("userpanel.html.tpl");
+		exit;
 	}
-}
-
-class ViewBoardSmarty extends NNTPBoardSmarty {}
-class ViewThreadSmarty extends NNTPBoardSmarty {}
-class PostSmarty extends NNTPBoardSmarty {}
-class UserPanelSmarty extends NNTPBoardSmarty {}
-
-/**
-* Smarty {redirect} function plugin
-*
-* Type: function
-* Name: redirect
-* Purpose: Do a HTTP redirect
-* @link http://www.webmaterials.com
-* (Webmaterials website)
-* @param array
-* @param Smarty
-* @return string
-*/
-function smarty_function_redirect($params, &$smarty) {
-	if (!isset($params['url'])) {
-		$smarty->triggererror("redirect: missing 'url' parameter");
-		return;
-	}
-	if (empty($params['url'])) {
-		$smarty->triggererror("redirect: empty 'url' parameter");
-		return;
-	}
-	header("Location: ".$params['url']);
-	$html ='<a href="'.$params['url'].'">'.$params['url'].'</a>';
-	return $html;
 }
 
 ?>

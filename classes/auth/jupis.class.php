@@ -100,7 +100,7 @@ class JuPisAuth extends JuPisAnonAuth {
 	private function getLDAPLink() {
 		$link = Net_LDAP2::connect(array("binddn" => $this->getUserDN(), "bindpw" => $this->password, "port" => 10389) );
 		if ($link instanceof PEAR_Error) {
-			throw new AuthException("Login failed!");
+			throw new LoginFailedAuthException($this->username);
 		}
 		return $link;
 	}

@@ -2,7 +2,6 @@
 
 class BodyPart {
 	private $messageid;
-	private $partid;
 	private $text;
 	private $charset = "UTF-8";
 	private $filename = null;
@@ -11,9 +10,8 @@ class BodyPart {
 	private $mimesubtype = null;
 	private $location = null;
 
-	public function __construct($message, $partid, $disposition, $mimetype, $text, $charset = "UTF-8", $filename = null) {
+	public function __construct($message, $disposition, $mimetype, $text, $charset = "UTF-8", $filename = null) {
 		$this->messageid = $message->getMessageID();
-		$this->partid = $partid;
 		if (!empty($disposition)) {
 			$this->disposition = strtolower($disposition);
 		}
@@ -33,10 +31,6 @@ class BodyPart {
 	
 	public function getMessageID() {
 		return $this->messageid;
-	}
-	
-	public function getPartID() {
-		return $this->partid;
 	}
 	
 	/**
@@ -75,10 +69,16 @@ class BodyPart {
 				$text = strip_tags($text);
 			}
 		} else {
-			$text = htmlentities($text, ENT_QUOTES, $charset);
+			// htmlentities kann nur sehr beschraenkt Charsets
+			$text = iconv(
+			            "ISO-8859-1", $charset,
+			            htmlentities(
+			                iconv($charset, "ISO-8859-1", $text),
+			                ENT_QUOTES, "ISO-8859-1") );
 		}
 
 		// TODO Links ersetzen und weitere Formatierung einbauen
+		$text = nl2br($text);
 
 		return $text;
 	}

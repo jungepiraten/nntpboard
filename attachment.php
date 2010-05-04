@@ -27,6 +27,8 @@ if ($part === null) {
 	die("BodyPart ungueltig!");
 }
 
+// TODO statisch weiterleiten (koennte effektiver sein)
+
 $disposition = $part->getDisposition();
 $filename = $part->getFilename();
 $charset = $part->getCharset();

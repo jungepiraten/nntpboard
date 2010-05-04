@@ -11,8 +11,24 @@ class Address {
 		$this->comment = $comment;
 	}
 
-	public function getIMFString() {
-		return (!empty($this->name) ? "{$this->name} <{$this->addr}>" : $this->addr) . (!empty($this->comment) ? " ({$this->comment})" : "");
+	public function hasName() {
+		return !empty($this->name);
+	}
+
+	public function getName() {
+		return $this->name;
+	}
+
+	public function getAddress() {
+		return $this->addr;
+	}
+
+	public function hasComment() {
+		return !empty($this->comment);
+	}
+
+	public function getComment() {
+		return $this->comment;
 	}
 
 	public function __toString() {

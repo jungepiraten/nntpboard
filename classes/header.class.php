@@ -1,5 +1,6 @@
 <?php
 
+// TODO wird nur von NNTPConnection benutzt ...
 class Header {
 	private $name;
 	private $value;
@@ -16,7 +17,10 @@ class Header {
 		return $this->name;
 	}
 
-	public function getValue() {
+	public function getValue($charset = null) {
+		if ($charset != null) {
+			return iconv($this->getCharset(), $charset, $this->getValue());
+		}
 		return $this->value;
 	}
 
@@ -32,7 +36,10 @@ class Header {
 		return isset($this->extra[strtolower($name)]);
 	}
 
-	public function getExtra($name) {
+	public function getExtra($name, $charset = null) {
+		if ($charset != null) {
+			return iconv($this->getCharset(), $charset, $this->getExtra($name));
+		}
 		return $this->extra[strtolower($name)];
 	}
 }
