@@ -4,7 +4,6 @@ require_once(dirname(__FILE__)."/classes/host.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
-require_once(dirname(__FILE__)."/classes/datadir.class.php");
 
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
@@ -24,10 +23,6 @@ class Config extends DefaultConfig {
 		$this->addBoard(null, new Board(200, "Prauscher", ""));
 		$this->addBoard(200, new Board(210, "Testbasis", "Prauschers Testbasis. MODERIERT!",
 		                     new Group($host, "prauscher.test", Group::READMODE_OPEN, Group::POSTMODE_MODERATED_AUTH)));
-	}
-
-	public function getDataDir() {
-		return new Datadir(dirname(__FILE__)."/data");
 	}
 
 	public function getTemplate($auth) {

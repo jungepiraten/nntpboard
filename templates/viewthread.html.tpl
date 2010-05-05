@@ -3,21 +3,19 @@
 
 <ul class="breadcrumb navigation">{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}</ul>
 
-<div class="options">
- <!-- TODO messageid != threadid! -->
- {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$thread.threadid}" class="reply">Antworten</a>{/if}
-</div>
-
+<ul class="page">
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
- {if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}
+ <li class="page">{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}</li>
 {/section}
+</ul>
 
 {foreach from=$messages item=message}
 <div class="message {cycle values="odd,even"}">
  <a name="article{$message.articlenum|escape:html}" class="anchor"></a>
  <span class="author">{$message.author|escape:html}</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
+ {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$message.messageid}" class="reply">Antworten</a>{/if}
  <span class="subject">{$message.subject|escape:html}</span>
  {foreach from=$message.bodyparts key=partid item=part}
   {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;partid={$partid}{/capture}
@@ -31,4 +29,11 @@
  {/foreach}
 </div>
 {/foreach}
+
+<ul class="page">
+{section name=page start=0 loop=$pages}
+{assign var=p value=$smarty.section.page.index}
+ <li class="page">{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}</li>
+{/section}
+</ul>
 {include file=footer.html.tpl}

@@ -20,10 +20,10 @@ if ($group === null) {
 }
 
 /* Thread laden */
-$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
+$connection = $group->getConnection($session->getAuth());
 // Sobald die Verbindung geoeffnet ist, beginnen wir einen Kritischen Abschnitt!
 $connection->open();
-if ($messageid !== null) {
+if ($threadid === null && $messageid !== null) {
 	$message = $connection->getMessage($messageid);
 	if ($message === null) {
 		// viewexception beendet das Script

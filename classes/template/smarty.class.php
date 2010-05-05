@@ -8,28 +8,19 @@ require_once("/usr/share/php/Smarty/Smarty.class.php");
  * NOTE: _all_ view* functions quit execution!
  */
 
-class NNTPBoardSmarty extends Smarty implements Template {
-	private $config;
-	private $charset;
-	private $auth;
+class NNTPBoardSmarty extends AbstractTemplate implements Template {
+	private $smarty;
 	
-	public function __construct($charset, $auth) {
-		parent::__construct();
+	public function __construct($charset, $auth, $threadsperpage = null, $messagesperpage = null) {
+		parent::__construct($charset, $auth, $threadsperpage, $messagesperpage);
 		$this->config = $config;
 		$this->charset = $charset;
 		$this->auth = $auth;
 
-		$this->assign("CHARSET", $this->getCharset());
-		$this->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
-		$this->assign("ADDRESS", $this->getAuth()->getAddress($this->getCharset()));
-	}
-
-	function getCharset() {
-		return $this->charset;
-	}
-
-	function getAuth() {
-		return $this->auth;
+		$this->smarty = new Smarty;
+		$this->smarty->assign("CHARSET", $this->getCharset());
+		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
+		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress($this->getCharset()));
 	}
 
 
@@ -102,8 +93,8 @@ class NNTPBoardSmarty extends Smarty implements Template {
 
 
 	public function viewexception($exception) {
-		$this->assign("message", $exception->getMessage());
-		$this->display("exception.html.tpl");
+		$this->smarty->assign("message", $exception->getMessage());
+		$this->smarty->display("exception.html.tpl");
 		exit;
 	}
 	
@@ -115,10 +106,8 @@ class NNTPBoardSmarty extends Smarty implements Template {
 			}
 		}
 		
-		// TODO parametisieren
-		$threadsperpage = 10;
 		$page = 0;
-		$pages = ceil(count($threads) / $threadsperpage);
+		$pages = ceil(count($threads) / $this->getThreadsPerPage());
 		if (isset($_REQUEST["page"])) {
 			$page = intval($_REQUEST["page"]);
 		}
@@ -127,13 +116,13 @@ class NNTPBoardSmarty extends Smarty implements Template {
 			$page = 0;
 		}
 		
-		$this->assign("page", $page);
-		$this->assign("pages", $pages);
+		$this->smarty->assign("page", $page);
+		$this->smarty->assign("pages", $pages);
 
-		$this->assign("board", $this->parseBoard($board));
-		$this->assign("threads", array_slice($threads, $page * $threadsperpage, $threadsperpage));
-		$this->assign("mayPost", $mayPost);
-		$this->display("viewboard.html.tpl");
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("threads", array_slice($threads, $page * $this->getThreadsPerPage(), $this->getThreadsPerPage()));
+		$this->smarty->assign("mayPost", $mayPost);
+		$this->smarty->display("viewboard.html.tpl");
 		exit;
 	}
 	
@@ -145,10 +134,8 @@ class NNTPBoardSmarty extends Smarty implements Template {
 			}
 		}
 		
-		// TODO parametisieren
-		$messagesperpage = 10;
 		$page = 0;
-		$pages = ceil(count($messages) / $messagesperpage);
+		$pages = ceil(count($messages) / $this->getMessagesPerPage());
 		if (isset($_REQUEST["page"])) {
 			$page = intval($_REQUEST["page"]);
 		}
@@ -157,19 +144,23 @@ class NNTPBoardSmarty extends Smarty implements Template {
 			$page = 0;
 		}
 		
-		$this->assign("page", $page);
-		$this->assign("pages", $pages);
-		$this->assign("board", $this->parseBoard($board));
-		$this->assign("thread", $this->parseThread($thread));
-		$this->assign("messages", array_slice($messages, $page * $messagesperpage, $messagesperpage));
-		$this->assign("mayPost", $mayPost);
-		$this->display("viewthread.html.tpl");
+		$this->smarty->assign("page", $page);
+		$this->smarty->assign("pages", $pages);
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("thread", $this->parseThread($thread));
+		$this->smarty->assign("messages", array_slice($messages, $page * $this->getMessagesPerPage(), $this->getMessagesPerPage()));
+		$this->smarty->assign("mayPost", $mayPost);
+		$this->smarty->display("viewthread.html.tpl");
 		exit;
 	}
 	
 	public function viewmessage($board, $thread, $message, $mayPost = false) {
 		// TODO auch auf die richtige seite weiterleiten :o
-		header("Location: viewthread.php?boardid={$board->getBoardID()}&threadid={$thread->getThreadID()}#article{$message->getArticleNum()}");
+		$page = 0;
+		header("Location: viewthread.php?boardid=" . urlencode($board->getBoardID()) .
+		                  "&threadid=" . urlencode($thread->getThreadID()) .
+		                  "&page=" . intval($page) . "#article" . 
+		                  urlencode($message->getArticleNum()));
 		exit;
 	}
 
@@ -177,14 +168,14 @@ class NNTPBoardSmarty extends Smarty implements Template {
 		$subject = "";
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
-			$this->assign("reference", $reference->getMessageID());
-			$this->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
+			$this->smarty->assign("reference", $reference->getMessageID());
+			$this->smarty->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
 		}
 
-		$this->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
+		$this->smarty->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
 		
-		$this->assign("board", $this->parseBoard($board));
-		$this->display("postform.html.tpl");
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->display("postform.html.tpl");
 		exit;
 	}
 
@@ -199,19 +190,19 @@ class NNTPBoardSmarty extends Smarty implements Template {
 	}
 	
 	public function viewloginform() {
-		$this->display("loginform.html.tpl");
+		$this->smarty->display("loginform.html.tpl");
 		exit;
 	}
 
 	public function viewloginfailed() {
-		$this->assign("loginfailed", true);
-		$this->display("loginform.html.tpl");
+		$this->smarty->assign("loginfailed", true);
+		$this->smarty->display("loginform.html.tpl");
 		exit;
 	}
 
 	public function viewloginsuccess($auth) {
 		// Da sich nach einem erfolgreichen Login das Authobjekt geaendert hat, updaten wir hier mal schnell
-		$this->assign("auth", $auth);
+		$this->smarty->assign("auth", $auth);
 		
 		header("Location: userpanel.php");
 		exit;
@@ -219,14 +210,14 @@ class NNTPBoardSmarty extends Smarty implements Template {
 
 	public function viewlogoutsuccess() {
 		// Da sich nach einem erfolgreichen Logout das Authobjekt geaendert hat, updaten wir hier mal schnell
-		$this->assign("auth", null);
+		$this->smarty->assign("auth", null);
 		
 		header("Location: userpanel.php");
 		exit;
 	}
 	
 	public function viewuserpanel() {
-		$this->display("userpanel.html.tpl");
+		$this->smarty->display("userpanel.html.tpl");
 		exit;
 	}
 }

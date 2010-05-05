@@ -7,16 +7,18 @@
 
 {if isset($board.childs)}<div class="subboards">{include file=board_boards.html.tpl subboards=$board.childs}</div>{/if}
 
-<div class="options">
- {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
-</div>
-
-{section name=page start=0 loop=$pages}
-{assign var=p value=$smarty.section.page.index}
- {if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}
-{/section}
+<ul class="options">
+ {if ($mayPost)}<li class="newthread"><a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a></li>{/if}
+</ul>
 
 {if isset($threads)}
+<ul class="page">
+{section name=page start=0 loop=$pages}
+{assign var=p value=$smarty.section.page.index}
+ <li class="page">{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}</li>
+{/section}
+</ul>
+
 <ul class="threads">
 {foreach from=$threads item=thread}
  <li class="thread {cycle values="odd,even"}{if $thread.unread} unread{/if}">
@@ -33,5 +35,16 @@
  </li>
 {/foreach}
 </ul>
+
+<ul class="page">
+{section name=page start=0 loop=$pages}
+{assign var=p value=$smarty.section.page.index}
+ <li class="page">{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}</li>
+{/section}
+</ul>
 {/if}
+
+<ul class="options">
+ {if ($mayPost)}<li class="newthread"><a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a></li>{/if}
+</ul>
 {include file=footer.html.tpl}

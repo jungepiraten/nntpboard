@@ -21,7 +21,7 @@ $group = $board->getGroup();
 if ($group === null) {
 	$template->showexception(new Exception("Board enthaelt keine Group!"));
 }
-$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
+$connection = $group->getConnection($session->getAuth());
 
 if ($reference !== null) {
 	$connection->open();

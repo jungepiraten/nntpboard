@@ -8,15 +8,15 @@ require_once(dirname(__FILE__)."/config.inc.php");
  *  - Nachrichten in den Cache herunterladen
  **/
 foreach ($config->getGroups() as $group) {
-	$cache = $group->getConnection($config->getDataDir(), null, Group::CONNECTION_CACHE);
-	// Nur CacheConnections zulassen
+	// Benutze keinen Auth ...
+	$cache = $group->getConnection(null);
+	
+	// Nur bei CacheConnections macht das wirklich Sinn ...
 	if (!($cache instanceof CacheConnection)) {
 		continue;
 	}
 
-	$connection = $group->getConnection($config->getDataDir(), null, Group::CONNECTION_DIRECT);
 	try {
-		$connection->open();
 		$cache->open();
 
 		/**
@@ -29,21 +29,15 @@ foreach ($config->getGroups() as $group) {
 		 **/
 
 		// Versuche neue Nachrichten zu ergattern
-		try {
-			$cache->loadMessages($connection);
-		} catch (Exception $e) {
-			echo "<pre>" . $e->getMessage() . "</pre>";
-		}
+		$cache->loadMessages();
 
 		// Versuche lokale Nachrichten zu posten
-		try {
-			$cache->sendMessages($connection);
-		} catch (Exception $e) {
-			echo "<pre>" . $e->getMessage() . "</pre>";
-		}
+		/* WICHTIG: Diese Nachrichten werden mit dem Auth-Parameter "null"
+		 *          verschickt - das kann, muss aber nicht funktionieren :P
+		 */
+		$cache->sendMessages();
 		
 		$cache->close();
-		$connection->close();
 	} catch (Exception $e) {
 var_dump($e);
 		echo "<pre>".$e->getMessage()."</pre>";

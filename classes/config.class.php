@@ -28,7 +28,6 @@ abstract class DefaultConfig {
 	abstract public function getAuth($user, $pass);
 	abstract public function getAnonymousAuth();
 
-	abstract public function getDatadir();
 	abstract public function getTemplate($auth);
 
 	abstract public function getMessageIDHost();

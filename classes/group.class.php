@@ -1,15 +1,11 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.class.php");
-require_once(dirname(__FILE__)."/connection/mixed.class.php");
 require_once(dirname(__FILE__)."/connection/cache.class.php");
+require_once(dirname(__FILE__)."/connection/cacheprovider/file.class.php");
 require_once(dirname(__FILE__)."/connection/nntp.class.php");
 
 class Group {
-	const CONNECTION_DEFAULT =	1;
-	const CONNECTION_DIRECT =	2;
-	const CONNECTION_CACHE =	3;
-
 	/* Immer direkte Verbindung nutzen */
 	const CACHEMODE_NOCACHE =	1;
 	/* Cache nur zum Lesen benutzen */
@@ -31,9 +27,9 @@ class Group {
 	/* Moderierte Gruppe, Alle duerfen vorschlagen */
 	const POSTMODE_MODERATED_OPEN =	3;
 	/* Moderierte Gruppe, Authentifizierte Benutzer duerfen vorschlagen */
-	const POSTMODE_MODERATED_AUTH =	3;
+	const POSTMODE_MODERATED_AUTH =	4;
 	/* Keiner darf schreiben */
-	const POSTMODE_CLOSED =	3;
+	const POSTMODE_CLOSED =	5;
 	
 	private $host;
 	private $group;
@@ -58,26 +54,35 @@ class Group {
 		return $this->group;
 	}
 	
-	public function getConnection($datadir = null, $auth = null, $useconnection = self::CONNECTION_DEFAULT) {
-		// Ist dies ein Spezialfall?
-		switch ($useconnection) {
-		case self::CONNECTION_DIRECT:
-			return $this->getDirectConnection($datadir, $auth);
-		case self::CONNECTION_CACHE:
-			return $this->getCacheConnection($datadir, $auth);
-		}
-		
+	public function getConnection($auth = null) {
 		// Frage die Gruppen-Spezifischen Eigenschaften ab
 		switch ($this->cachemode) {
 		case self::CACHEMODE_NOCACHE:
-			return $this->getDirectConnection($datadir, $auth);
+			return $this->getDirectConnection($auth);
 		case self::CACHEMODE_READONLY:
-			return $this->getMixedConnection($datadir, $auth);
+			return $this->getMixedConnection($auth);
 		case self::CACHEMODE_CACHEONLY:
-			return $this->getCacheConnection($datadir, $auth);
+			return $this->getCacheConnection($auth);
 		}
 
 		throw new Exception("Ungueltiger CacheMode!");
+	}
+
+	private function getMixedConnection($auth) {
+		return new CacheConnection($this, $auth, $this->getCacheProvider(),
+		           $this->getDirectConnection($auth));
+	}
+
+	private function getDirectConnection($auth) {
+		return new NNTPConnection($this, $auth);
+	}
+
+	private function getCacheConnection($auth) {
+		return new CacheConnection($this, $auth, $this->getCacheProvider());
+	}
+
+	private function getCacheProvider() {
+		return new FileCacheProvider(dirname(__FILE__) . "/../data/" . $this->getGroup());
 	}
 
 	public function mayRead($auth) {
@@ -115,20 +120,6 @@ class Group {
 			return true;
 		}
 		return false;
-	}
-
-	private function getMixedConnection($datadir, $auth) {
-		$connection = new MixedConnection($this->getCacheConnection($datadir, $auth));
-		$connection->addConnection( MixedConnection::USE_POST, $this->getDirectConnection($datadir, $auth) );
-		return $connection;
-	}
-
-	private function getDirectConnection($datadir, $auth) {
-		return new NNTPConnection($this, $auth);
-	}
-
-	private function getCacheConnection($datadir, $auth) {
-		return new CacheConnection($this, $auth, $datadir);
 	}
 }
 

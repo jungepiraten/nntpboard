@@ -7,8 +7,8 @@ require_once(dirname(__FILE__)."/../connection.class.php");
 require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
-require_once(dirname(__FILE__)."/../header.class.php");
 require_once(dirname(__FILE__)."/../bodypart.class.php");
+require_once(dirname(__FILE__)."/nntp/header.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 
 if (!function_exists("quoted_printable_encode")) {
@@ -192,11 +192,12 @@ class NNTPConnection extends AbstractConnection {
 	/**
 	 * Initialisiere den Thread-Array
 	 * Dafuer muessen wir ALLE nachrichten laden und sortieren :(
+	 * TODO brauchen wir hier ueberhaupt Threads?
 	 **/
 	private function initThreads() {
 		$this->threads = array();
-		foreach ($this->getArticleNums() AS $artnr) {
-			$message = $this->getMessageByNum($artnr);
+		foreach ($this->getMessageIDs() AS $msgid) {
+			$message = $this->getMessage($msgid);
 
 			// Entweder Unterpost oder neuen Thread starten
 			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
@@ -211,15 +212,16 @@ class NNTPConnection extends AbstractConnection {
 			// Nachricht zum Thread hinzufuegen
 			$this->getThread($threadid)->addMessage($message);
 		}
+		// TODO sortieren
 	}
 
 	/**
 	 * KONVERT-FUNKTIONEN
-	 * TODO: Auslagern?
+	 * TODO: Auslagern? in einzelne NNTP-Klassen
 	 **/
 
 	/**
-	 * Parse die Header in einen Array von Header-Objekten
+	 * Parse die Header in einen Array von Header-Objekten [X]
 	 **/
 	private function parseHeaderLines($header_data) {
 		if (!is_array($header_data)) {
@@ -240,17 +242,7 @@ class NNTPConnection extends AbstractConnection {
 				$line .= " ".ltrim($header_data[++$i]);
 			}
 
-			list($name, $value) = explode(":", $line, 2);
-			// Eventuell vorhandene Extra-Attribute auffangen
-			$extras = explode(";", $value);
-			$value = trim(array_shift($extras));
-			$h = new Header(trim($name), mb_decode_mimeheader($value), $charset);
-			foreach ($extras AS $extra) {
-				list($name, $value) = explode("=", $extra, 2);
-				$name = mb_decode_mimeheader(trim($name));
-				$value = mb_decode_mimeheader(trim(trim($value),'"'));
-				$h->addExtra($name, $value);
-			}
+			$h = NNTPHeader::parsePlain($line);
 
 			$header[strtolower($h->getName())] = $h;
 		}
@@ -338,6 +330,7 @@ class NNTPConnection extends AbstractConnection {
 	/**
 	 * Parst einen BodyPart
 	 * @return	BodyPart
+	 * TODO Mime-Parsing komplett aendern
 	 **/
 	private function parseBodyPart($message, $part) {
 		list($header, $body) = preg_split("$\r?\n\r?\n$", $part, 2);
@@ -392,24 +385,6 @@ class NNTPConnection extends AbstractConnection {
 	 * Baut aus einem Message-Objekt wieder eine Nachricht
 	 **/
 	private function generateMessage($message) {
-		// TODO PEAR: Mail_mime
-		/*$mail = new Mail_Mime;
-		$headers = array(
-			"Message-ID"	=> $message->getMessageID(),
-			"From"		=> self::Author2Plain($message->getAuthor(), $charset),
-			"Date"		=> date("r", $message->getDate()),
-			"Subject"	=> $message->getSubject($charset),
-			"Newsgroups"	=> $message->getGroup()
-			);
-		if ($message->hasParent()) {
-			$headers["References"] = $message->getParentID();
-		}
-
-		foreach ($message->getBodyParts() AS $part) {
-			$
-		}
-
-		var_dump($mail->getMessage());*/
 		$charset = $message->getCharset();
 		$crlf = "\r\n";
 		

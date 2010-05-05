@@ -17,7 +17,11 @@ require_once(dirname(__FILE__)."/../exceptions/datadir.exception.php");
 class CacheConnection extends AbstractConnection {
 	private $group;
 	private $auth;
-	private $datadir;
+	private $cache;
+	/**
+	 * $uplink - Die Verbindung, mit der Nachrichten synchronisiert werden
+	 **/
+	private $uplink;
 
 	// MessageID => Message
 	private $messages = array();
@@ -28,112 +32,60 @@ class CacheConnection extends AbstractConnection {
 	// MessageID => true
 	private $queue = array();
 	
-	public function __construct($group, $auth, $datadir) {
+	public function __construct($group, $auth, $cache, $uplink = null) {
 		parent::__construct();
 		
 		$this->group = $group;
 		$this->auth = $auth;
-		$this->datadir = $datadir;
+		$this->cache = $cache;
+		$this->uplink = $uplink;
 	}
 	
 	public function open() {
-		if (file_exists($this->datadir->getGroupPath($this->group))) {
-			$filename = $this->datadir->getGroupPath($this->group);
-			$data = unserialize(file_get_contents($filename));
-			if ( !is_array($data["threadids"])
-			  || !is_array($data["threads"])
-			  || !is_array($data["queue"]) )
-			{
-				throw new InvalidDatafileDataDirException($this->datadir->getGroupPath($this->group));
-			}
-			$this->threadids	= $data["threadids"];
-			$this->threads		= $data["threads"];
-			$this->queue		= $data["queue"];
-
-			/**
-			 * Lade Threads erst nach und nach, um Weniger Last zu verursachen
-			 * vgl loadThreadMessages($threadid)
-			 **/
-		}
+		$this->cache->open();
 	}
 
 	public function close() {
-		$data = array(
-			"threadids"	=> $this->threadids,
-			"threads"	=> $this->threads,
-			"queue"		=> $this->queue);
-		
-		file_put_contents($this->datadir->getGroupPath($this->group), serialize($data));
-		
-		// Speichere die Nachrichten Threadweise
-		foreach ($this->threads AS $threadid => $thread) {
-			$messageids = $thread->getMessageIDs();
-			$messages = array();
-			// Attachments speichern
-			foreach ($messageids AS $messageid) {
-				$message = $this->getMessage($messageid);
-				$message->saveAttachments($this->datadir);
-				$messages[$messageid] = $message;
-			}
-			
-			$filename = $this->datadir->getThreadPath($this->group, $thread);
-			file_put_contents($filename, serialize($messages));
-		}
+		$this->cache->close();
 	}
 
 
 	public function getMessageIDs() {
-		return array_keys($this->threadids);
+		return $this->cache->getMessageIDs();
 	}
 
 	public function getMessageCount() {
-		return count($this->messages);
+		return $this->cache->getMessageCount();
 	}
 
 	public function hasMessage($messageid) {
-		// Wir speichern alle vorhanden MessageIDs
-		return $this->hasThread($messageid);
+		return $this->cache->hasMessage($messageid);
 	}
 
 	public function getMessage($messageid) {
-		// Haben wir die Nachricht schon gecached?
-		if (isset($this->messages[$messageid])) {
-			return $this->messages[$messageid];
-		}
-		// Falls wir den Thread kennen, laden wir darueber die Nachrichten
-		// (loadThreadMessages speichert in $messages)
-		if ($this->hasThread($messageid)) {
-			$this->loadThreadMessages($this->getThread($messageid));
-			return $this->messages[$messageid];
-		}
-		throw new NotFoundMessageException($messageid, $this->group);
+		return $this->cache->getMessage($messageid);
 	}
 
 
 	public function getThreadIDs() {
-		return array_keys($this->threads);
+		return $this->cache->getThreadIDs();
 	}
 
 	public function getThreadCount() {
-		return count($this->threads);
+		return $this->cache->getThreadCount();
 	}
 
 	public function hasThread($messageid) {
-		return isset($this->threadids[$messageid]) && isset($this->threads[$this->threadids[$messageid]]);
+		return $this->cache->hasThread($messageid);
 	}
 
 	public function getThread($messageid) {
-		$threadid = $this->threadids[$messageid];
-		return $this->threads[$threadid];
+		return $this->cache->getThread($messageid);
 	}
 
 
 	protected function getLastThread() {
-		if (empty($this->threads)) {
-			throw new EmptyGroupException($this->group);
-		}
-		// Wir nehmen an, dass die Threads sortiert sind ...
-		return array_shift(array_slice($this->threads, 0, 1));
+		return array_slice($this->getThreads(), 0, 1);
 	}
 
 	/**
@@ -143,6 +95,13 @@ class CacheConnection extends AbstractConnection {
 	 * Solange ist die Nachricht nur im Forum sichtbar.
 	 **/
 	public function post($message) {
+		// Falls vorhanden, posten wir das erstmal woanders (evtl kommen dabei ja Exceptions)
+		if ($this->uplink !== null) {
+			$this->uplink->open();
+			$this->uplink->post($message);
+			$this->uplink->close();
+		}
+		// Berechtigungscheck
 		if (!$this->group->mayPost($this->auth)) {
 			throw new PostingNotAllowedException();
 		}
@@ -150,104 +109,100 @@ class CacheConnection extends AbstractConnection {
 		if ($this->group->isModerated()) {
 			return;
 		}
-		$this->addQueueMessage($message);
-		$this->sort();
+		// Markiere die Nachricht nur in der Queue, falls der Uplink sie nicht schon hat.
+		if ($this->uplink !== null) {
+			$this->addMessage($message);
+		} else {
+			$this->addQueueMessage($message);
+		}
+		$this->cache->sort();
 	}
 
 	/**
-	 * Poste Queue-Nachrichten auf $connection
+	 * Poste Queue-Nachrichten auf den Uplink
 	 **/
-	public function sendMessages($connection) {
+	public function sendMessages() {
+		if ($this->uplink == null) {
+			return;
+		}
+		$this->uplink->open();
 		foreach ($this->getQueue() AS $messageid) {
 			// Nachricht laden
 			$message = $this->getMessage($messageid);
-			// Nachricht posten und hier Löschen
-			$connection->post($message);
-			$this->removeMessage($message);
+			// Nachricht posten und hier Loeschen
+			// Falls NNTP sie annimmmt, kommt sie mit loadMessages() wieder rein
+			$this->uplink->post($message);
+			$this->removeQueueMessage($message);
 		}
+		$this->uplink->close();
 	}
 	
 	/**
-	 * Hole neue Daten von $connection
+	 * Hole neue Daten vom Uplink
 	 **/
-	public function loadMessages($connection) {
-		// Wenn die hoechste ArtikelNum sich nicht veraendert hat, hat sich gar nix getan (spart sortieren)
-		if ($connection->getMessageCount() <= 0 || $connection->getMessageCount() == $this->getMessageCount()) {
+	public function loadMessages() {
+		if ($this->uplink == null) {
 			return;
 		}
-		$articles = $connection->getMessageIDs();
-
-		// TODO array_diff nutzen?
-		
-		foreach ($articles as $messageid) {
-			// Lade nur neue Nachrichten
-			if (!$this->hasMessage($messageid)) {
-				$message = $connection->getMessage($messageid);
-				$this->addMessage($message);
-			}
+		$this->uplink->open();
+		// Wenn die hoechste ArtikelNum sich nicht veraendert hat, hat sich gar nix getan (spart sortieren)
+		if ($this->uplink->getMessageCount() <= 0
+		 || $this->uplink->getMessageCount() == $this->getMessageCount()) {
+			$this->uplink->close();
+			return;
 		}
-		$this->sort();
+		// Liste mit neuen Nachrichten aufstellen
+		$newmessages = array_diff($this->uplink->getMessageIDs(), $this->getMessageIDs());
+
+		foreach ($newmessages as $messageid) {
+			$message = $this->uplink->getMessage($messageid);
+			$this->addMessage($message);
+		}
+		$this->uplink->close();
+		$this->cache->sort();
 	}
 	
 	/**
-	 * Sortiere die Threads nach Letztem Posting (in der Uebersicht wichtig)
+	 * Queue-Verwaltung
 	 **/
-	private function sort() {
-		if (!function_exists("cmpThreads")) {
-			function cmpThreads($a, $b) {
-				return $b->getLastPostDate() - $a->getLastPostDate();
-			}
-		}
-		uasort($this->threads, cmpThreads);
+	private function getQueue() {
+		return $this->cache->getQueue();
 	}
 
-	/**
-	 * Lade Nachrichten eines Threads aus einer Datei
-	 **/
-	private function loadThreadMessages($thread) {
-		$filename = $this->datadir->getThreadPath( $this->group , $thread );
-		if (!file_exists($filename)) {
-			throw new NotFoundThreadException($thread, $this->group);
-		}
-		$messages = unserialize(file_get_contents($filename));
-		if (!is_array($messages)) {
-			throw new InvalidDatafileDataDirException($filename);
-		}
-		foreach ($messages AS $messageid => $message) {
-			$this->messages[$messageid] = $message;
-			//$this->addMessage($message);
-		}
+	private function addQueueMessage($message) {
+		$this->addMessage($message);
+		$this->cache->addToQueue($message);
+	}
+
+	private function removeQueueMessage($messageid) {
+		$this->removeMessage($messageid);
+		$this->cache->removeFromQueue($messageid);
 	}
 	
 	/**
 	 * Fuege eine Nachricht ein und referenziere sie
-	 * TODO referenzieren outsourcen?
 	 **/
 	private function addMessage($message) {
-		// Speichere die Nachricht (und Verweise auf selbige)
-		$this->messages[$message->getMessageID()] = $message;
-
-		// Entweder Unterpost oder neuen Thread starten
+		// Unterpost verlinkenuplink
 		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+			$thread = $this->getThread($message->getParentID());
 			$this->getMessage($message->getParentID())->addChild($message);
-			$threadid = $this->threadids[$message->getParentID()];
 		} else {
 			$thread = new Thread($message);
-			$this->addThread($thread);
-			$threadid = $thread->getThreadID();
 		}
 
 		// Nachricht zum Thread hinzufuegen
-		$this->threadids[$message->getMessageID()] = $threadid;
-		$this->getThread($threadid)->addMessage($message);
+		$thread->addMessage($message);
+
+		$this->cache->addMessage($message, $thread);
 
 		/**
 		 * Wenn wir die Nachricht vom NNTP bekommen haben, koennen wir ihn aus der Queue streichen
 		 * Wenn diese Nachricht aus der Queue kommt, wird sie gleich in die Queue eingetragen
 		 * => Einfach aus der Queue streichen, falls noetig wirds wieder eingetragen
 		 */
-		if ($this->hasQueued($message->getMessageID())) {
-			$this->removeQueue($message->getMessageID());
+		if ($this->cache->hasQueued($message->getMessageID())) {
+			$this->cache->removeQueue($message->getMessageID());
 		}
 	}
 
@@ -256,9 +211,7 @@ class CacheConnection extends AbstractConnection {
 	 **/
 	private function removeMessage($messageid) {
 		$message = $this->getMessage($messageid);
-
-		// Entferne die Nachricht und Verlinkungen auf selbige
-		unset($this->messages[$message->getMessageID()]);
+		$this->cache->removeMessage($messageid);
 
 		// Unterelemente auf das Vaterelement schieben
 		foreach ($message->getChilds() AS $messageid) {
@@ -270,63 +223,9 @@ class CacheConnection extends AbstractConnection {
 		}
 		
 		// Nachricht aus dem Thread haengen
-		if ($this->hasThread($this->threadids[$message->getMessageID()])) {
-			$this->getThread($this->threadids[$message->getMessageID()])->removeMessage($message);
+		if ($this->hasThread($message->getMessageID())) {
+			$this->getThread($message->getMessageID())->removeMessage($message);
 		}
-		unset($this->threadids[$message->getMessageID()]);
-	}
-
-	/**
-	 * Fuege einen neuen Thread ein
-	 **/
-	private function addThread($thread) {
-		$this->threads[$thread->getThreadID()] = $thread;
-	}
-
-	/**
-	 * Fuegt eine Nachricht in die Queue ein und speichert sie
-	 **/
-	private function addQueueMessage($message) {
-		$this->addMessage($message);
-		$this->addQueue($message);
-	}
-
-	/**
-	 * Loesche eine Nachricht aus Queue und Nachrichtenspeicher
-	 **/
-	private function removeQueueMessage($messageid) {
-		$this->removeMessage($messageid);
-		$this->removeQueue($messageid);
-	}
-
-	/**
-	 * Gibt eine Liste der Message-IDs in der Queue zurueck
-	 **/
-	private function getQueue() {
-		return array_keys($this->queue);
-	}
-	
-	/**
-	 * Prueft, ob die Nachricht in der Queue steht
-	 **/
-	private function hasQueued($messageid) {
-		return isset($this->queue[$messageid]);
-	}
-
-	/**
-	 * Fuegt eine Nachricht in die Queue ein
-	 * Die eigentliche Message wird im regulaeren Nachrichtencontainer
-	 * gespeichert.
-	 **/
-	private function addQueue($message) {
-		$this->queue[$message->getMessageID()] = true;
-	}
-
-	/**
-	 * Streiche die MessageID aus der Queue
-	 **/
-	private function removeQueue($messageid) {
-		unset($this->queue[$messageid]);
 	}
 }
 

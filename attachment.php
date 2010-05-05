@@ -17,7 +17,7 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
+$connection = $group->getConnection($session->getAuth());
 $connection->open();
 
 $message = $connection->getMessage($messageid);

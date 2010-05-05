@@ -86,8 +86,8 @@ class Message {
 		return $this->parts[$i];
 	}
 	
-	public function saveAttachments($datadir) {
-		/* Speichere alle Attachments ab */
+	/*TODO umlagern ! public function saveAttachments($datadir) {
+		// Speichere alle Attachments ab
 		foreach ($this->parts AS $partid => &$part) {
 			if ($part->isAttachment()) {
 				$filename = $datadir->getAttachmentPath($this->group, $part);
@@ -96,7 +96,7 @@ class Message {
 				}
 			}
 		}
-	}
+	}*/
 	
 	public function isMime() {
 		return ($this->mime !== null);

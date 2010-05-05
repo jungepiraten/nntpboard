@@ -14,7 +14,7 @@ if ($board === null) {
 
 $group = $board->getGroup();
 if ($group !== null) {
-	$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
+	$connection = $group->getConnection($session->getAuth());
 	$connection->open();
 	$threads = array();
 	foreach ($connection->getThreadIDs() AS $threadid) {
