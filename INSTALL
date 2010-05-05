@@ -1,10 +1,13 @@
 Installation von NNTPBoard
+--------------------------
 
 Vorbereitungen:
 * Apache mit PHP muss installiert sein
-* Benoetigt wird vor allem das PHP-Modul imap
+* PEAR-Pakete installieren: Net_NNTP und Net_LDAP2
 
 Installation:
 01. Entpacken der Ordnerstruktur
-02. Anpassen der config.inc.php
-03. Eintragen des Cronjobs "cron.php"
+02. Anpassen der Ordnerberechtigung fuer templates_c und data
+    (Webuser muss schreiben koennen)
+03. Anpassen der config.inc.php
+04. Eintragen des Cronjobs "cron.php"

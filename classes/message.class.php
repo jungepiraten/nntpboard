@@ -3,21 +3,10 @@
 require_once(dirname(__FILE__)."/bodypart.class.php");
 require_once(dirname(__FILE__)."/exceptions/message.exception.php");
 
-if (!function_exists("quoted_printable_encode")) {
-	// aus http://de.php.net/quoted_printable_decode
-	function quoted_printable_encode($string) {
-		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
-		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
-		return $string;
-	}
-}
-
 class Message {
 	private $articlenum;
 	private $messageid;
-	private $threadid;
 	private $parentid = null;
-	private $parentartnum = null;
 	private $charset = "UTF-8";
 	private $subject;
 	private $date;
@@ -28,7 +17,7 @@ class Message {
 	
 	private $group;
 	
-	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $threadid, $parentid, $parentartnum) {
+	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $parentid, $mime = null) {
 		$this->group = $group;
 		$this->articlenum = $articlenum;
 		$this->messageid = $messageid;
@@ -36,9 +25,7 @@ class Message {
 		$this->author = $author;
 		$this->subject = $subject;
 		$this->charset = $charset;
-		$this->threadid = $threadid;
 		$this->parentid = $parentid;
-		$this->parentartnum = $parentartnum;
 		$this->mime = $mime;
 	}
 	
@@ -48,10 +35,6 @@ class Message {
 	
 	public function getMessageID() {
 		return $this->messageid;
-	}
-	
-	public function getThreadID() {
-		return $this->threadid !== null ? $this->threadid : $this->getArticleNum();
 	}
 
 	public function hasParent() {
@@ -65,13 +48,6 @@ class Message {
 		return $this->parentid;
 	}
 
-	public function getParentArtNum() {
-		if (! $this->hasParent()) {
-			return null;
-		}
-		return $this->parentartnum;
-	}
-
 	public function getSubject($charset = null) {
 		if ($charset !== null) {
 			return iconv($this->getCharset(), $charset, $this->getSubject());
@@ -83,10 +59,7 @@ class Message {
 		return $this->date;
 	}
 
-	public function getAuthor($charset = null) {
-		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getAuthor());
-		}
+	public function getAuthor() {
 		return $this->author;
 	}
 	
@@ -98,7 +71,7 @@ class Message {
 		if ($bodypart->getMessageID() != $this->getMessageID()) {
 			throw new MessageIDNotMatchingMessageException($this);
 		}
-		$this->parts[$bodypart->getPartID()] = $bodypart;
+		$this->parts[] = $bodypart;
 	}
 	
 	public function getBodyParts() {

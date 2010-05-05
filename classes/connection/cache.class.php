@@ -23,8 +23,6 @@ class CacheConnection extends AbstractConnection {
 	private $messages = array();
 	// MessageID => ThreadID
 	private $threadids = array();
-	// ArtikelNum => MessageID
-	private $articlenums = array();
 	// ThreadID => Thread
 	private $threads = array();
 	// MessageID => true
@@ -43,14 +41,12 @@ class CacheConnection extends AbstractConnection {
 			$filename = $this->datadir->getGroupPath($this->group);
 			$data = unserialize(file_get_contents($filename));
 			if ( !is_array($data["threadids"])
-			  || !is_array($data["articlenums"])
 			  || !is_array($data["threads"])
 			  || !is_array($data["queue"]) )
 			{
 				throw new InvalidDatafileDataDirException($this->datadir->getGroupPath($this->group));
 			}
 			$this->threadids	= $data["threadids"];
-			$this->articlenums	= $data["articlenums"];
 			$this->threads		= $data["threads"];
 			$this->queue		= $data["queue"];
 
@@ -64,7 +60,6 @@ class CacheConnection extends AbstractConnection {
 	public function close() {
 		$data = array(
 			"threadids"	=> $this->threadids,
-			"articlenums"	=> $this->articlenums,
 			"threads"	=> $this->threads,
 			"queue"		=> $this->queue);
 		
@@ -72,7 +67,7 @@ class CacheConnection extends AbstractConnection {
 		
 		// Speichere die Nachrichten Threadweise
 		foreach ($this->threads AS $threadid => $thread) {
-			$messageids = $thread->getMessages();
+			$messageids = $thread->getMessageIDs();
 			$messages = array();
 			// Attachments speichern
 			foreach ($messageids AS $messageid) {
@@ -86,20 +81,18 @@ class CacheConnection extends AbstractConnection {
 		}
 	}
 
-	public function hasMessageNum($num) {
-		return (isset($this->articlenums[$num]) && $this->hasMessage($this->articlenums[$num]));
+
+	public function getMessageIDs() {
+		return array_keys($this->threadids);
 	}
-	
-	public function getMessageByNum($num) {
-		// Die einzige Moeglichkeit besteht darin, die MessageID herauszufinden
-		if (isset($this->articlenums[$num])) {
-			return $this->getMessage($this->articlenums[$num]);
-		}
-		throw new NotFoundMessageException($num, $this->group);
+
+	public function getMessageCount() {
+		return count($this->messages);
 	}
 
 	public function hasMessage($messageid) {
-		return isset($this->messages[$messageid]);
+		// Wir speichern alle vorhanden MessageIDs
+		return $this->hasThread($messageid);
 	}
 
 	public function getMessage($messageid) {
@@ -109,32 +102,31 @@ class CacheConnection extends AbstractConnection {
 		}
 		// Falls wir den Thread kennen, laden wir darueber die Nachrichten
 		// (loadThreadMessages speichert in $messages)
-		if (!empty($this->threadids[$messageid])) {
-			$this->loadThreadMessages($this->threadids[$messageid]);
+		if ($this->hasThread($messageid)) {
+			$this->loadThreadMessages($this->getThread($messageid));
 			return $this->messages[$messageid];
 		}
 		throw new NotFoundMessageException($messageid, $this->group);
 	}
 
-	public function hasThread($threadid) {
-		return isset($this->threads[$threadid]);
-	}
 
-	public function getThread($threadid) {
-		return $this->threads[$threadid];
-	}
-
-	public function getThreads() {
-		return $this->threads;
+	public function getThreadIDs() {
+		return array_keys($this->threads);
 	}
 
 	public function getThreadCount() {
 		return count($this->threads);
 	}
 
-	public function getMessagesCount() {
-		return count($this->messages);
+	public function hasThread($messageid) {
+		return isset($this->threadids[$messageid]) && isset($this->threads[$this->threadids[$messageid]]);
 	}
+
+	public function getThread($messageid) {
+		$threadid = $this->threadids[$messageid];
+		return $this->threads[$threadid];
+	}
+
 
 	protected function getLastThread() {
 		if (empty($this->threads)) {
@@ -142,13 +134,6 @@ class CacheConnection extends AbstractConnection {
 		}
 		// Wir nehmen an, dass die Threads sortiert sind ...
 		return array_shift(array_slice($this->threads, 0, 1));
-	}
-
-	/**
-	 * Gebe eine Liste aller ArtikelNummern zurueck
-	 **/
-	public function getArticleNums() {
-		return array_keys($this->articlenums);
 	}
 
 	/**
@@ -186,16 +171,19 @@ class CacheConnection extends AbstractConnection {
 	 * Hole neue Daten von $connection
 	 **/
 	public function loadMessages($connection) {
-		$articles = $connection->getArticleNums();
 		// Wenn die hoechste ArtikelNum sich nicht veraendert hat, hat sich gar nix getan (spart sortieren)
-		if (max($articles) <= max($this->getArticleNums())) {
+		if ($connection->getMessageCount() <= 0 || $connection->getMessageCount() == $this->getMessageCount()) {
 			return;
 		}
+		$articles = $connection->getMessageIDs();
+
+		// TODO array_diff nutzen?
 		
-		foreach ($articles as $articlenr) {
+		foreach ($articles as $messageid) {
 			// Lade nur neue Nachrichten
-			if (!$this->hasMessageNum($articlenr)) {
-				$this->addMessage($connection->getMessageByNum($articlenr));
+			if (!$this->hasMessage($messageid)) {
+				$message = $connection->getMessage($messageid);
+				$this->addMessage($message);
 			}
 		}
 		$this->sort();
@@ -216,21 +204,18 @@ class CacheConnection extends AbstractConnection {
 	/**
 	 * Lade Nachrichten eines Threads aus einer Datei
 	 **/
-	private function loadThreadMessages($threadid) {
-		if (!$this->hasThread($threadid)) {
-			return;
-		}
-		
-		$filename = $this->datadir->getThreadPath( $this->group , $this->getThread($threadid) );
+	private function loadThreadMessages($thread) {
+		$filename = $this->datadir->getThreadPath( $this->group , $thread );
 		if (!file_exists($filename)) {
-			throw new NotFoundThreadException($threadid, $this->getGroup());
+			throw new NotFoundThreadException($thread, $this->group);
 		}
 		$messages = unserialize(file_get_contents($filename));
 		if (!is_array($messages)) {
 			throw new InvalidDatafileDataDirException($filename);
 		}
-		foreach ($messages AS $message) {
-			$this->addMessage($message);
+		foreach ($messages AS $messageid => $message) {
+			$this->messages[$messageid] = $message;
+			//$this->addMessage($message);
 		}
 	}
 	
@@ -241,19 +226,20 @@ class CacheConnection extends AbstractConnection {
 	private function addMessage($message) {
 		// Speichere die Nachricht (und Verweise auf selbige)
 		$this->messages[$message->getMessageID()] = $message;
-		$this->threadids[$message->getMessageID()] = $message->getThreadID();
-		$this->articlenums[$message->getArticleNum()] = $message->getMessageID();
 
-		// Ist Unterpost (und Bezugspost auch vorhanden?)
+		// Entweder Unterpost oder neuen Thread starten
 		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$this->getMessage($message->getMessageID())->addChild($message);
+			$this->getMessage($message->getParentID())->addChild($message);
+			$threadid = $this->threadids[$message->getParentID()];
+		} else {
+			$thread = new Thread($message);
+			$this->addThread($thread);
+			$threadid = $thread->getThreadID();
 		}
-		
-		// Thread erstellen und Nachricht in Thread einordnen
-		if (!$this->hasThread($message->getThreadID())) {
-			$this->addThread(new Thread($message));
-		}
-		$this->getThread($message->getThreadID())->addMessage($message);
+
+		// Nachricht zum Thread hinzufuegen
+		$this->threadids[$message->getMessageID()] = $threadid;
+		$this->getThread($threadid)->addMessage($message);
 
 		/**
 		 * Wenn wir die Nachricht vom NNTP bekommen haben, koennen wir ihn aus der Queue streichen
@@ -272,9 +258,7 @@ class CacheConnection extends AbstractConnection {
 		$message = $this->getMessage($messageid);
 
 		// Entferne die Nachricht und Verlinkungen auf selbige
-		unset($this->messages[$message->getArticleNum()]);
-		unset($this->threadids[$message->getArticleNum()]);
-		unset($this->articlenums[$message->getMessageID()]);
+		unset($this->messages[$message->getMessageID()]);
 
 		// Unterelemente auf das Vaterelement schieben
 		foreach ($message->getChilds() AS $messageid) {
@@ -286,9 +270,10 @@ class CacheConnection extends AbstractConnection {
 		}
 		
 		// Nachricht aus dem Thread haengen
-		if ($this->hasThread($message->getThreadID())) {
-			$this->getThread($message->getThreadID())->removeMessage($message);
+		if ($this->hasThread($this->threadids[$message->getMessageID()])) {
+			$this->getThread($this->threadids[$message->getMessageID()])->removeMessage($message);
 		}
+		unset($this->threadids[$message->getMessageID()]);
 	}
 
 	/**

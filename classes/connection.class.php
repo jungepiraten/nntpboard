@@ -4,15 +4,13 @@ interface Connection {
 	public function open();
 	public function close();
 
-	public function getThreadCount();
-	public function getMessagesCount();
-
-	public function getThreads();
-	public function getArticleNums();
-	public function hasMessageNum($num);
-	public function getMessageByNum($num);
+	public function getMessageIDs();
+	public function getMessageCount();
 	public function hasMessage($msgid);
 	public function getMessage($msgid);
+
+	public function getThreadIDs();
+	public function getThreadCount();
 	public function hasThread($threadid);
 	public function getThread($threadid);
 	

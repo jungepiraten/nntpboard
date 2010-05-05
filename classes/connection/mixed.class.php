@@ -45,30 +45,26 @@ class MixedConnection extends AbstractConnection {
 		}
 	}
 
-	public function getThreadCount() {
-		return $this->getConnection(self::USE_READ)->getThreadCount();
+	/** Messages **/
+	public function getMessageIDs() {
+		return $this->getConnection(self::USE_READ)->getMessageIDs();
 	}
-	public function getMessagesCount() {
+	public function getMessageCount() {
 		return $this->getConnection(self::USE_READ)->getMessagesCount();
-	}
-
-	public function getThreads() {
-		return $this->getConnection(self::USE_READ)->getThreads();
-	}
-	public function getArticleNums() {
-		return $this->getConnection(self::USE_READ)->getArticleNums();
-	}
-	public function hasMessageNum($num) {
-		return $this->getConnection(self::USE_READ)->hasMessageNum($num);
-	}
-	public function getMessageByNum($num) {
-		return $this->getConnection(self::USE_READ)->getMessageByNum($num);
 	}
 	public function hasMessage($msgid) {
 		return $this->getConnection(self::USE_READ)->hasMessage($msgid);
 	}
 	public function getMessage($msgid) {
 		return $this->getConnection(self::USE_READ)->getMessage($msgid);
+	}
+
+	/** Threads **/
+	public function getThreadIDs() {
+		return $this->getConnection(self::USE_READ)->getThreadIDs();
+	}
+	public function getThreadCount() {
+		return $this->getConnection(self::USE_READ)->getThreadCount();
 	}
 	public function hasThread($threadid) {
 		return $this->getConnection(self::USE_READ)->hasThread($threadid);

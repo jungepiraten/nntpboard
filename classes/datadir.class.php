@@ -5,11 +5,9 @@ require_once(dirname(__FILE__) . "/exceptions/datadir.exception.php");
 // TODO Konzept der DataDir ueberdenken
 class DataDir {
 	private $dir;
-	private $webdir;
 	
-	public function __construct($dir, $webdir) {
+	public function __construct($dir) {
 		$this->dir = $dir;
-		$this->webdir = $webdir;
 	}
 	
 	private function getPath($filename) {
@@ -20,9 +18,7 @@ class DataDir {
 					if (!file_exists(dirname($dir))) {
 						mkdir_parents(dirname($dir));
 					}
-					if (!@mkdir($dir)) {
-						return false;
-					}
+					return mkdir($dir);
 				}
 			}
 		}
@@ -31,10 +27,6 @@ class DataDir {
 			throw new CreationFailedDataDirException(dirname($filename));
 		}
 		return rtrim($this->dir, "/") . "/" . ltrim($filename, "/");
-	}
-	
-	public function getWebPath($filename) {
-		return rtrim($this->webdir, "/") . "/" . ltrim($filename, "/");
 	}
 	
 	
@@ -60,15 +52,11 @@ class DataDir {
 	
 	
 	private function getAttachmentfilename($group, $part) {
-		return ($group instanceof Group ? $group->getGroup() : $group)."/attachments/".md5($part->getMessageID()).".".$part->getPartID()."/".$part->getFilename();
+		return ($group instanceof Group ? $group->getGroup() : $group)."/attachments/".md5($part->getMessageID())."/".$part->getFilename();
 	}
 	
 	public function getAttachmentPath($group, $part) {
 		return $this->getPath($this->getAttachmentfilename($group, $part));
-	}
-	
-	public function getAttachmentWebpath($group, $part) {
-		return $this->getWebPath($this->getAttachmentfilename($group, $part));
 	}
 }
 

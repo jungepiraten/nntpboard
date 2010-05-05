@@ -31,8 +31,8 @@ class Address {
 		return $this->comment;
 	}
 
-	public function __toString() {
-		return !empty($this->name) ? $this->name : (!empty($this->comment) ? $this->comment : $this->addr);
+	public function __toString($charset = null) {
+		return $this->hasName() ? $this->getName($charset) : ($this->hasComment() ? $this->getComment($charset) : $this->getAddress());
 	}
 }
 

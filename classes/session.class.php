@@ -17,10 +17,10 @@ class Session {
 	}
 
 	public function getAuth() {
-		if (isset($_SESSION["auth"])) {
-			return $_SESSION["auth"];
+		if (!isset($_SESSION["auth"])) {
+			$_SESSION["auth"] = $this->config->getAnonymousAuth();
 		}
-		return $this->config->getAnonymousAuth();
+		return $_SESSION["auth"];
 	}
 }
 

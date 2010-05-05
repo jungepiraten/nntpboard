@@ -1,31 +1,32 @@
 {include file=header.html.tpl}
-<h1>{$thread->getSubject()}</h1>
+<h1>{$thread.subject}</h1>
 
 <ul class="breadcrumb navigation">{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}</ul>
 
-{assign var=boardid value=$board->getBoardID()}
-{assign var=group value=$board->getGroup()}
-
 <div class="options">
- {if ($mayPost)}<a href="post.php?boardid={$boardid}&amp;reference={$thread->getThreadID()}" class="reply">Antworten</a>{/if}
+ <!-- TODO messageid != threadid! -->
+ {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$thread.threadid}" class="reply">Antworten</a>{/if}
 </div>
 
+{section name=page start=0 loop=$pages}
+{assign var=p value=$smarty.section.page.index}
+ {if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}">{/if}{$p+1}{if $page!=$p}</a>{/if}
+{/section}
+
 {foreach from=$messages item=message}
-{assign var=messageid value=$message->getMessageID()}
 <div class="message {cycle values="odd,even"}">
- <a name="article{$message->getArticleNum()|escape:html}" class="anchor"></a>
- <span class="author">{$message->getAuthor()}</span>
- <span class="date">{$message->getDate()|date_format:"%d.%m.%Y %H:%M"}</span>
- <span class="subject">{$message->getSubject()}</span>
- {foreach from=$message->getBodyParts() key=partid item=part}
-  <!-- TODO unschoen, bitte mehr PHP hier! -->
-  {assign var=attachmentlink value=$DATADIR->getAttachmentWebPath($group,$part)}
-  {if     $part->isInline() && $part->isText()}
-  <p class="body">{$part->getHTML($CHARSET)}</p>
-  {elseif $part->isInline() && $part->isImage()}
+ <a name="article{$message.articlenum|escape:html}" class="anchor"></a>
+ <span class="author">{$message.author|escape:html}</span>
+ <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
+ <span class="subject">{$message.subject|escape:html}</span>
+ {foreach from=$message.bodyparts key=partid item=part}
+  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;partid={$partid}{/capture}
+  {if     $part.isinline && $part.istext}
+  <p class="body">{$part.text}</p>
+  {elseif $part.isinline && $part.isimage}
   <img src="{$attachmentlink}" width="300px" class="body" />
   {else}
-   <a href="{$attachmentlink}" class="attachment body">{$part->getFilename()}</a>
+   <a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
   {/if}
  {/foreach}
 </div>

@@ -11,6 +11,15 @@ require_once(dirname(__FILE__)."/../header.class.php");
 require_once(dirname(__FILE__)."/../bodypart.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 
+if (!function_exists("quoted_printable_encode")) {
+	// aus http://de.php.net/quoted_printable_decode
+	function quoted_printable_encode($string) {
+		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
+		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
+		return $string;
+	}
+}
+
 class NNTPConnection extends AbstractConnection {
 	private $group;
 	private $username;
@@ -18,8 +27,6 @@ class NNTPConnection extends AbstractConnection {
 
 	// ThreadID => Thread | Muss null sein - wird erst spaeter initialisiert (vgl. initThreads())
 	private $threads = null;
-	// ArtikelNum => MessageID
-	private $articlenums = array();
 	// MessageID => ArtikelNum
 	private $messageids = array();
 	// MessageID => Message
@@ -79,7 +86,6 @@ class NNTPConnection extends AbstractConnection {
 			throw new Exception($ret);
 		} else {
 			foreach ($articles AS $article) {
-				$this->articlenums[$article["Number"]] = $article["Message-ID"];
 				$this->messageids[$article["Message-ID"]] = $article["Number"];
 			}
 		}
@@ -89,44 +95,6 @@ class NNTPConnection extends AbstractConnection {
 		$this->nntpclient->disconnect();
 	}
 
-	public function hasMessage($msgid) {
-		return isset($this->messageids[$msgid]);
-	}
-
-	public function getMessage($msgid) {
-		// Frage zuerst den Kurzzeitcache
-		if (isset($this->messages[$msgid])) {
-			return $this->messages[$msgid];
-		}
-		// Versuche die nachricht frisch zu laden
-		if (isset($this->articlenums[$msgid])) {
-			return $this->getMessageByNum($this->articlenums[$msgid]);
-		}
-		throw new NotFoundMessageException($msgid, $this->group);
-	}
-
-	public function hasMessageNum($artnr) {
-		return isset($this->messageids[$artnr]);
-	}
-	
-	public function getMessageByNum($artnr) {
-		// Kurzer Blick in den Cache
-		if (isset($this->messageids[$artnr]) && isset($this->messages[$this->messageids[$artnr]])) {
-			return $this->getMessage($this->messageids[$artnr]);
-		}
-		
-		// Lade die Nachricht und Parse sie
-		$article = $this->nntpclient->getArticle($artnr);
-		if (PEAR::isError($article)) {
-			throw new NotFoundMessageException($artnr, $this->group);
-		}
-		$message = $this->parseMessage($artnr, implode("\r\n", $article));
-		
-		// Schreibe die Nachricht in den Kurzzeit-Cache
-		$this->messages[$message->getMessageID()] = $message;
-
-		return $message;
-	}
 
 	protected function getLastThread() {
 		// Initialisiere die Threads, falls noch nicht geschehen
@@ -141,11 +109,55 @@ class NNTPConnection extends AbstractConnection {
 		return array_shift(array_slice($this->threads, 0, 1));
 	}
 
-	public function getThreads() {
+
+	public function getMessageIDs() {
+		return array_keys($this->messageids);
+	}
+
+	public function getMessageCount() {
+		return count($this->messageids);
+	}
+
+	public function hasMessage($msgid) {
+		return isset($this->messageids[$msgid]);
+	}
+
+	public function getMessage($msgid) {
+		// Frage zuerst den Kurzzeitcache
+		if (isset($this->messages[$msgid])) {
+			return $this->messages[$msgid];
+		}
+		// Versuche die nachricht frisch zu laden
+		if (isset($this->messageids[$msgid])) {
+			$artnr = $this->messageids[$msgid];
+			// Lade die Nachricht und Parse sie
+			$article = $this->nntpclient->getArticle($artnr);
+			if (PEAR::isError($article)) {
+				throw new NotFoundMessageException($artnr, $this->group);
+			}
+			$message = $this->parseMessage($artnr, implode("\r\n", $article));
+			
+			// Schreibe die Nachricht in den Kurzzeit-Cache
+			$this->messages[$msgid] = $message;
+
+			return $message;
+		}
+		throw new NotFoundMessageException($msgid, $this->group);
+	}
+
+
+	public function getThreadIDs() {
 		if (!isset($this->threads)) {
 			$this->initThreads();
 		}
-		return $this->threads;
+		return array_keys($this->threads);
+	}
+
+	public function getThreadCount() {
+		if (!isset($this->threads)) {
+			$this->initThreads();
+		}
+		return count($this->threads);
 	}
 
 	public function hasThread($threadid) {
@@ -164,23 +176,9 @@ class NNTPConnection extends AbstractConnection {
 		return $this->threads[$threadid];
 	}
 
-	public function getThreadCount() {
-		if (!isset($this->threads)) {
-			$this->initThreads();
-		}
-		return count($this->threads);
-	}
-
-	public function getMessagesCount() {
-		return count($this->articles);
-	}
-
-	public function getArticleNums() {
-		return array_keys($this->articlenums);
-	}
 
 	public function post($message) {
-		if ($this->nntpclient->post($this->generateMessage($message)) instanceof PEAR_Error) {
+		if (($ret = $this->nntpclient->post($this->generateMessage($message))) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {
 			case 440:
@@ -200,16 +198,23 @@ class NNTPConnection extends AbstractConnection {
 		foreach ($this->getArticleNums() AS $artnr) {
 			$message = $this->getMessageByNum($artnr);
 
-			if (isset($this->threads[$message->getThreadID()])) {
-				$this->threads[$message->getThreadID()]->addMessage($message);
+			// Entweder Unterpost oder neuen Thread starten
+			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+				$this->getMessage($message->getParentID())->addChild($message);
+				$threadid = $this->threadids[$message->getParentID()];
 			} else {
-				$this->threads[$message->getThreadID()] = new Thread($message);
+				$thread = new Thread($message);
+				$this->addThread($thread);
+				$threadid = $thread->getThreadID();
 			}
+
+			// Nachricht zum Thread hinzufuegen
+			$this->getThread($threadid)->addMessage($message);
 		}
 	}
 
 	/**
-	 * Konvert-Funktionen
+	 * KONVERT-FUNKTIONEN
 	 * TODO: Auslagern?
 	 **/
 
@@ -238,11 +243,12 @@ class NNTPConnection extends AbstractConnection {
 			list($name, $value) = explode(":", $line, 2);
 			// Eventuell vorhandene Extra-Attribute auffangen
 			$extras = explode(";", $value);
-			$h = new Header(trim($name), mb_decode_mimeheader(trim(array_shift($extras))), $charset);
+			$value = trim(array_shift($extras));
+			$h = new Header(trim($name), mb_decode_mimeheader($value), $charset);
 			foreach ($extras AS $extra) {
 				list($name, $value) = explode("=", $extra, 2);
 				$name = mb_decode_mimeheader(trim($name));
-				$value = mb_decode_mimeheader(trim($value, "\"\' \t"));
+				$value = mb_decode_mimeheader(trim(trim($value),'"'));
 				$h->addExtra($name, $value);
 			}
 
@@ -277,20 +283,12 @@ class NNTPConnection extends AbstractConnection {
 		/* Thread finden */
 
 		// Default: Neuer Thread
-		$threadid = $messageid;
 		$parentid = null;
-		$parendnum = null;
 
 		// References
-		// TODO das handling mit getMessage ist irgendwie unschoen
 		if (isset($header["references"]) && trim($header["references"]->getValue()) != "") {
 			$references = explode(" ", preg_replace("#\s+#", " ", $header["references"]->getValue()));
-			$message = $this->getMessage(array_pop($references));
-			if ($message != null) {
-				$threadid = $message->getThreadID();
-				$parentid = $message->getMessageID();
-				$parentnum = $message->getArticleNum();
-			}
+			$parentid = array_pop($references);
 		}
 		
 		/* MIME-Nachrichten */
@@ -300,7 +298,7 @@ class NNTPConnection extends AbstractConnection {
 			$mimetype = substr($header["content-type"]->getValue(),10);
 		}
 		
-		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $threadid, $parentid, $parentnum, $mimetype);
+		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $parentid, $mimetype);
 		
 		/* Strukturanalyse des Bodys */
 		if ($mimetype != null && $header["content-type"]->hasExtra("boundary")) {
@@ -309,11 +307,11 @@ class NNTPConnection extends AbstractConnection {
 			array_pop($parts);
 			array_shift($parts);
 			
-			foreach ($parts AS $p => $part) {
+			foreach ($parts AS $part) {
 				$message->addBodyPart($this->parseBodyPart($message, $part));
 			}
 		} else {
-			$message->addBodyPart($this->parseBodyPart($message, 0, $header_lines, $body));
+			$message->addBodyPart($this->parseBodyPart($message, $article));
 		}
 		
 		return $message;
@@ -451,7 +449,7 @@ class NNTPConnection extends AbstractConnection {
 			if ($message->isMime()) {
 				$data .= "--" . $boundary . $crlf;
 			}
-			$this->generateBodyPart($part);
+			$data .= $this->generateBodyPart($part);
 		}
 		// MIME-Abschluss einbringen
 		if ($message->isMime()) {
@@ -471,8 +469,9 @@ class NNTPConnection extends AbstractConnection {
 	/**
 	 * Baut aus einem Message-Objekt wieder eine Nachricht
 	 **/
-	private function generateBodyPart($bodypart) {
-		$charset = $bodypart->getCharset();
+	private function generateBodyPart($part) {
+		$charset = $part->getCharset();
+		$crlf = "\r\n";
 	
 		$data  = "Content-Type: " . $part->getMimeType() . "; Charset=\"" . addcslashes($charset, "\"") . "\"" . $crlf;
 		// Der Erste Abschnitt kriegt keinen Disposition-Header (Haupttext)

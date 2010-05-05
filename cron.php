@@ -41,10 +41,11 @@ foreach ($config->getGroups() as $group) {
 		} catch (Exception $e) {
 			echo "<pre>" . $e->getMessage() . "</pre>";
 		}
-
+		
 		$cache->close();
 		$connection->close();
 	} catch (Exception $e) {
+var_dump($e);
 		echo "<pre>".$e->getMessage()."</pre>";
 	}
 }

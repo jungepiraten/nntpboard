@@ -7,27 +7,37 @@ require_once(dirname(__FILE__)."/../auth.class.php");
 require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 
 class JuPisAnonAuth extends AbstractAuth implements Auth {
+	private $readdate = null;
+	private $readthreads = array();
+
 	public function __construct() {
-		
+		// Alle Posts vor dem Login sind schon gelesen ;)
+		$this->readdate = time();
 	}
 
 	public function getAddress() {
-		// TODO bessere adresse ausdenken *g*
-		return new Address("Bernd", "bernd@example.com");
+		return null;
 	}
 
 	public function isUnreadThread($thread) {
-		// TODO einfacher timestamp-check
+		// Falls die Nachricht aelter als readdate ist, gilt sie als gelesen
+		if ($thread->getLastPostDate() < $this->readdate) {
+			return false;
+		}
+		// Entweder wir kennen den Thread noch gar nicht ...
+		if (!isset($this->readthreads[$thread->getThreadID()])) {
+			return true;
+		}
+		// ... oder der Timestamp hat sich veraendert
+		if ($this->readthreads[$thread->getThreadID()] < $thread->getLastPostDate()) {
+			return true;
+		}
 		return false;
 	}
 
-	public function isUnreadGroup($group) {
-		// TODO einfacher timestamp-check
-		return false;
-	}
-
-	public function isAnonymous() {
-		return true;
+	public function markReadThread($thread) {
+		// Trage den aktuellen Timestamp ein
+		$this->readthreads[$thread->getThreadID()] = $thread->getLastPostDate();
 	}
 
 	public function getNNTPUsername() {
@@ -64,20 +74,6 @@ class JuPisAuth extends JuPisAnonAuth {
 		return new Address($this->username, $this->username . "@community.junge-piraten.de");
 	}
 
-	public function isAnonymous() {
-		return false;
-	}
-
-	public function isUnreadThread($thread) {
-		// TODO wie ueberpruefen, ob ein Thread ungelesen ist? *kopfkratz*
-		return false;
-	}
-
-	public function isUnreadGroup($group) {
-		// TODO wie ueberpruefen, ob eine Gruppe ungelesen ist? *kopfkratz*
-		return false;
-	}
-
 	public function getNNTPUsername() {
 		return $this->username;
 	}
@@ -91,6 +87,8 @@ class JuPisAuth extends JuPisAnonAuth {
 	public function fetchUserDetails() {
 		$link = $this->getLDAPLink();
 		// TODO mailadresse oder so holen
+		// TODO gelesene posts laden
+		$link->done();
 	}
 
 	private function getUserDN() {

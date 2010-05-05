@@ -1,6 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__)."/config.inc.php");
+require_once(dirname(__FILE__)."/classes/session.class.php");
+$session = new Session($config);
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $messageid = stripslashes($_REQUEST["messageid"]);
@@ -15,9 +17,10 @@ $group = $board->getGroup();
 if ($group === null) {
 	die("Board enthaelt keine Group!");
 }
-$group->load();
+$connection = $group->getConnection($config->getDataDir(), $session->getAuth());
+$connection->open();
 
-$message = $group->getMessage($messageid);
+$message = $connection->getMessage($messageid);
 if ($message === null) {
 	die("Nachricht ungueltig!");
 }
@@ -26,8 +29,6 @@ $part = $message->getBodyPart($partid);
 if ($part === null) {
 	die("BodyPart ungueltig!");
 }
-
-// TODO statisch weiterleiten (koennte effektiver sein)
 
 $disposition = $part->getDisposition();
 $filename = $part->getFilename();

@@ -72,6 +72,12 @@ div.subboards>ul.subboards ul.subboards {
 	padding:5px 10px;
 }
 
+/* Threadliste */
+
+.thread.unread {
+	background-color:red;
+}
+
 /* Thread-Ansicht */
 
 .message {

@@ -61,14 +61,6 @@ class Board {
 	public function getSubBoards() {
 		return $this->subboards;
 	}
-	
-	public function getBoards() {
-		$boards = array($this);
-		foreach ($this->getSubBoards() AS $subboard) {
-			$boards = array_merge($boards, $subboard->getBoards());
-		}
-		return $boards;
-	}
 
 	public function hasGroup() {
 		return ($this->group !== null);

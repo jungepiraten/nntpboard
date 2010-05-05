@@ -6,15 +6,12 @@ class Thread {
 	private $subject;
 	private $date;
 	private $author;
-	private $lastpostmessageid;
-	private $lastpostdate;
-	private $lastpostauthor;
 	private $messages = array();
 	
 	private $group;
 	
 	public function __construct($message) {
-		$this->threadid = $message->getThreadID();
+		$this->threadid = $message->getMessageID();
 		$this->subject = $message->getSubject();
 		$this->date = $message->getDate();
 		$this->author = $message->getAuthor();
@@ -22,32 +19,33 @@ class Thread {
 		$this->charset = $message->getCharset();
 	}
 	
-	public function getMessages($connection = null) {
-		if ($connection === null) {
-			return array_keys($this->messages);
-		}
+	public function getMessageIDs() {
+		return array_keys($this->messages);
+	}
 
-		$messages = array();
-		foreach ($this->getMessages() AS $messageid) {
-			$messages[$messageid] = $connection->getMessage($messageid);
-		}
-		return $messages;
+	public function getMessageCount() {
+		return count($this->messages);
 	}
 	
 	public function addMessage($message) {
-		if (!in_array($message->getMessageID(), $this->getMessages())) {
-			if ($message->getDate() > $this->lastpostdate) {
-				$this->lastpostmessageid = $message->getMessageID();
-				$this->lastpostdate = $message->getDate();
-				$this->lastpostauthor = $message->getAuthor($this->getCharset());
-			}
-			$this->messages[$message->getMessageID()] = true;
+		if (!in_array($message->getMessageID(), $this->getMessageIDs())) {
+			$this->messages[$message->getMessageID()] = array("date" => $message->getDate(), "author" => $message->getAuthor());
+			$this->sort();
 		}
+	}
+
+	private function sort() {
+		if (!function_exists("cmpMessageArray")) {
+			function cmpMessageArray($a, $b) {
+				return $a["date"] - $b["date"];
+			}
+		}
+		uasort($this->messages, cmpMessageArray);
 	}
 
 	public function removeMessage($message) {
 		unset($this->messages[$message->getMessageID()]);
-		// TODO ggf. lastpost* zuruecksetzen
+		$this->sort();
 	}
 	
 	public function getThreadID() {
@@ -65,10 +63,7 @@ class Thread {
 		return $this->date;
 	}
 	
-	public function getAuthor($charset = null) {
-		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getAuthor());
-		}
+	public function getAuthor() {
 		return $this->author;
 	}
 	
@@ -77,18 +72,15 @@ class Thread {
 	}
 	
 	public function getLastPostMessageID() {
-		return $this->lastpostmessageid;
+		return array_shift(array_slice(array_keys($this->messages),-1));
 	}
 	
 	public function getLastPostDate() {
-		return $this->lastpostdate;
+		return $this->messages[$this->getLastPostMessageID()]["date"];
 	}
 	
-	public function getLastPostAuthor($charset = null) {
-		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getLastPostAuthor());
-		}
-		return $this->lastpostauthor;
+	public function getLastPostAuthor() {
+		return $this->messages[$this->getLastPostMessageID()]["author"];
 	}
 	
 	public function getCharset() {
