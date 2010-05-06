@@ -1,11 +1,11 @@
 <?php
 
 class NNTPHeader {
-	public static function parseLines($plain) {
+	public static function parsePlain($plain) {
 		if (!is_array($plain)) {
-			$plain = explode("\n", $plain);
+			$plain = explode("\r\n", $plain);
 		}
-		$header = array();
+		$header = new NNTPHeader;
 		for ($i=0; $i<count($plain); $i++) {
 			// Eventuellen Zeilenruecklauf abschneiden
 			$line = rtrim($plain[$i]);
@@ -13,20 +13,37 @@ class NNTPHeader {
 			while (isset($plain[$i+1]) && preg_match("$^\s$", $plain[$i+1])) {
 				$line .= " ".ltrim($plain[++$i]);
 			}
-
-			$h = NNTPHeader::parsePlain($line);
-
-			$header[strtolower($h->getName())] = $h;
+			$header->set(NNTPSingleHeader::parsePlain($line));
 		}
 		return $header;
 	}
 
+	private $headers = array();
+
+	public function __construct() {
+	}
+
+	public function set($header) {
+		$this->headers[strtolower($header->getName())] = $header;
+	}
+
+	public function has($name) {
+		return isset($this->headers[strtolower($name)]);
+	}
+
+	public function get($name) {
+		return $this->headers[strtolower($name)];
+	}
+}
+
+class NNTPSingleHeader {
 	public static function parsePlain($line) {
 		list($name, $value) = explode(":", $line, 2);
+
 		// Eventuell vorhandene Extra-Attribute auffangen
 		$extras = explode(";", $value);
 		$value = trim(array_shift($extras));
-		$h = new NNTPHeader(trim($name), mb_decode_mimeheader($value), mb_internal_encoding());
+		$h = new NNTPSingleHeader(trim($name), mb_decode_mimeheader($value), mb_internal_encoding());
 		foreach ($extras AS $extra) {
 			list($name, $value) = explode("=", $extra, 2);
 			$name = mb_decode_mimeheader(trim($name));

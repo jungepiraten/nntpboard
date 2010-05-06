@@ -25,22 +25,22 @@ if ($message === null) {
 	die("Nachricht ungueltig!");
 }
 
-$part = $message->getBodyPart($partid);
-if ($part === null) {
-	die("BodyPart ungueltig!");
+$attachment = $message->getAttachment($partid);
+if ($attachment === null) {
+	die("Attachment ungueltig!");
 }
 
-$disposition = $part->getDisposition();
-$filename = $part->getFilename();
-$charset = $part->getCharset();
+$disposition = $attachment->getDisposition();
+$filename = $attachment->getFilename();
+$charset = $attachment->getCharset();
 
 // see RFC 2616 for these Headers
-header("Content-Type: ".$part->getMimeType() . (empty($charset) ? "" : "; Charset=".$charset));
-header("Content-Length: ".$part->getLength());
+header("Content-Type: ".$attachment->getMimeType() . (empty($charset) ? "" : "; Charset=".$charset));
+header("Content-Length: ".$attachment->getLength());
 if (!empty($disposition)) {
 	header("Content-Disposition: " . $disposition . (empty($filename) ? "" : "; filename=\"".addslashes($filename)."\""));
 }
 
-print($part->getText());
+print($attachment->getContent());
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__)."/bodypart.class.php");
+require_once(dirname(__FILE__)."/attachment.class.php");
 require_once(dirname(__FILE__)."/exceptions/message.exception.php");
 
 class Message {
@@ -11,13 +11,15 @@ class Message {
 	private $subject;
 	private $date;
 	private $author;
-	private $mime = null;
-	private $parts = array();
+	private $textbody;
+	private $htmlbody;
+	
+	private $attachments = array();
 	private $childs = array();
 	
 	private $group;
 	
-	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $parentid, $mime = null) {
+	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $parentid, $textbody, $htmlbody = null) {
 		$this->group = $group;
 		$this->articlenum = $articlenum;
 		$this->messageid = $messageid;
@@ -26,7 +28,8 @@ class Message {
 		$this->subject = $subject;
 		$this->charset = $charset;
 		$this->parentid = $parentid;
-		$this->mime = $mime;
+		$this->textbody = $textbody;
+		$this->htmlbody = $htmlbody;
 	}
 	
 	public function getArticleNum() {
@@ -62,28 +65,44 @@ class Message {
 	public function getAuthor() {
 		return $this->author;
 	}
+
+	public function getText($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getText());
+		}
+		return $this->textbody;
+	}
+
+	public function getHTML($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getHTML());
+		}
+		if (isset($this->htmlbody) && trim($this->htmlbody) != "") {
+			$text = $this->htmlbody;
+			// TODO filtern
+			$text = strip_tags($text, "<b><i><u><a>");
+		} else {
+			$text = $this->getText();
+			$text = nl2br($text);
+			// TODO formatierung
+		}
+		return $text;
+	}
 	
 	public function getCharset() {
 		return $this->charset;
 	}
 	
-	public function addBodyPart(BodyPart $bodypart) {
-		if ($bodypart->getMessageID() != $this->getMessageID()) {
-			throw new MessageIDNotMatchingMessageException($this);
-		}
-		$this->parts[] = $bodypart;
+	public function addAttachment(Attachment $attachment) {
+		$this->attachments[] = $attachment;
 	}
 	
-	public function getBodyParts() {
-		return $this->parts;
+	public function getAttachments() {
+		return $this->attachments;
 	}
 	
-	public function setBodyParts($parts) {
-		$this->parts = $parts;
-	}
-	
-	public function getBodyPart($i) {
-		return $this->parts[$i];
+	public function getAttachment($i) {
+		return $this->attachments[$i];
 	}
 	
 	/*TODO umlagern ! public function saveAttachments($datadir) {

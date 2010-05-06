@@ -66,20 +66,20 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["subject"]		= $message->getSubject($this->getCharset());
 		$row["author"]		= $this->parseAddress($message->getAuthor());
 		$row["date"]		= $message->getDate();
-		$row["bodyparts"]	= array();
-		foreach ($message->getBodyParts() AS $partid => $part) {
-			$row["bodyparts"][$partid] = $this->parseBodyPart($part);
+		$row["body"]		= $message->getHTML($this->getCharset());
+		$row["attachments"]	= array();
+		foreach ($message->getAttachments() AS $partid => $attachment) {
+			$row["attachments"][$partid] = $this->parseAttachment($attachment);
 		}
 		return $row;
 	}
 
-	private function parseBodyPart($part) {
+	private function parseAttachment($attachment) {
 		$row = array();
-		$row["isinline"]	= $part->isInline();
-		$row["istext"]		= $part->isText();
-		$row["isimage"]		= $part->isImage();
-		$row["text"]		= $part->getHTML($this->getCharset());
-		$row["filename"]	= $part->getFilename();
+		$row["isinline"]	= $attachment->isInline();
+		$row["istext"]		= $attachment->isText();
+		$row["isimage"]		= $attachment->isImage();
+		$row["filename"]	= $attachment->getFilename();
 		return $row;
 	}
 

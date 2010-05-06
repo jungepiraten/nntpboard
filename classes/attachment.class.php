@@ -1,8 +1,7 @@
 <?php
 
-class BodyPart {
-	private $messageid;
-	private $text;
+class Attachment {
+	private $content;
 	private $charset = "UTF-8";
 	private $filename = null;
 	private $disposition = null;
@@ -10,8 +9,7 @@ class BodyPart {
 	private $mimesubtype = null;
 	private $location = null;
 
-	public function __construct($message, $disposition, $mimetype, $text, $charset = "UTF-8", $filename = null) {
-		$this->messageid = $message->getMessageID();
+	public function __construct($disposition, $mimetype, $content, $charset = "UTF-8", $filename = null) {
 		if (!empty($disposition)) {
 			$this->disposition = strtolower($disposition);
 		}
@@ -24,67 +22,27 @@ class BodyPart {
 				$this->mimesubtype = null;
 			}
 		}
-		$this->text = $text;
+		$this->content = $content;
 		$this->charset = $charset;
 		$this->filename = $filename;
 	}
 	
-	public function getMessageID() {
-		return $this->messageid;
-	}
-	
 	/**
 	 * getText()
-	 * @param	$charset	String
-	 * 	Zu verwendender Zeichensatz im Rueckgabewert. vgl. iconv
 	 * @return	String
 	 *	Body der Nachricht im Zeichensatz $charset
 	 **/
-	public function getText($charset = null) {
-		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getText());
-		}		if ($this->text === null && $this->location !== null) {
+	public function getContent() {
+		if ($this->content !== null) {
+			return $this->content;
+		}
+		if ($this->location !== null) {
 			return file_get_contents($this->location);
 		}
-		return $this->text;
-	}
-	
-	/**
-	 * getHTML()
-	 * @param	$charset	String
-	 * 	Zu benutzender Zeichensatz. vgl. getText()
-	 * @param	$allowhtml	boolean, String
-	 *	HTML erlauben (nur falls Body HTML enthaelt)? false fuer nein,
-	 * 	true fuer ja, beliebiger String fuer erlaubte tags, vgl. strip_tags
-	 * @return
-	 * 	Body der Nachricht im Zeichensatz $charset mit HTML-Tags
-	 **/
-	public function getHTML($charset = null, $allowhtml = false) {
-		$text = $this->getText($charset);
-		if (in_array(strtolower($this->getMimeType()), array("text/html", "application/xhtml+xml"))) {
-			// Erlaube kein HTML!
-			if (is_string($allowhtml)) {
-				$text = strip_tags($text, $allowhtml);
-			} elseif ($allowhtml !== true) {
-				$text = strip_tags($text);
-			}
-		} else {
-			// htmlentities kann nur sehr beschraenkt Charsets
-			$text = iconv(
-			            "ISO-8859-1", $charset,
-			            htmlentities(
-			                iconv($charset, "ISO-8859-1", $text),
-			                ENT_QUOTES, "ISO-8859-1") );
-		}
-
-		// TODO Links ersetzen und weitere Formatierung einbauen
-		$text = nl2br($text);
-
-		return $text;
 	}
 	
 	public function getLength() {
-		return strlen($this->getText());
+		return strlen($this->getContent());
 	}
 
 	/* Content-Disposition */

@@ -7,8 +7,9 @@ require_once(dirname(__FILE__)."/../connection.class.php");
 require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
-require_once(dirname(__FILE__)."/../bodypart.class.php");
+require_once(dirname(__FILE__)."/../attachment.class.php");
 require_once(dirname(__FILE__)."/nntp/header.class.php");
+require_once(dirname(__FILE__)."/nntp/message.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 
 if (!function_exists("quoted_printable_encode")) {
@@ -135,7 +136,8 @@ class NNTPConnection extends AbstractConnection {
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($artnr, $this->group);
 			}
-			$message = $this->parseMessage($artnr, implode("\r\n", $article));
+			$message = NNTPMessage::parsePlain($this->group->getGroup(), $artnr, implode("\r\n", $article));
+			$message = $message->getObject();
 			
 			// Schreibe die Nachricht in den Kurzzeit-Cache
 			$this->messages[$msgid] = $message;
@@ -219,167 +221,6 @@ class NNTPConnection extends AbstractConnection {
 	 * KONVERT-FUNKTIONEN
 	 * TODO: Auslagern? in einzelne NNTP-Klassen
 	 **/
-
-	/**
-	 * Parse die Header in einen Array von Header-Objekten [X]
-	 **/
-	private function parseHeaderLines($header_data) {
-		if (!is_array($header_data)) {
-			$header_data = explode("\n", $header_data);
-		}
-		/**
-		 * Wir nehmen einfach mal UTF-8 an (die Header-Klasse speichert
-		 * ihren Zeichensatz mit, weshalb hier jeder ASCII-Zeichensatz passen wuerde)
-		 **/
-		$charset = "UTF-8";
-		mb_internal_encoding($charset);
-		$header = array();
-		for ($i=0; $i<count($header_data); $i++) {
-			// Eventuellen Zeilenruecklauf abschneiden
-			$line = rtrim($header_data[$i]);
-			// Multiline-Header
-			while (isset($header_data[$i+1]) && preg_match("$^\s$", $header_data[$i+1])) {
-				$line .= " ".ltrim($header_data[++$i]);
-			}
-
-			$h = NNTPHeader::parsePlain($line);
-
-			$header[strtolower($h->getName())] = $h;
-		}
-		return $header;
-	}
-	
-	/**
-	 * Parst einen Kompletten Artikel (inkl. (mehreren) Body(s) und allen Headern)
-	 * gibt ein Message-Objekt zurueck
-	 * @param	int	$artnr
-	 * @param	string	$body
-	 *		Nachricht
-	 * @return	Message
-	 **/
-	private function parseMessage($artnr, $article) {
-		/* Nachricht */
-		list($header, $body) = preg_split("$\r?\n\r?\n$", $article, 2);
-		$header = $this->parseHeaderLines($header);
-
-		/* Lese Header */
-		$messageid = isset($header["message-id"]) ? $header["message-id"]->getValue() : null;
-		$subject = isset($header["subject"]) ? $header["subject"]->getValue() : null;
-		$date = isset($header["date"]) ? strtotime($header["date"]->getValue()) : null;
-		$sender = isset($header["from"]) ? $this->parseAddress(array_shift(explode(",", $header["from"]->getValue()))) : null;
-		$charset = isset($header["content-type"]) && $header["content-type"]->hasExtra("charset") ? $header["content-type"]->getExtra("charset") : "UTF-8";
-
-		// Sperre den Cache-Eintrag, um eine Endlosschleife zu vermeiden
-		$this->messages[$messageid] = false;
-
-		/* Thread finden */
-
-		// Default: Neuer Thread
-		$parentid = null;
-
-		// References
-		if (isset($header["references"]) && trim($header["references"]->getValue()) != "") {
-			$references = explode(" ", preg_replace("#\s+#", " ", $header["references"]->getValue()));
-			$parentid = array_pop($references);
-		}
-		
-		/* MIME-Nachrichten */
-		$mimetype = null;
-		if (isset($header["content-type"])
-		 && substr($header["content-type"]->getValue(),0,9) == "multipart") {
-			$mimetype = substr($header["content-type"]->getValue(),10);
-		}
-		
-		$message = new Message($this->group->getGroup(), $artnr, $messageid, $date, $sender, $subject, $charset, $parentid, $mimetype);
-		
-		/* Strukturanalyse des Bodys */
-		if ($mimetype != null && $header["content-type"]->hasExtra("boundary")) {
-			$parts = explode("--" . $header["content-type"]->getExtra("boundary"), $body);
-			// Der erste (This is an multipart ...) und letzte Teil (--) besteht nur aus Sinnlosem Inhalt
-			array_pop($parts);
-			array_shift($parts);
-			
-			foreach ($parts AS $part) {
-				$message->addBodyPart($this->parseBodyPart($message, $part));
-			}
-		} else {
-			$message->addBodyPart($this->parseBodyPart($message, $article));
-		}
-		
-		return $message;
-	}
-
-	/**
-	 * Parse die Adresse von "Name <mailadresse> (Kommentar)"
-	 * @return	Address
-	 **/
-	private function parseAddress($addr) {
-		if (preg_match('/^(.*) \((.*?)\)\s*$/', $addr, $m)) {
-			array_shift($m);
-			$addr = trim(array_shift($m));
-			$comment = trim(array_shift($m));
-		}
-		if (preg_match('/^(.*) <(.*)>\s*$/', $addr, $m)) {
-			array_shift($m);
-			$name = trim(array_shift($m)," \"'\t");
-			$addr = trim(array_shift($m));
-		}
-		return new Address($name, trim($addr, "<>"), $comment);
-	}
-	
-	/**
-	 * Parst einen BodyPart
-	 * @return	BodyPart
-	 * TODO Mime-Parsing komplett aendern
-	 **/
-	private function parseBodyPart($message, $part) {
-		list($header, $body) = preg_split("$\r?\n\r?\n$", $part, 2);
-		$header = $this->parseHeaderLines($header);
-
-		// Per default nehmen wir UTF-8 (warum auch was anderes?)
-		$charset = "UTF-8";
-		if (isset($header["content-type"]) && $header["content-type"]->hasExtra("charset")) {
-			$charset = $header["content-type"]->getExtra("charset");
-		}
-		
-		/** See RFC 2045 / Section 6.1. **/
-		$encoding = "7bit";
-		if (isset($header["content-transfer-encoding"])) {
-			$encoding = strtolower($header["content-transfer-encoding"]->getValue());
-		}
-		switch ($encoding) {
-		default:
-		case "7bit":
-		case "8bit":
-		case "binary":
-			// No encoding => Do nothing
-			break;
-		case "quoted-printable":
-			$body = quoted_printable_decode($body);
-			break;
-		case "base64":
-			$body = base64_decode($body);
-			break;
-		}
-
-		/** Mime-Type **/
-		$mimetype = "text/plain";
-		if (isset($header["content-type"])) {
-			$mimetype = $header["content-type"]->getValue();
-		}
-		
-		/** Disposition **/
-		$disposition = "inline";
-		$filename = null;
-		if (isset($header["content-disposition"])) {
-			$disposition = $header["content-disposition"]->getValue();
-			if ($header["content-disposition"]->hasExtra("filename")) {
-				$filename = $header["content-disposition"]->getExtra("filename");
-			}
-		}
-		
-		return new BodyPart($message, $disposition, $mimetype, $body, $charset, $filename);
-	}
 
 	/**
 	 * Baut aus einem Message-Objekt wieder eine Nachricht

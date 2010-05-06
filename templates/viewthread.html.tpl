@@ -17,11 +17,10 @@
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$message.messageid}" class="reply">Antworten</a>{/if}
  <span class="subject">{$message.subject|escape:html}</span>
- {foreach from=$message.bodyparts key=partid item=part}
+ <p class="body">{$message.body}</p>
+ {foreach from=$message.attachments key=partid item=part}
   {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;partid={$partid}{/capture}
-  {if     $part.isinline && $part.istext}
-  <p class="body">{$part.text}</p>
-  {elseif $part.isinline && $part.isimage}
+  {if $part.isinline && $part.isimage}
   <img src="{$attachmentlink}" width="300px" class="body" />
   {else}
    <a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
