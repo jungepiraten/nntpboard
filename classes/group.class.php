@@ -1,11 +1,17 @@
 <?php
 
-require_once(dirname(__FILE__)."/config.class.php");
 require_once(dirname(__FILE__)."/connection/cache.class.php");
-require_once(dirname(__FILE__)."/connection/cacheprovider/file.class.php");
-require_once(dirname(__FILE__)."/connection/nntp.class.php");
+require_once(dirname(__FILE__)."/connection/uplink.class.php");
 
-class Group {
+interface Group {
+	public function mayRead($auth);
+	public function mayPost($auth);
+	public function isModerated();
+	public function getConnection($auth);
+}
+
+abstract class AbstractGroup implements Group {
+	// TODO unschoen - aber noch mehr klassen nutzen? ...
 	/* Immer direkte Verbindung nutzen */
 	const CACHEMODE_NOCACHE =	1;
 	/* Cache nur zum Lesen benutzen */
@@ -31,30 +37,33 @@ class Group {
 	/* Keiner darf schreiben */
 	const POSTMODE_CLOSED =	5;
 	
-	private $host;
-	private $group;
 	private $readmode;
 	private $postmode;
 	private $cachemode;
 
-	public function __construct(Host $host, $group, $readmode = self::READMODE_OPEN, $postmode = self::POSTMODE_AUTH, $cachemode = self::CACHEMODE_READONLY) {
-		$this->host = $host;
-		$this->group = $group;
-		
+	public function __construct($readmode = self::READMODE_OPEN, $postmode = self::POSTMODE_AUTH, $cachemode = self::CACHEMODE_READONLY) {
 		$this->readmode = $readmode;
 		$this->postmode = $postmode;
 		$this->cachemode = $cachemode;
 	}
-	
-	public function getHost() {
-		return $this->host;
+
+	abstract protected function getCacheProvider();
+
+	abstract protected function getUplink($auth);
+
+	protected function getCacheConnection($auth) {
+		return new CacheConnection($this, $this->getCacheProvider());
+	}
+
+	protected function getMixedConnection($auth) {
+		return new CacheConnection($this, $this->getCacheProvider(), $this->getUplink($auth));
+	}
+
+	protected function getDirectConnection($auth) {
+		return new UplinkConnection($this->getUplink($auth));
 	}
 	
-	public function getGroup() {
-		return $this->group;
-	}
-	
-	public function getConnection($auth = null) {
+	public function getConnection($auth) {
 		// Frage die Gruppen-Spezifischen Eigenschaften ab
 		switch ($this->cachemode) {
 		case self::CACHEMODE_NOCACHE:
@@ -66,23 +75,6 @@ class Group {
 		}
 
 		throw new Exception("Ungueltiger CacheMode!");
-	}
-
-	private function getMixedConnection($auth) {
-		return new CacheConnection($this, $auth, $this->getCacheProvider(),
-		           $this->getDirectConnection($auth));
-	}
-
-	private function getDirectConnection($auth) {
-		return new NNTPConnection($this, $auth);
-	}
-
-	private function getCacheConnection($auth) {
-		return new CacheConnection($this, $auth, $this->getCacheProvider());
-	}
-
-	private function getCacheProvider() {
-		return new FileCacheProvider(dirname(__FILE__) . "/../data/" . $this->getGroup());
 	}
 
 	public function mayRead($auth) {

@@ -26,6 +26,7 @@ class NNTPAddress extends Address {
 	}
 
 	public function getPlain() {
-		return ($this->hasName() ? "{$this->getName()} <{$this->getAddress()}>" : $this->getAddress()) . ($this->hasComment() ? " ({$this->getComment()})" : "");
+		return	($this->hasName() ? "{$this->getName()} <{$this->getAddress()}>" : $this->getAddress()) .
+			($this->hasComment() ? " ({$this->getComment()})" : "");
 	}
 }

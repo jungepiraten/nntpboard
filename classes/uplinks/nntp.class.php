@@ -3,7 +3,7 @@
 // http://pear.php.net/package/Net_NNTP
 require_once("Net/NNTP/Client.php");
 
-require_once(dirname(__FILE__)."/../connection.class.php");
+require_once(dirname(__FILE__)."/../uplink.class.php");
 require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
@@ -12,22 +12,11 @@ require_once(dirname(__FILE__)."/nntp/header.class.php");
 require_once(dirname(__FILE__)."/nntp/message.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 
-if (!function_exists("quoted_printable_encode")) {
-	// aus http://de.php.net/quoted_printable_decode
-	function quoted_printable_encode($string) {
-		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
-		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
-		return $string;
-	}
-}
-
-class NNTPConnection extends AbstractConnection {
+class NNTPUplink extends AbstractUplink {
 	private $group;
 	private $username;
 	private $password;
 
-	// ThreadID => Thread | Muss null sein - wird erst spaeter initialisiert (vgl. initThreads())
-	private $threads = null;
 	// MessageID => ArtikelNum
 	private $messageids = array();
 	// MessageID => Message
@@ -35,7 +24,7 @@ class NNTPConnection extends AbstractConnection {
 
 	private $nntpclient;
 	
-	public function __construct($group, $auth) {
+	public function __construct(NNTPGroup $group, $auth) {
 		parent::__construct();
 
 		$this->group = $group;
@@ -97,20 +86,6 @@ class NNTPConnection extends AbstractConnection {
 	}
 
 
-	protected function getLastThread() {
-		// Initialisiere die Threads, falls noch nicht geschehen
-		if (!isset($this->threads)) {
-			$this->initThreads();
-		}
-		// Wenn wir noch immer keine Threads finden koennen, haben wir wohl keine :(
-		if (empty($this->threads)) {
-			throw new EmptyGroupException($this->group);
-		}
-		// Wir nehmen an, dass die Threads sortiert sind ...
-		return array_shift(array_slice($this->threads, 0, 1));
-	}
-
-
 	public function getMessageIDs() {
 		return array_keys($this->messageids);
 	}
@@ -148,138 +123,19 @@ class NNTPConnection extends AbstractConnection {
 	}
 
 
-	public function getThreadIDs() {
-		if (!isset($this->threads)) {
-			$this->initThreads();
-		}
-		return array_keys($this->threads);
-	}
-
-	public function getThreadCount() {
-		if (!isset($this->threads)) {
-			$this->initThreads();
-		}
-		return count($this->threads);
-	}
-
-	public function hasThread($threadid) {
-		// Wenn die Threads noch nicht initalisiert sind, nehmen wir an,
-		// dass wir diesen Thread nicht haben
-		if (!isset($this->threads)) {
-			return false;
-		}
-		return isset($this->threads[$threadid]);
-	}
-
-	public function getThread($threadid) {
-		if (!isset($this->threads)) {
-			$this->initThreads();
-		}
-		return $this->threads[$threadid];
-	}
-
-
 	public function post($message) {
-		if (($ret = $this->nntpclient->post($this->generateMessage($message))) instanceof PEAR_Error) {
+		$nntpmsg = NNTPMessage::parseObject($message);
+		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {
 			case 440:
 				throw new PostingNotAllowedException($this->group->getGroup());
+			case 441:
+				// Nachricht Syntaktisch Inkorrekt -.- (TODO)
 			}
 			// Ein unerwarteter Fehler - wie spannend *g*
 			throw new PostException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
 		}
-	}
-
-	/**
-	 * Initialisiere den Thread-Array
-	 * Dafuer muessen wir ALLE nachrichten laden und sortieren :(
-	 * TODO brauchen wir hier ueberhaupt Threads?
-	 **/
-	private function initThreads() {
-		$this->threads = array();
-		foreach ($this->getMessageIDs() AS $msgid) {
-			$message = $this->getMessage($msgid);
-
-			// Entweder Unterpost oder neuen Thread starten
-			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-				$this->getMessage($message->getParentID())->addChild($message);
-				$threadid = $this->threadids[$message->getParentID()];
-			} else {
-				$thread = new Thread($message);
-				$this->addThread($thread);
-				$threadid = $thread->getThreadID();
-			}
-
-			// Nachricht zum Thread hinzufuegen
-			$this->getThread($threadid)->addMessage($message);
-		}
-		// TODO sortieren
-	}
-
-	/**
-	 * KONVERT-FUNKTIONEN
-	 * TODO: Auslagern? in einzelne NNTP-Klassen
-	 **/
-
-	/**
-	 * Baut aus einem Message-Objekt wieder eine Nachricht
-	 **/
-	private function generateMessage($message) {
-		$charset = $message->getCharset();
-		$crlf = "\r\n";
-		
-		/**
-		 * Wichtig: In den Headern darf nur 7-bit-Codierung genutzt werden.
-		 * Alles andere muss Codiert werden (vgl. mb_encode_mimeheader() )
-		 **/
-		mb_internal_encoding($charset);
-		
-		/* Standart-Header */
-		$data  = "Message-ID: " . $message->getMessageID() . $crlf;
-		$data .= "From: " . $this->generateAddress($message->getAuthor()) . $crlf;
-		$data .= "Date: " . date("r", $message->getDate()) . $crlf;
-		$data .= "Subject: " . mb_encode_mimeheader($message->getSubject($charset), $charset) . $crlf;
-		$data .= "Newsgroups: " . $message->getGroup() . $crlf;
-		if ($message->hasParent()) {
-			$data .= "References: " . $message->getParentID() . $crlf;
-		}
-		$data .= "User-Agent: " . "MessageConverter" . $crlf;
-		if ($message->isMime()) {
-			/* MIME-Header */
-			// Generiere den Boundary - er sollte _nicht_ im Text vorkommen
-			$boundary = "--" . md5(uniqid());
-			$data .= "Content-Type: multipart/" . $message->getMimeType() . "; boundary=\"" . addcslashes($boundary, "\"") . "\"" . $crlf;
-			$data .= $crlf;
-			$data .= "This is a MIME-Message." . $crlf;
-
-			$parts = $message->getBodyParts();
-		} else {
-			// Sicherstellen, dass wir nur einen BodyPart fuer Nicht-MIME-Nachrichten haben
-			$parts = array( array_shift($message->getBodyParts()) );
-		}
-		
-		$disposition = false;
-		foreach ($parts AS $part) {
-			// MIME-Boundary nur, wenn die Nachricht MIME ist
-			if ($message->isMime()) {
-				$data .= "--" . $boundary . $crlf;
-			}
-			$data .= $this->generateBodyPart($part);
-		}
-		// MIME-Abschluss einbringen
-		if ($message->isMime()) {
-			$data .= "--" . $boundary . "--" . $crlf;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Wandle ein Address-Objekt in einen String um
-	 **/
-	private function generateAddress($addr) {
-		return ($addr->hasName() ? "{$addr->getName()} <{$addr->getAddress()}>" : $addr->getAddress()) . ($addr->hasComment() ? " ({$addr->getComment()})" : "");
 	}
 
 	/**

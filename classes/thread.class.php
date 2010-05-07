@@ -28,10 +28,8 @@ class Thread {
 	}
 	
 	public function addMessage($message) {
-		if (!in_array($message->getMessageID(), $this->getMessageIDs())) {
-			$this->messages[$message->getMessageID()] = array("date" => $message->getDate(), "author" => $message->getAuthor());
-			$this->sort();
-		}
+		$this->messages[$message->getMessageID()] = array("date" => $message->getDate(), "author" => $message->getAuthor());
+		$this->sort();
 	}
 
 	private function sort() {

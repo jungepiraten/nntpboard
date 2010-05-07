@@ -14,7 +14,6 @@ if (!function_exists("mkdir_parents")) {
 	}
 }
 
-// TODO CacheProvider aufbauen
 class FileCacheProvider extends AbstractCacheProvider {
 	private $dir;
 
@@ -44,7 +43,7 @@ class FileCacheProvider extends AbstractCacheProvider {
 	 **/
 	public function open() {
 		if (!file_exists($this->getGroupFilename())) {
-			// TODO Exception?
+			// Die Gruppe existiert noch nicht - also laden wir auch keine Posts
 			return;
 		}
 

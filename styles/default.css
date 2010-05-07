@@ -116,3 +116,16 @@ div.subboards>ul.subboards ul.subboards {
 	font-weight:bold;
 	text-decoration:none;
 }
+
+.quote {
+	margin-left: 2px;
+	border: 2px solid black;
+	border-left: 5px solid green;
+	padding-left: 2px;
+}
+.quote .quote {
+	border-left-color: blue;
+}
+.quote .quote .quote {
+	border-left-color: red;
+}

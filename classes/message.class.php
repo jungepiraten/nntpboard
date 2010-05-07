@@ -66,27 +66,26 @@ class Message {
 		return $this->author;
 	}
 
-	public function getText($charset = null) {
+	public function hasTextBody() {
+		return isset($this->textbody) && trim($this->textbody) != "";
+	}
+
+	public function getTextBody($charset = null) {
 		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getText());
+			return iconv($this->getCharset(), $charset, $this->getTextBody());
 		}
 		return $this->textbody;
 	}
 
-	public function getHTML($charset = null) {
+	public function hasHTMLBody() {
+		return isset($this->htmlbody) && trim($this->htmlbody) != "";
+	}
+
+	public function getHTMLBody($charset = null) {
 		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getHTML());
+			return iconv($this->getCharset(), $charset, $this->getHTMLBody());
 		}
-		if (isset($this->htmlbody) && trim($this->htmlbody) != "") {
-			$text = $this->htmlbody;
-			// TODO filtern
-			$text = strip_tags($text, "<b><i><u><a>");
-		} else {
-			$text = $this->getText();
-			$text = nl2br($text);
-			// TODO formatierung
-		}
-		return $text;
+		return $this->htmlbody;
 	}
 	
 	public function getCharset() {
@@ -104,18 +103,6 @@ class Message {
 	public function getAttachment($i) {
 		return $this->attachments[$i];
 	}
-	
-	/*TODO umlagern ! public function saveAttachments($datadir) {
-		// Speichere alle Attachments ab
-		foreach ($this->parts AS $partid => &$part) {
-			if ($part->isAttachment()) {
-				$filename = $datadir->getAttachmentPath($this->group, $part);
-				if (!file_exists($filename)) {
-					$part->saveAsFile($filename);
-				}
-			}
-		}
-	}*/
 	
 	public function isMime() {
 		return ($this->mime !== null);

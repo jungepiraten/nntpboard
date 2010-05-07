@@ -15,8 +15,12 @@ require_once(dirname(__FILE__)."/../exceptions/datadir.exception.php");
 
 class CacheConnection extends AbstractConnection {
 	private $group;
-	private $auth;
+
+	/**
+	 * $cache - Der Cache, der die Nachrichten speichert
+	 **/
 	private $cache;
+
 	/**
 	 * $uplink - Die Verbindung, mit der Nachrichten synchronisiert werden
 	 **/
@@ -31,11 +35,10 @@ class CacheConnection extends AbstractConnection {
 	// MessageID => true
 	private $queue = array();
 	
-	public function __construct($group, $auth, $cache, $uplink = null) {
+	public function __construct($group, $cache, $uplink = null) {
 		parent::__construct();
 		
 		$this->group = $group;
-		$this->auth = $auth;
 		$this->cache = $cache;
 		$this->uplink = $uplink;
 	}
@@ -84,6 +87,7 @@ class CacheConnection extends AbstractConnection {
 
 
 	protected function getLastThread() {
+		// wir nehmen hier eine sortierung an (TODO)
 		return array_slice($this->getThreads(), 0, 1);
 	}
 
@@ -100,11 +104,11 @@ class CacheConnection extends AbstractConnection {
 			$this->uplink->post($message);
 			$this->uplink->close();
 		}
-		// Berechtigungscheck
-		if (!$this->group->mayPost($this->auth)) {
-			throw new PostingNotAllowedException();
+		// Berechtigungscheck TODO unschoene loesung
+		if (false && !$this->group->mayPost($this->auth)) {
+			throw new PostingNotAllowedException($this->group);
 		}
-		// Moderierte Nachrichten kommen via NNTP rein (direkt ueber addMessage)
+		// Moderierte Nachrichten kommen via Uplink rein (direkt ueber addMessage)
 		if ($this->group->isModerated()) {
 			return;
 		}
@@ -184,8 +188,11 @@ class CacheConnection extends AbstractConnection {
 	private function addMessage($message) {
 		// Unterpost verlinkenuplink
 		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$thread = $this->getThread($message->getParentID());
 			$this->getMessage($message->getParentID())->addChild($message);
+		}
+
+		if ($message->hasParent() && $this->hasThread($message->getParentID())) {
+			$thread = $this->getThread($message->getParentID());
 		} else {
 			$thread = new Thread($message);
 		}

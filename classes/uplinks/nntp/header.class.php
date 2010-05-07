@@ -34,6 +34,34 @@ class NNTPHeader {
 	public function get($name) {
 		return $this->headers[strtolower($name)];
 	}
+
+	public function extractMessageHeader() {
+		$headers = new NNTPHeader;
+		foreach ($this->headers as $name => $header) {
+			if (substr($name,0,7) != "content") {
+				$headers->set($header);
+			}
+		}
+		return $headers;
+	}
+
+	public function extractContentHeader() {
+		$headers = new NNTPHeader;
+		foreach ($this->headers as $name => $header) {
+			if (substr($name,0,7) == "content") {
+				$headers->set($header);
+			}
+		}
+		return $headers;
+	}
+
+	public function getPlain() {
+		$text = "";
+		foreach ($this->headers AS $header) {
+			$text .= $header->getPlain() . "\r\n";
+		}
+		return $text;
+	}
 }
 
 class NNTPSingleHeader {
@@ -43,25 +71,28 @@ class NNTPSingleHeader {
 		// Eventuell vorhandene Extra-Attribute auffangen
 		$extras = explode(";", $value);
 		$value = trim(array_shift($extras));
-		$h = new NNTPSingleHeader(trim($name), mb_decode_mimeheader($value), mb_internal_encoding());
+		$h = new NNTPSingleHeader(trim($name), $value);
 		foreach ($extras AS $extra) {
 			list($name, $value) = explode("=", $extra, 2);
-			$name = mb_decode_mimeheader(trim($name));
-			$value = mb_decode_mimeheader(trim(trim($value),'"'));
+			$name = trim($name);
+			$value = trim(trim($value),'"');
 			$h->addExtra($name, $value);
 		}
 		return $h;
 	}
 
+	public static function generate($name, $value, $charset) {
+		mb_internal_encoding($charset);
+		return new NNTPSingleHeader($name, mb_encode_mimeheader($value, $charset));
+	}
+
 	private $name;
 	private $value;
-	private $charset;
 	private $extra = array();
 
-	public function __construct($name, $value, $charset) {
+	public function __construct($name, $value) {
 		$this->name = $name;
 		$this->value = $value;
-		$this->charset = $charset;
 	}
 
 	public function getName() {
@@ -70,7 +101,7 @@ class NNTPSingleHeader {
 
 	public function getValue($charset = null) {
 		if ($charset != null) {
-			return iconv($this->getCharset(), $charset, $this->getValue());
+			return iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($this->getValue()));
 		}
 		return $this->value;
 	}
@@ -89,9 +120,18 @@ class NNTPSingleHeader {
 
 	public function getExtra($name, $charset = null) {
 		if ($charset != null) {
-			return iconv($this->getCharset(), $charset, $this->getExtra($name));
+			return iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($this->getValue()));
 		}
 		return $this->extra[strtolower($name)];
+	}
+
+	public function getPlain() {
+		$text = $this->getName() . ": " . $this->getValue();
+		// Fuege Zusaetzliche Informationen hinzu
+		foreach ($this->extra AS $name => $extra) {
+			$text .= "; " . $name . "=\"" . addclashes($extra, '"') . "\"";
+		}
+		return $text;
 	}
 }
 

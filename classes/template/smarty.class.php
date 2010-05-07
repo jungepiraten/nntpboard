@@ -66,7 +66,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["subject"]		= $message->getSubject($this->getCharset());
 		$row["author"]		= $this->parseAddress($message->getAuthor());
 		$row["date"]		= $message->getDate();
-		$row["body"]		= $message->getHTML($this->getCharset());
+		$row["body"]		= $this->formatMessage($message);
 		$row["attachments"]	= array();
 		foreach ($message->getAttachments() AS $partid => $attachment) {
 			$row["attachments"][$partid] = $this->parseAttachment($attachment);
@@ -90,6 +90,57 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		return $address->__toString($this->getCharset());
 	}
 
+	private function formatMessage($message) {
+		if ($message->hasHTMLBody()) {
+			$text = $message->getHTMLBody($this->getCharset());
+			// Nur "gutes" HTML durchlassen
+			$text = strip_tags($text, "<b><i><u><a>");
+		} else {
+			$text = $message->getTextBody($this->getCharset());
+			
+			// Inline-GPG ausschneiden (RFC 2440)
+			$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
+			
+			// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
+			$text = iconv("UTF-8", $this->getCharset(),
+			              htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
+
+			// Zitate sind eine fiese sache ...
+			$lines = explode("\n", $text);
+			$text = "";
+			$quoted = 0;
+			for ($i=0; $i<count($lines); $i++) {
+				$line = rtrim($lines[$i]);
+				$quoted_loc = 0;
+				// Wir haben vorher schon htmlentities rausgeparst ...
+				while (substr($line,0,4) == "&gt;") {
+					$line = ltrim(substr($line,4));
+					$quoted_loc++;
+				}
+				while ($quoted < $quoted_loc) {
+					$text .= "<div class=\"quote\">";
+					$quoted++;
+				}
+				while ($quoted > $quoted_loc) {
+					$text .= "</div>";
+					$quoted--;
+				}
+				$text .= $line . "\r\n";
+			}
+			while ($quoted > 0) {
+				$text .= "</div>";
+				$quoted--;
+			}
+			// Formatierung
+			$text = preg_replace('$(\s)(\*[^\s]+\*)(\s)$', '$1<b>$2</b>$3', $text);
+			$text = preg_replace('$(\s)(/[^\s]+/)(\s)$', '$1<i>$2</i>$3', $text);
+			$text = preg_replace('$(\s)(_[^\s]+_)(\s)$', '$1<u>$2</u>$3', $text);
+
+			// Zeilenumbrueche
+			$text = nl2br(trim($text));
+		}
+		return $text;
+	}
 
 
 	public function viewexception($exception) {

@@ -2,7 +2,6 @@
 
 require_once(dirname(__FILE__)."/classes/address.class.php");
 require_once(dirname(__FILE__)."/classes/message.class.php");
-require_once(dirname(__FILE__)."/classes/bodypart.class.php");
 
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
@@ -47,15 +46,9 @@ if (isset($_REQUEST["post"])) {
 		$parentid = null;
 	}
 
-	$message = new Message($group->getGroup(), $articlenum, $messageid, time(), $autor, $subject, $charset, $parentid,  $mime = null);
+	$textbody = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
 
-	/* Wir nutzen vorerst nur text/plain -Nachrichten */
-	$disposition = "inline";
-	$mimetype = "text/plain";
-	$text = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
-
-	$bodypart = new BodyPart($message, $disposition, $mimetype, $text, $charset);
-	$message->addBodyPart($bodypart);
+	$message = new Message($group->getGroup(), $articlenum, $messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
 	
 	try {
 		$connection->open();
