@@ -18,6 +18,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->auth = $auth;
 
 		$this->smarty = new Smarty;
+		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
+		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
 		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress($this->getCharset()));
@@ -61,7 +63,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 
 	private function parseMessage($message) {
 		$row = array();
-		$row["articlenum"]	= $message->getArticleNum();
 		$row["messageid"]	= $message->getMessageID();
 		$row["subject"]		= $message->getSubject($this->getCharset());
 		$row["author"]		= $this->parseAddress($message->getAuthor());
@@ -93,8 +94,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private function formatMessage($message) {
 		if ($message->hasHTMLBody()) {
 			$text = $message->getHTMLBody($this->getCharset());
-			// Nur "gutes" HTML durchlassen
-			$text = strip_tags($text, "<b><i><u><a>");
+			// Nur "gutes" HTML durchlassen / TODO weitere "gute" tags sammeln ;)
+			$text = strip_tags($text, "<b><i><u><a><tt><small><big>");
 		} else {
 			$text = $message->getTextBody($this->getCharset());
 			
@@ -206,12 +207,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 	
 	public function viewmessage($board, $thread, $message, $mayPost = false) {
-		// TODO auch auf die richtige seite weiterleiten :o
-		$page = 0;
+		$page = floor($thread->getMessagePosition($message) / $this->getMessagesPerPage());
 		header("Location: viewthread.php?boardid=" . urlencode($board->getBoardID()) .
 		                  "&threadid=" . urlencode($thread->getThreadID()) .
 		                  "&page=" . intval($page) . "#article" . 
-		                  urlencode($message->getArticleNum()));
+		                  urlencode($message->getMessageID()));
 		exit;
 	}
 

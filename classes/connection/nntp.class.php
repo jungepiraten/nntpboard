@@ -3,7 +3,7 @@
 // http://pear.php.net/package/Net_NNTP
 require_once("Net/NNTP/Client.php");
 
-require_once(dirname(__FILE__)."/../uplink.class.php");
+require_once(dirname(__FILE__)."/../connection.class.php");
 require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
@@ -12,61 +12,53 @@ require_once(dirname(__FILE__)."/nntp/header.class.php");
 require_once(dirname(__FILE__)."/nntp/message.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 
-class NNTPUplink extends AbstractUplink {
+class NNTPConnection extends AbstractConnection {
+	private $host;
 	private $group;
-	private $username;
-	private $password;
 
 	// MessageID => ArtikelNum
 	private $messageids = array();
-	// MessageID => Message
-	private $messages = array();
+	// y (read-write), n (read-only) oder m (moderiert)
+	private $mode = null;
 
 	private $nntpclient;
 	
-	public function __construct(NNTPGroup $group, $auth) {
+	public function __construct(Host $host, $group) {
 		parent::__construct();
 
+		$this->host = $host;
 		$this->group = $group;
-		// NNTP-Zugangsdaten holen
-		if ($auth instanceof Auth) {
-			$this->username = $auth->getNNTPUsername();
-			$this->password = $auth->getNNTPPassword();
-		}
+		$this->nexthop = $uplink;
 
 		// Verbindung initialisieren
 		$this->nntpclient = new Net_NNTP_Client;
 	}
 	
-	public function open() {
+	public function open($auth = null) {
 		// Verbindung oeffnen
-		$ret = $this->nntpclient->connect($this->group->getHost()->getHost(), false, $this->group->getHost()->getPort());
+		$ret = $this->nntpclient->connect($this->host->getHost(), false, $this->host->getPort());
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
 		
 		// ggf. Authentifieren
-		if (!empty($this->username) && !empty($this->password)) {
-			$ret = $this->nntpclient->authenticate($this->username, $this->password);
+		if (isset($auth)) {
+			$ret = $this->nntpclient->authenticate($auth->getNNTPUsername(), $auth->getNNTPPassword());
 			if (PEAR::isError($ret)) {
 				throw new Exception($ret);
 			}
 		}
 
-		// Zugriffsrechte laden
-		$ret = $this->nntpclient->getGroups($this->group->getGroup());
+		// Gruppenmodus laden
+		$ret = $this->nntpclient->getGroups($this->group, true);
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
-		if (!isset($ret[$this->group->getGroup()])) {
-			throw new Exception("Reading not allowed!");
-		}
-		// y, n or m / TODO: benutze diese informationen irgendwie sinnvoll
-		$posting = $ret[$this->group->getGroup()]["posting"];
+		$this->mode = $ret[$this->group]["posting"];
 		
 		// Waehle die passende Gruppe aus
 		// Hole Zuordnung ArtNr <=> MessageID
-		$ret = $this->nntpclient->selectGroup($this->group->getGroup(), true);
+		$ret = $this->nntpclient->selectGroup($this->group, true);
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
@@ -89,21 +81,18 @@ class NNTPUplink extends AbstractUplink {
 	public function getMessageIDs() {
 		return array_keys($this->messageids);
 	}
-
 	public function getMessageCount() {
 		return count($this->messageids);
 	}
-
 	public function hasMessage($msgid) {
 		return isset($this->messageids[$msgid]);
 	}
-
 	public function getMessage($msgid) {
 		// Frage zuerst den Kurzzeitcache
 		if (isset($this->messages[$msgid])) {
 			return $this->messages[$msgid];
 		}
-		// Versuche die nachricht frisch zu laden
+		// Versuche die Nachricht frisch zu laden
 		if (isset($this->messageids[$msgid])) {
 			$artnr = $this->messageids[$msgid];
 			// Lade die Nachricht und Parse sie
@@ -111,7 +100,7 @@ class NNTPUplink extends AbstractUplink {
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($artnr, $this->group);
 			}
-			$message = NNTPMessage::parsePlain($this->group->getGroup(), $artnr, implode("\r\n", $article));
+			$message = NNTPMessage::parsePlain(implode("\r\n", $article));
 			$message = $message->getObject();
 			
 			// Schreibe die Nachricht in den Kurzzeit-Cache
@@ -119,65 +108,51 @@ class NNTPUplink extends AbstractUplink {
 
 			return $message;
 		}
+		// Letzter Versuch: rekursiv
+		if ($this->nexthop !== null) {
+			return $this->nexthop->getMessage($msgid);
+		}
+		// Diese Nachricht gibt es offensichtlich nicht mehr ;)
 		throw new NotFoundMessageException($msgid, $this->group);
 	}
 
+	protected function mayRead() {
+		return true;
+	}
 
+	protected function mayPost() {
+		return $this->mode != "n";
+	}
+
+	protected function isModerated() {
+		return $this->mode == "m";
+	}
+
+	public function getGroup() {
+		$group = parent::getGroup();
+		foreach ($this->getMessageIDs() as $messageid) {
+			$group->addMessage($this->getMessage($messageid));
+		}
+		return $group;
+	}
+
+	/**
+	 * Schreibe eine Nachricht
+	 **/
 	public function post($message) {
 		$nntpmsg = NNTPMessage::parseObject($message);
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {
 			case 440:
-				throw new PostingNotAllowedException($this->group->getGroup());
+				throw new PostingNotAllowedException($this->group, $ret);
 			case 441:
-				// Nachricht Syntaktisch Inkorrekt -.- (TODO)
+				// Nachricht Syntaktisch inkorrekt
+				throw new PostingFailedException($this->group, $ret);
 			}
 			// Ein unerwarteter Fehler - wie spannend *g*
-			throw new PostException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
+			throw new PostingException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
 		}
-	}
-
-	/**
-	 * Baut aus einem Message-Objekt wieder eine Nachricht
-	 **/
-	private function generateBodyPart($part) {
-		$charset = $part->getCharset();
-		$crlf = "\r\n";
-	
-		$data  = "Content-Type: " . $part->getMimeType() . "; Charset=\"" . addcslashes($charset, "\"") . "\"" . $crlf;
-		// Der Erste Abschnitt kriegt keinen Disposition-Header (Haupttext)
-		if ($disposition) {
-			$data .= "Content-Disposition: " . $part->getDisposition() . ($part->hasFilename() ? "; filename=\"".addcslashes($part->getFilename(), "\"")."\"" : "") . $crlf;
-			$disposition = true;
-		}
-		// Waehle das Encoding aus - Base64 geht immer, aber fuer Text ist quoted-printable doch schoener
-		$encoding = "base64";
-		if ($part->isText()) {
-			$encoding = "quoted-printable";
-		}
-		$data .= "Content-Transfer-Encoding: " . $encoding . $crlf;
-		$data .= $crlf;
-
-		/* Body */
-		$body = $part->getText($charset);
-		switch ($encoding) {
-		case "7bit":
-		case "8bit":
-		case "binary":
-			// Do nothing!
-			break;
-		case "base64":
-			$body = chunk_split(base64_encode($body), 76, $crlf);
-			break;
-		case "quoted-printable":
-			$body = quoted_printable_encode($body);
-			break;
-		}
-		
-		$data .= rtrim($body, $crlf) . $crlf;
-		$data .= $crlf;
-		return $data;
 	}
 }
 

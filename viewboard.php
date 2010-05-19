@@ -12,17 +12,25 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-$group = $board->getGroup();
-if ($group !== null) {
-	$connection = $group->getConnection($session->getAuth());
+$connection = $board->getConnection($session->getAuth());
+if ($connection !== null) {
 	$connection->open();
-	$threads = array();
-	foreach ($connection->getThreadIDs() AS $threadid) {
-		$threads[] = $connection->getThread($threadid);
-	}
+	$group = $connection->getGroup();
 	$connection->close();
+
+	$threads = array();
+	foreach ($group->getThreadIDs() AS $threadid) {
+		$threads[] = $group->getThread($threadid);
+	}
+
+	if (!function_exists("cmpThreads")) {
+		function cmpThreads($a, $b) {
+			return $b->getLastPostDate() - $a->getLastPostDate();
+		}
+	}
+	uasort($threads, cmpThreads);
 	
-	$template->viewboard($board, $group, $threads, $group->mayPost($session->getAuth()));
+	$template->viewboard($board, $group, $threads, $group->mayPost());
 } else {
 	$template->viewboard($board, $group);
 }

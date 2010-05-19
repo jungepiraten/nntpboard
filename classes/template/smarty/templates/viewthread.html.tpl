@@ -12,7 +12,7 @@
 
 {foreach from=$messages item=message}
 <div class="message {cycle values="odd,even"}">
- <a name="article{$message.articlenum|escape:html}" class="anchor"></a>
+ <a name="article{$message.messageid|escape:html}" class="anchor"></a>
  <span class="author">{$message.author|escape:html}</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$message.messageid}" class="reply">Antworten</a>{/if}

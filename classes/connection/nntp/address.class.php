@@ -4,10 +4,10 @@ require_once(dirname(__FILE__) . "/../../address.class.php");
 
 class NNTPAddress extends Address {
 	public static function parseObject($addr) {
-		return new NNTPAddress($addr->getName(), $addr->getAddress(), $addr->getComment());
+		return new NNTPAddress($addr->getName(), $addr->getAddress(), $addr->getComment(), $addr->getCharset());
 	}
 	
-	public static function parsePlain($addr) {
+	public static function parsePlain($addr, $charset = "UTF-8") {
 		if (preg_match('/^(.*) \((.*?)\)\s*$/', $addr, $m)) {
 			array_shift($m);
 			$addr = trim(array_shift($m));
@@ -18,7 +18,7 @@ class NNTPAddress extends Address {
 			$name = trim(array_shift($m)," \"'\t");
 			$addr = trim(array_shift($m));
 		}
-		return new NNTPAddress($name, trim($addr, "<>"), $comment);
+		return new NNTPAddress($name, trim($addr, "<>"), $comment, $charset);
 	}
 
 	public function getObject() {

@@ -4,7 +4,6 @@ require_once(dirname(__FILE__)."/attachment.class.php");
 require_once(dirname(__FILE__)."/exceptions/message.exception.php");
 
 class Message {
-	private $articlenum;
 	private $messageid;
 	private $parentid = null;
 	private $charset = "UTF-8";
@@ -17,11 +16,7 @@ class Message {
 	private $attachments = array();
 	private $childs = array();
 	
-	private $group;
-	
-	public function __construct($group, $articlenum, $messageid, $date, $author, $subject, $charset, $parentid, $textbody, $htmlbody = null) {
-		$this->group = $group;
-		$this->articlenum = $articlenum;
+	public function __construct($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $htmlbody = null) {
 		$this->messageid = $messageid;
 		$this->date = $date;
 		$this->author = $author;
@@ -30,10 +25,6 @@ class Message {
 		$this->parentid = $parentid;
 		$this->textbody = $textbody;
 		$this->htmlbody = $htmlbody;
-	}
-	
-	public function getArticleNum() {
-		return $this->articlenum;
 	}
 	
 	public function getMessageID() {
@@ -103,14 +94,6 @@ class Message {
 	public function getAttachment($i) {
 		return $this->attachments[$i];
 	}
-	
-	public function isMime() {
-		return ($this->mime !== null);
-	}
-
-	public function getMimeType() {
-		return $this->mime;
-	}
 
 	public function getChilds() {
 		return array_keys($this->childs);
@@ -122,10 +105,6 @@ class Message {
 	
 	public function removeChild($msg) {
 		unset($this->childs[$msg->getMessageID()]);
-	}
-	
-	public function getGroup() {
-		return $this->group;
 	}
 }
 

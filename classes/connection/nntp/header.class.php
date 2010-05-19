@@ -129,7 +129,7 @@ class NNTPSingleHeader {
 		$text = $this->getName() . ": " . $this->getValue();
 		// Fuege Zusaetzliche Informationen hinzu
 		foreach ($this->extra AS $name => $extra) {
-			$text .= "; " . $name . "=\"" . addclashes($extra, '"') . "\"";
+			$text .= "; " . $name . "=\"" . addcslashes($extra, '"') . "\"";
 		}
 		return $text;
 	}

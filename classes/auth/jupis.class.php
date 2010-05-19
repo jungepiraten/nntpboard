@@ -11,7 +11,7 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 	private $readthreads = array();
 
 	public function __construct() {
-		// Alle Posts vor dem Login sind schon gelesen ;)
+		// Alle Posts vor dem Login sind schon gelesen ;) / TODO zeitfrist?
 		$this->readdate = time();
 	}
 
@@ -39,6 +39,8 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		// Trage den aktuellen Timestamp ein
 		$this->readthreads[$thread->getThreadID()] = $thread->getLastPostDate();
 	}
+
+	// TODO isUnreadGroup / isUnreadBoard
 
 	public function getNNTPUsername() {
 		return null;

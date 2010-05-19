@@ -8,14 +8,11 @@ class Thread {
 	private $author;
 	private $messages = array();
 	
-	private $group;
-	
 	public function __construct($message) {
 		$this->threadid = $message->getMessageID();
 		$this->subject = $message->getSubject();
 		$this->date = $message->getDate();
 		$this->author = $message->getAuthor();
-		$this->group = $message->getGroup();
 		$this->charset = $message->getCharset();
 	}
 	
@@ -30,6 +27,14 @@ class Thread {
 	public function addMessage($message) {
 		$this->messages[$message->getMessageID()] = array("date" => $message->getDate(), "author" => $message->getAuthor());
 		$this->sort();
+	}
+
+	public function getMessagePosition($message) {
+		if ($message instanceof Message) {
+			$message = $message->getMessageID();
+		}
+		$positions = array_flip(array_keys($this->messages));
+		return $positions[$message];
 	}
 
 	private function sort() {
@@ -83,10 +88,6 @@ class Thread {
 	
 	public function getCharset() {
 		return $this->charset;
-	}
-	
-	public function getGroup() {
-		return $this->group;
 	}
 }
 

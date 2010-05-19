@@ -7,14 +7,14 @@ class Board {
 	private $parent = null;
 	private $name = "";
 	private $desc = "";
-	private $group;
+	private $connection = null;
 	private $subboards = array();
 
-	public function __construct($boardid, $name, $desc, $group = null) {
+	public function __construct($boardid, $name, $desc, Connection $connection = null) {
 		$this->boardid = $boardid;
 		$this->name = $name;
 		$this->desc = $desc;
-		$this->group = $group;
+		$this->connection = $connection;
 	}
 
 	public function getBoardID() {
@@ -63,11 +63,11 @@ class Board {
 	}
 
 	public function hasGroup() {
-		return ($this->group !== null);
+		return ($this->connection !== null);
 	}
 
-	public function getGroup() {
-		return $this->group;
+	public function getConnection() {
+		return $this->connection;
 	}
 }
 

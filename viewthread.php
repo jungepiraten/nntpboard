@@ -14,37 +14,36 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-$group = $board->getGroup();
-if ($group === null) {
+$connection = $board->getConnection($session->getAuth());
+if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
 }
 
 /* Thread laden */
-$connection = $group->getConnection($session->getAuth());
 // Sobald die Verbindung geoeffnet ist, beginnen wir einen Kritischen Abschnitt!
 $connection->open();
+$group = $connection->getGroup();
+$connection->close();
 if ($threadid === null && $messageid !== null) {
-	$message = $connection->getMessage($messageid);
+	$message = $group->getMessage($messageid);
 	if ($message === null) {
 		// viewexception beendet das Script
 		$connection->close();
 		$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
 	}
-	$thread = $connection->getThread($messageid);
-	$connection->close();
+	$thread = $group->getThread($messageid);
 	$template->viewmessage($board, $thread, $message, $group->mayPost($session->getAuth()));
 }
 
-$thread = $connection->getThread($threadid);
+$thread = $group->getThread($threadid);
 if ($thread === null) {
-	$connection->close();
 	$template->viewexception(new Exception("Thread nicht gefunden!"));
 }
 
 // Nachrichten laden
 $messages = array();
 foreach ($thread->getMessageIDs() AS $messageid) {
-	$messages[] = $connection->getMessage($messageid);
+	$messages[] = $group->getMessage($messageid);
 }
 $connection->close();
 if (!is_array($messages) || count($messages) < 1) {
@@ -52,6 +51,6 @@ if (!is_array($messages) || count($messages) < 1) {
 }
 
 $session->getAuth()->markReadThread($thread);
-$template->viewthread($board, $thread, $messages, $group->mayPost($session->getAuth()));
+$template->viewthread($board, $thread, $messages, $group->mayPost());
 
 ?>

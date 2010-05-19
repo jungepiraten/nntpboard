@@ -21,7 +21,7 @@ abstract class DefaultConfig {
 		}
 		throw new NotFoundBoardException($id);
 	}
-	protected function getBoardIDs() {
+	public function getBoardIDs() {
 		return array_keys($this->boards);
 	}
 	

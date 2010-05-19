@@ -3,8 +3,52 @@
 require_once(dirname(__FILE__) . "/header.class.php");
 require_once(dirname(__FILE__) . "/../../attachment.class.php");
 
+if (!function_exists("quoted_printable_encode")) {
+	// aus http://de.php.net/quoted_printable_decode
+	function quoted_printable_encode($string) {
+		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
+		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
+		return $string;
+	}
+}
+
 class NNTPPlainBody {
 	public static function parsePlain($header, $body) {
+		return new NNTPPlainBody($header, $body);
+	}
+
+	public static function parseObject($attachment) {
+		$header = new NNTPHeader;
+		$header->set(	new NNTPSingleHeader("Content-Type",			$attachment->getMimeType()));
+		$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"base64"));
+		$header_disposition = new NNTPSingleHeader("Content-Disposition",	$attachment->getDisposition());
+		if ($attachment->hasFilename()) {
+			$header_disposition->addExtra("filename", $attachment->getFilename());
+		}
+		$header->set($header_disposition);
+		return new NNTPPlainBody($header, base64_encode($attachment->getContent()));
+	}
+
+	public static function parse($mimetype, $charset, $encoding, $body) {
+		$header = new NNTPHeader;
+		$contenttypeheader = new NNTPSingleHeader("Content-Type",		$mimetype);
+		$contenttypeheader->addExtra("charset", $charset);
+		$header->set($contenttypeheader);
+		$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	$encoding));
+
+		switch ($encoding) {
+		case "7bit":
+		case "8bit":
+		case "binary":
+			// Keine weitere Kodierung gewuenscht!
+			break;
+		case "base64":
+			$body = chunk_split(base64_encode($body), 76, "\r\n");
+			break;
+		case "quoted-printable":
+			$body = quoted_printable_encode($body);
+			break;
+		}
 		return new NNTPPlainBody($header, $body);
 	}
 
@@ -84,7 +128,8 @@ class NNTPPlainBody {
 	}
 
 	public function getObject() {
-		return new Attachment($this->getDisposition(), $this->getMimeType(), $this->getBody(), $this->getCharset(), $this->getFileName());
+		// Attachments haben keinen Zeichensatz, da wir nur Binaere Inhalte nutzen (hoffentlich *g*)
+		return new Attachment($this->getDisposition(), $this->getMimeType(), $this->getBody(), $this->getFileName());
 	}
 }
 

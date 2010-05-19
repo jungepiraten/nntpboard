@@ -7,6 +7,7 @@ interface Auth {
 	public function getNNTPUsername();
 	public function getNNTPPassword();
 
+	// TODO grml - ungelesene threads
 	public function isUnreadThread($thread);
 	public function markReadThread($thread);
 }

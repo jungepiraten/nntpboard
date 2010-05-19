@@ -13,12 +13,12 @@ $reference = !empty($_REQUEST["reference"]) ? stripslashes($_REQUEST["reference"
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
-	$template->showexception(new Exception("Board nicht gefunden!"));
+	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
 $group = $board->getGroup();
 if ($group === null) {
-	$template->showexception(new Exception("Board enthaelt keine Group!"));
+	$template->viewexception(new Exception("Board enthaelt keine Group!"));
 }
 $connection = $group->getConnection($session->getAuth());
 
@@ -31,8 +31,6 @@ if ($reference !== null) {
 if (isset($_REQUEST["post"])) {
 	// TODO Sperre gegen F5
 
-	// Die Artikelnummer wird erst durch den Newsserver zugewiesen
-	$articlenum = null;
 	$messageid = "<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">";
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->isAnonymous()
@@ -48,7 +46,7 @@ if (isset($_REQUEST["post"])) {
 
 	$textbody = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
 
-	$message = new Message($group->getGroup(), $articlenum, $messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
+	$message = new Message($messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
 	
 	try {
 		$connection->open();
@@ -60,7 +58,7 @@ if (isset($_REQUEST["post"])) {
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);
 		}
-	} catch (PostingNotAllowedException $e) {
+	} catch (PostingException $e) {
 		$template->viewexception($e);
 	}
 }

@@ -32,10 +32,9 @@ if ($attachment === null) {
 
 $disposition = $attachment->getDisposition();
 $filename = $attachment->getFilename();
-$charset = $attachment->getCharset();
 
 // see RFC 2616 for these Headers
-header("Content-Type: ".$attachment->getMimeType() . (empty($charset) ? "" : "; Charset=".$charset));
+header("Content-Type: ".$attachment->getMimeType());
 header("Content-Length: ".$attachment->getLength());
 if (!empty($disposition)) {
 	header("Content-Disposition: " . $disposition . (empty($filename) ? "" : "; filename=\"".addslashes($filename)."\""));

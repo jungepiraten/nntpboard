@@ -14,7 +14,7 @@ require_once(dirname(__FILE__)."/../exceptions/message.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/datadir.exception.php");
 
 class CacheConnection extends AbstractConnection {
-	private $group;
+	private $readonly;
 
 	/**
 	 * $cache - Der Cache, der die Nachrichten speichert
@@ -25,22 +25,13 @@ class CacheConnection extends AbstractConnection {
 	 * $uplink - Die Verbindung, mit der Nachrichten synchronisiert werden
 	 **/
 	private $uplink;
-
-	// MessageID => Message
-	private $messages = array();
-	// MessageID => ThreadID
-	private $threadids = array();
-	// ThreadID => Thread
-	private $threads = array();
-	// MessageID => true
-	private $queue = array();
 	
-	public function __construct($group, $cache, $uplink = null) {
+	public function __construct($cache, $uplink = null, $readonly = false) {
 		parent::__construct();
 		
-		$this->group = $group;
 		$this->cache = $cache;
 		$this->uplink = $uplink;
+		$this->readonly = $readonly;
 	}
 	
 	public function open() {
@@ -51,44 +42,36 @@ class CacheConnection extends AbstractConnection {
 		$this->cache->close();
 	}
 
+	public function getMessageCount() {
+		return $this->cache->getMessageCount();
+	}
 
 	public function getMessageIDs() {
 		return $this->cache->getMessageIDs();
 	}
 
-	public function getMessageCount() {
-		return $this->cache->getMessageCount();
+	public function getGroup() {
+		$group = parent::getGroup();
+		$messages = $this->cache->getMessageIDs();
+		foreach ($messages as $messageid) {
+			$group->addMessage($this->cache->getMessage($messageid));
+		}
+		return $group;
 	}
 
-	public function hasMessage($messageid) {
-		return $this->cache->hasMessage($messageid);
+	protected function mayRead() {
+		return true;
 	}
 
-	public function getMessage($messageid) {
-		return $this->cache->getMessage($messageid);
+	protected function mayPost() {
+		// TODO uplink fragen
+		return ! $this->readonly;
 	}
 
-
-	public function getThreadIDs() {
-		return $this->cache->getThreadIDs();
-	}
-
-	public function getThreadCount() {
-		return $this->cache->getThreadCount();
-	}
-
-	public function hasThread($messageid) {
-		return $this->cache->hasThread($messageid);
-	}
-
-	public function getThread($messageid) {
-		return $this->cache->getThread($messageid);
-	}
-
-
-	protected function getLastThread() {
-		// wir nehmen hier eine sortierung an (TODO)
-		return array_slice($this->getThreads(), 0, 1);
+	protected function isModerated() {
+		// Warum sollte ein Cache Moderiert sein?
+		// falls wir sowas mal brauchen, gehört es in den Uplink
+		return false;
 	}
 
 	/**
@@ -101,43 +84,21 @@ class CacheConnection extends AbstractConnection {
 		// Falls vorhanden, posten wir das erstmal woanders (evtl kommen dabei ja Exceptions)
 		if ($this->uplink !== null) {
 			$this->uplink->open();
+			// Die Berechtigungen prueft der Uplink selbst
 			$this->uplink->post($message);
+			// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
+			// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
+			if (!$this->uplink->isModerated()) {
+				$this->addMessage($message);
+			}
 			$this->uplink->close();
-		}
-		// Berechtigungscheck TODO unschoene loesung
-		if (false && !$this->group->mayPost($this->auth)) {
-			throw new PostingNotAllowedException($this->group);
-		}
-		// Moderierte Nachrichten kommen via Uplink rein (direkt ueber addMessage)
-		if ($this->group->isModerated()) {
-			return;
-		}
-		// Markiere die Nachricht nur in der Queue, falls der Uplink sie nicht schon hat.
-		if ($this->uplink !== null) {
-			$this->addMessage($message);
 		} else {
-			$this->addQueueMessage($message);
+			// Berechtigungscheck
+			if ($this->isReadOnly()) {
+				throw new PostingNotAllowedException($this->group);
+			}
+			$this->addMessage($message);
 		}
-		$this->cache->sort();
-	}
-
-	/**
-	 * Poste Queue-Nachrichten auf den Uplink
-	 **/
-	public function sendMessages() {
-		if ($this->uplink == null) {
-			return;
-		}
-		$this->uplink->open();
-		foreach ($this->getQueue() AS $messageid) {
-			// Nachricht laden
-			$message = $this->getMessage($messageid);
-			// Nachricht posten und hier Loeschen
-			// Falls NNTP sie annimmmt, kommt sie mit loadMessages() wieder rein
-			$this->uplink->post($message);
-			$this->removeQueueMessage($message);
-		}
-		$this->uplink->close();
 	}
 	
 	/**
@@ -148,90 +109,52 @@ class CacheConnection extends AbstractConnection {
 			return;
 		}
 		$this->uplink->open();
+
 		// Wenn die hoechste ArtikelNum sich nicht veraendert hat, hat sich gar nix getan (spart sortieren)
 		if ($this->uplink->getMessageCount() <= 0
 		 || $this->uplink->getMessageCount() == $this->getMessageCount()) {
 			$this->uplink->close();
 			return;
 		}
+		$group = $this->uplink->getGroup();
+
 		// Liste mit neuen Nachrichten aufstellen
 		$newmessages = array_diff($this->uplink->getMessageIDs(), $this->getMessageIDs());
-
 		foreach ($newmessages as $messageid) {
 			$message = $this->uplink->getMessage($messageid);
 			$this->addMessage($message);
 		}
+
+		// Veraltete Nachrichten ausstreichen (z.b. Cancel)
+		$oldmessages = array_diff($this->getMessageIDs(), $this->uplink->getMessageIDs());
+		foreach ($oldmessages as $messageid) {
+			$this->removeMessage($messageid);
+		}
+
 		$this->uplink->close();
-		$this->cache->sort();
-	}
-	
-	/**
-	 * Queue-Verwaltung
-	 **/
-	private function getQueue() {
-		return $this->cache->getQueue();
-	}
-
-	private function addQueueMessage($message) {
-		$this->addMessage($message);
-		$this->cache->addToQueue($message);
-	}
-
-	private function removeQueueMessage($messageid) {
-		$this->removeMessage($messageid);
-		$this->cache->removeFromQueue($messageid);
 	}
 	
 	/**
 	 * Fuege eine Nachricht ein und referenziere sie
 	 **/
 	private function addMessage($message) {
-		// Unterpost verlinkenuplink
-		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$this->getMessage($message->getParentID())->addChild($message);
-		}
-
-		if ($message->hasParent() && $this->hasThread($message->getParentID())) {
-			$thread = $this->getThread($message->getParentID());
-		} else {
-			$thread = new Thread($message);
-		}
-
-		// Nachricht zum Thread hinzufuegen
-		$thread->addMessage($message);
-
-		$this->cache->addMessage($message, $thread);
+		$this->cache->addMessage($message);
 
 		/**
-		 * Wenn wir die Nachricht vom NNTP bekommen haben, koennen wir ihn aus der Queue streichen
+		 * Wenn wir die Nachricht vom Uplink bekommen haben, koennen wir ihn aus der Queue streichen
 		 * Wenn diese Nachricht aus der Queue kommt, wird sie gleich in die Queue eingetragen
 		 * => Einfach aus der Queue streichen, falls noetig wirds wieder eingetragen
 		 */
-		if ($this->cache->hasQueued($message->getMessageID())) {
-			$this->cache->removeQueue($message->getMessageID());
-		}
+		#if ($this->cache->hasQueued($message->getMessageID())) {
+		#	$this->cache->removeQueue($message->getMessageID());
+		#}
 	}
 
 	/**
 	 * Loesche die Nachricht mit allen Referenzen
 	 **/
 	private function removeMessage($messageid) {
-		$message = $this->getMessage($messageid);
 		$this->cache->removeMessage($messageid);
-
-		// Unterelemente auf das Vaterelement schieben
-		foreach ($message->getChilds() AS $messageid) {
-			$this->getMessage($messageid)->setParentID($message->hasParentID() ? $message->getParentID() : null);
-		}
-		// Verlinkungen der Vaterelemente loesen
-		if ($message->hasParent() && $this->hasMessageNum($message->getParentID())) {
-			$this->getMessage($message->getParentID())->removeChild($message);
-		}
-		
-		// Nachricht aus dem Thread haengen
-		if ($this->hasThread($message->getMessageID())) {
-			$this->getThread($message->getMessageID())->removeMessage($message);
-		}
 	}
 }
 

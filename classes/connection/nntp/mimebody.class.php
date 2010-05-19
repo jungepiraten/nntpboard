@@ -3,24 +3,20 @@
 require_once(dirname(__FILE__) . "/header.class.php");
 require_once(dirname(__FILE__) . "/plainbody.class.php");
 require_once(dirname(__FILE__) . "/mimebody/mixed.class.php");
+require_once(dirname(__FILE__) . "/mimebody/related.class.php");
 require_once(dirname(__FILE__) . "/mimebody/alternative.class.php");
 require_once(dirname(__FILE__) . "/mimebody/signed.class.php");
-
-if (!function_exists("quoted_printable_encode")) {
-	// aus http://de.php.net/quoted_printable_decode
-	function quoted_printable_encode($string) {
-		$string = str_replace(array('%20', '%0D%0A', '%'), array(' ', "\r\n", '='), rawurlencode($string));
-		$string = preg_replace('/[^\r\n]{73}[^=\r\n]{2}/', "$0=\r\n", $string);
-		return $string;
-	}
-}
 
 abstract class NNTPMimeBody {
 	public static function parsePlain($header, $body) {
 		$parts = array();
 		$mimetype = null;
-		// TODO abfrage erweitern ...
-		if ($header->has("Content-Type") && $header->get("Content-Type")->hasExtra("boundary")) {
+		
+		if ($header->has("Content-Type")
+		 && substr($header->get("Content-Type")->getValue(),0,9) == "multipart"
+		 && $header->get("Content-Type")->hasExtra("boundary"))
+		{
+			// Multipart-Nachricht	
 			$mimetype = $header->get("Content-Type")->getValue();
 			$boundary = $header->get("Content-Type")->getExtra("boundary");
 			$mimeparts = explode("--" . $boundary, $body);
@@ -34,12 +30,15 @@ abstract class NNTPMimeBody {
 				$parts[] = self::parsePlain($partheader, $partbody);
 			}
 		} else {
+			// Singlepart-Nachricht
 			$parts[] = NNTPPlainBody::parsePlain($header, $body);
 		}
 		
 		switch ($mimetype) {
 		case "multipart/signed":
 			return new NNTPSignedMimeBody($header, $parts);
+		case "multipart/related":
+			return new NNTPRelatedMimeBody($header, $parts);
 		case "multipart/alternative":
 			return new NNTPAlternativeMimeBody($header, $parts);
 		default:
@@ -49,11 +48,37 @@ abstract class NNTPMimeBody {
 	}
 	
 	public static function parseObject($message) {
-		// TODO breitere unterstuetzung als nur text/plain
-		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Content-Type",	"text/plain",	$message->getCharset()));
-		$parts = array(new NNTPPlainBody($header, $message->getTextBody()));
-		return new NNTPMixedMimeBody($header, $parts);
+		$parts = array();
+
+		// Text-Teil
+		if ($message->hasTextBody()) {
+			$parts[] = NNTPPlainBody::parse("text/plain", $message->getCharset(), "base64", $message->getTextBody());
+		}
+		// HTML-Teil
+		if ($message->hasHTMLBody()) {
+			$parts[] = NNTPPlainBody::parse("text/html", $message->getCharset(), "base64", $message->getHTMLBody());
+		}
+		// In einen alternative-Body packen (falls noetig)
+		if (count($parts) > 1) {
+			$header = new NNTPHeader;
+			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
+			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
+			$header->set($contenttype);
+			$parts = array(new NNTPAlternativeMimeBody($header, $parts));
+		}
+		// Eventuelle Attachments verpacken wir jetzt
+		foreach ($message->getAttachments() AS $attachment) {
+			$header = new NNTPHeader;
+			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
+			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
+			$header->set($contenttype);
+			$parts[] = NNTPPlainBody::parseObject($attachment);
+		}
+		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
+		if (count($parts) > 1) {
+			return new NNTPMixedMimeBody($header, $parts);
+		}
+		return array_shift($parts);
 	}
 	
 	private $header;

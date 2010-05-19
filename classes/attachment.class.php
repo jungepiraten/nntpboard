@@ -2,14 +2,12 @@
 
 class Attachment {
 	private $content;
-	private $charset = "UTF-8";
 	private $filename = null;
 	private $disposition = null;
 	private $mimetype = null;
 	private $mimesubtype = null;
-	private $location = null;
 
-	public function __construct($disposition, $mimetype, $content, $charset = "UTF-8", $filename = null) {
+	public function __construct($disposition, $mimetype, $content, $filename = null) {
 		if (!empty($disposition)) {
 			$this->disposition = strtolower($disposition);
 		}
@@ -23,21 +21,17 @@ class Attachment {
 			}
 		}
 		$this->content = $content;
-		$this->charset = $charset;
 		$this->filename = $filename;
 	}
 	
 	/**
 	 * getText()
 	 * @return	String
-	 *	Body der Nachricht im Zeichensatz $charset
+	 *	Inhalt des Anhangs
 	 **/
 	public function getContent() {
 		if ($this->content !== null) {
 			return $this->content;
-		}
-		if ($this->location !== null) {
-			return file_get_contents($this->location);
 		}
 	}
 	
@@ -89,17 +83,6 @@ class Attachment {
 	
 	public function isVideo() {
 		return (strtolower($this->mimetype) == 'video');
-	}
-	
-	public function getCharset() {
-		return $this->charset;
-	}
-
-	public function saveAsFile($filename) {
-		if ($this->location === null) {
-			$this->location = $filename;
-		}
-		file_put_contents($filename, $this->getText());
 	}
 }
 

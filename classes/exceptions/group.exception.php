@@ -11,7 +11,8 @@ class GroupException extends Exception {
 
 class EmptyGroupException extends GroupException {}
 
-class PostException extends GroupException {}
-class PostingNotAllowedException extends PostException {}
+class PostingException extends GroupException {}
+class PostingNotAllowedException extends PostingException {}
+class PostingFailedException extends PostingException {}
 
 ?>
