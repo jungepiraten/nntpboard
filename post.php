@@ -16,15 +16,15 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-$group = $board->getGroup();
-if ($group === null) {
+$connection = $board->getConnection($session->getAuth());
+if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
 }
-$connection = $group->getConnection($session->getAuth());
 
 if ($reference !== null) {
 	$connection->open();
-	$reference = $connection->getMessage($reference);
+	$group = $connection->getGroup();
+	$reference = $group->getMessage($reference);
 	$connection->close();
 }
 
@@ -51,9 +51,10 @@ if (isset($_REQUEST["post"])) {
 	try {
 		$connection->open();
 		$connection->post($message);
-		$thread = $connection->getThread($message->getMessageID());
+		$group = $connection->getGroup();
+		$thread = $group->getThread($message->getMessageID());
 		$connection->close();
-		if ($group->isModerated()) {
+		if ($board->isModerated()) {
 			$template->viewpostmoderated($board, $thread, $message);
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);

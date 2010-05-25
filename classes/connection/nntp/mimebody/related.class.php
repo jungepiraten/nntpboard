@@ -16,7 +16,7 @@ class NNTPRelatedMimeBody extends NNTPMimeBody {
 				}
 			}
 		}
-		return array_slice($this->getParts(),0,1);
+		return array_shift(array_slice($this->getParts(),0,1));
 	}
 
 	public function getBodyPart($mimetype, $charset = null) {

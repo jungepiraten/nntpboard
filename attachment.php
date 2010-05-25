@@ -13,14 +13,15 @@ if ($board === null) {
 	die("Board nicht gefunden!");
 }
 
-$group = $board->getGroup();
-if ($group === null) {
+$connection = $board->getConnection($session->getAuth());
+if ($connection === null) {
 	die("Board enthaelt keine Group!");
 }
-$connection = $group->getConnection($session->getAuth());
 $connection->open();
+$group = $connection->getGroup();
+$connection->close();
 
-$message = $connection->getMessage($messageid);
+$message = $group->getMessage($messageid);
 if ($message === null) {
 	die("Nachricht ungueltig!");
 }

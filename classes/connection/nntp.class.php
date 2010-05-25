@@ -15,6 +15,8 @@ require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 class NNTPConnection extends AbstractConnection {
 	private $host;
 	private $group;
+	private $username;
+	private $password;
 
 	// MessageID => ArtikelNum
 	private $messageids = array();
@@ -23,18 +25,27 @@ class NNTPConnection extends AbstractConnection {
 
 	private $nntpclient;
 	
-	public function __construct(Host $host, $group) {
+	public function __construct(Host $host, $group, Auth $auth = null) {
 		parent::__construct();
 
 		$this->host = $host;
 		$this->group = $group;
 		$this->nexthop = $uplink;
 
+		if (isset($auth)) {
+			$this->username = $auth->getNNTPUsername();
+			$this->password = $auth->getNNTPPassword();
+		}
+
 		// Verbindung initialisieren
 		$this->nntpclient = new Net_NNTP_Client;
 	}
 	
-	public function open($auth = null) {
+	public function getGroupID() {
+		return "nntp:".$this->group."@".$this->host;
+	}
+	
+	public function open() {
 		// Verbindung oeffnen
 		$ret = $this->nntpclient->connect($this->host->getHost(), false, $this->host->getPort());
 		if (PEAR::isError($ret)) {
@@ -42,8 +53,8 @@ class NNTPConnection extends AbstractConnection {
 		}
 		
 		// ggf. Authentifieren
-		if (isset($auth)) {
-			$ret = $this->nntpclient->authenticate($auth->getNNTPUsername(), $auth->getNNTPPassword());
+		if (isset($this->username)) {
+			$ret = $this->nntpclient->authenticate($this->username, $this->password);
 			if (PEAR::isError($ret)) {
 				throw new Exception($ret);
 			}
@@ -116,18 +127,6 @@ class NNTPConnection extends AbstractConnection {
 		throw new NotFoundMessageException($msgid, $this->group);
 	}
 
-	protected function mayRead() {
-		return true;
-	}
-
-	protected function mayPost() {
-		return $this->mode != "n";
-	}
-
-	protected function isModerated() {
-		return $this->mode == "m";
-	}
-
 	public function getGroup() {
 		$group = parent::getGroup();
 		foreach ($this->getMessageIDs() as $messageid) {
@@ -140,7 +139,7 @@ class NNTPConnection extends AbstractConnection {
 	 * Schreibe eine Nachricht
 	 **/
 	public function post($message) {
-		$nntpmsg = NNTPMessage::parseObject($message);
+		$nntpmsg = NNTPMessage::parseObject($this->group, $message);
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {
@@ -153,6 +152,7 @@ class NNTPConnection extends AbstractConnection {
 			// Ein unerwarteter Fehler - wie spannend *g*
 			throw new PostingException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
 		}
+		return $this->mode;
 	}
 }
 

@@ -32,7 +32,7 @@ if ($threadid === null && $messageid !== null) {
 		$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
 	}
 	$thread = $group->getThread($messageid);
-	$template->viewmessage($board, $thread, $message, $group->mayPost($session->getAuth()));
+	$template->viewmessage($board, $thread, $message, $board->mayPost($session->getAuth()));
 }
 
 $thread = $group->getThread($threadid);
@@ -51,6 +51,6 @@ if (!is_array($messages) || count($messages) < 1) {
 }
 
 $session->getAuth()->markReadThread($thread);
-$template->viewthread($board, $thread, $messages, $group->mayPost());
+$template->viewthread($board, $thread, $messages, $board->mayPost($session->getAuth()));
 
 ?>

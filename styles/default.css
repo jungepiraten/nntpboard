@@ -74,7 +74,7 @@ div.subboards>ul.subboards ul.subboards {
 
 /* Threadliste */
 
-.thread.unread {
+.thread.unread, .board.unread {
 	background-color:red;
 }
 

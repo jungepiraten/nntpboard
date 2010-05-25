@@ -30,7 +30,7 @@ if ($connection !== null) {
 	}
 	uasort($threads, cmpThreads);
 	
-	$template->viewboard($board, $group, $threads, $group->mayPost());
+	$template->viewboard($board, $group, $threads, $board->mayPost($session->getAuth()));
 } else {
 	$template->viewboard($board, $group);
 }

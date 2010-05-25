@@ -13,14 +13,14 @@
   {if isset($address)}
    <span class="user">{$address|escape:html}</span>
   {else}
-   <input type="text" class="user" name="user" value="{if isset($smarty.request.user)}{$smarty.request.user|escape:html}{else}{$user|escape:html}{/if}" />
+   <input type="text" class="user" name="user" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" />
   <label for="user" class="user">E-Mail:</label>
-   <input type="text" class="email" name="email" value="{if isset($smarty.request.email)}{$smarty.request.email|escape:html}{else}{$email|escape:html}{/if}" />
+   <input type="text" class="email" name="email" value="{if isset($smarty.request.email)}{$smarty.request.email|stripslashes|escape:html}{else}{$email|escape:html}{/if}" />
   {/if}
   <label for="subject" class="subject">Betreff:</label>
-  <input type="text" name="subject" class="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|escape:html}{else}{$subject|escape:html}{/if}" />
+  <input type="text" name="subject" class="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|stripslashes|escape:html}{else}{$subject|escape:html}{/if}" />
   <label for="body" class="body">Text:</label>
-  <textarea name="body" class="body">{if isset($smarty.request.body)}{$smarty.request.body|escape:html}{else}{$body|escape:html}{/if}</textarea>
+  <textarea name="body" class="body">{if isset($smarty.request.body)}{$smarty.request.body|stripslashes|escape:html}{else}{$body|escape:html}{/if}</textarea>
 
   <input type="submit" name="post" class="submit" value="Schreiben" />
  </fieldset>

@@ -17,12 +17,12 @@ class NNTPMessage {
 		return new NNTPMessage($header->extractMessageHeader(), $body);
 	}
 
-	public static function parseObject($message) {
+	public static function parseObject($group, $message) {
 		$charset = $message->getCharset();
 		
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group->getNNTPGroup(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
 		if ($message->hasParent()) {
 			$header->set(	NNTPSingleHeader::generate("References",	$message->getParentID(), $charset));
 		}

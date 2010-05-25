@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . "/../mimebody.class.php");
 
 class NNTPSignedMimeBody extends NNTPMimeBody {
 	private function getContentPart() {
-		return array_slice($this->getParts(),0,1);
+		return array_shift(array_slice($this->getParts(),0,1));
 	}
 
 	public function getBodyPart($mimetype, $charset = null) {

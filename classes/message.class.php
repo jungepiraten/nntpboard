@@ -35,6 +35,14 @@ class Message {
 		return $this->parentid !== null;
 	}
 
+	public function setParentID($parentid) {
+		$this->parentid = $parentid;
+	}
+
+	public function setParent($parent) {
+		$this->setParentID($parent->getMessageID());
+	}
+
 	public function getParentID() {
 		if (! $this->hasParent()) {
 			return null;

@@ -34,15 +34,35 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		}
 		$row["name"]		= $board->getName();
 		$row["desc"]		= $board->getDesc();
-		// TODO letzter Post einbauen
+		// Letzter Post und ungelesenes Forum markieren
+		if ($board->hasThreads()) {
+			$c = $board->getConnection(null);
+			$c->open();
+			$group = $c->getGroup();
+			$c->close();
+			$row["unread"]			= $this->auth->isUnreadGroup($group);
+			$row["lastpostsubject"]		= $group->getLastPostSubject($this->getCharset());
+			$row["lastpostthreadid"]	= $group->getLastPostThreadID();
+			$row["lastpostmessageid"]	= $group->getLastPostMessageID();
+			$row["lastpostdate"]		= $group->getLastPostDate();
+			$row["lastpostauthor"]		= $group->getLastPostAuthor($this->getCharset());
+		}
+		// Unterforen einbinden
 		if ($board->hasSubBoards()) {
 			$row["childs"]	= array();
-			foreach ($board->getSubBoards() AS $child) {
+			foreach ($board->getSubBoardIDs() AS $childid) {
 				// Kleiner Hack, um eine Endlosschleife zu vermeiden
-				$child = $this->parseBoard($child, false);
+				$child = $this->parseBoard($board->getSubBoard($childid), false);
 				$child["parent"] = &$row;
 				$row["childs"][] = $child;
+				// Markiere auch obere Hierarchien ungelesen
+				if ($child["unread"] == true) {
+					$row["unread"] = $child["unread"];
+				}
 			}
+		}
+		if (isset($row["parent"])) {
+			$row["parent"]["unread"] = $row["unread"];
 		}
 		return $row;
 	}
@@ -208,10 +228,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	
 	public function viewmessage($board, $thread, $message, $mayPost = false) {
 		$page = floor($thread->getMessagePosition($message) / $this->getMessagesPerPage());
-		header("Location: viewthread.php?boardid=" . urlencode($board->getBoardID()) .
-		                  "&threadid=" . urlencode($thread->getThreadID()) .
-		                  "&page=" . intval($page) . "#article" . 
-		                  urlencode($message->getMessageID()));
+		$location = "viewthread.php?boardid=" . urlencode($board->getBoardID()) .
+		            "&threadid=" . urlencode($thread->getThreadID()) .
+		            "&page=" . intval($page) . "#article" . 
+		            urlencode($message->getMessageID());
+		header("Location: " . $location);
+		echo "<a href=\"".htmlentities($location)."\">Weiter</a>";
 		exit;
 	}
 
@@ -236,7 +258,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	public function viewpostmoderated($board, $thread, $message) {
-		// TODO bestaetigung anzeigen
+		$smarty->assign("board", $this->parseBoard($board));
+		$smarty->assign("message", $this->parseMessage($message));
+		$this->smarty->display("postmoderated.html.tpl");
 		exit;
 	}
 	

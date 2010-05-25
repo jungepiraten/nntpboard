@@ -8,7 +8,7 @@
 <form action="userpanel.php" method="post" class="login">
  <fieldset>
   <label for="username" class="username">Benutzername:</label>
-  <input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|escape:html}{/if}" />
+  <input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|stripslashes|escape:html}{/if}" />
   <label for="password" class="password">Passwort:</label>
   <input type="password" class="password" name="password" />
 

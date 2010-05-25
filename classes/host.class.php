@@ -20,6 +20,10 @@ class Host {
 	public function getPort() {
 		return $this->port;
 	}
+
+	public function __toString() {
+		return $this->getHost() . ":" . $this->getPort();
+	}
 }
 
 ?>

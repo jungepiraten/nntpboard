@@ -48,7 +48,6 @@ class Thread {
 
 	public function removeMessage($message) {
 		unset($this->messages[$message->getMessageID()]);
-		$this->sort();
 	}
 	
 	public function getThreadID() {

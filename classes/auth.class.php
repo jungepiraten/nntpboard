@@ -7,9 +7,10 @@ interface Auth {
 	public function getNNTPUsername();
 	public function getNNTPPassword();
 
-	// TODO grml - ungelesene threads
 	public function isUnreadThread($thread);
 	public function markReadThread($thread);
+	public function isUnreadGroup($group);
+	public function markReadGroup($group);
 }
 
 abstract class AbstractAuth implements Auth {

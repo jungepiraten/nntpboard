@@ -7,17 +7,29 @@ require_once(dirname(__FILE__)."/../auth.class.php");
 require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 
 class JuPisAnonAuth extends AbstractAuth implements Auth {
+	const ZEITFRIST = 10800;	// 3 Stunden
 	private $readdate = null;
 	private $readthreads = array();
 
 	public function __construct() {
-		// Alle Posts vor dem Login sind schon gelesen ;) / TODO zeitfrist?
-		$this->readdate = time();
+		$this->readdate = $this->loadReadDate();
+		$this->readthreads = $this->loadReadThreads();
 	}
 
 	public function getAddress() {
 		return null;
 	}
+
+	protected function loadReadDate() {
+		// Alle Posts vor dem Login sind schon gelesen ;)
+		return time() - self::ZEITFRIST;
+	}
+
+	protected function loadReadThreads() {
+		return array();
+	}
+
+	protected function saveReadThread($threadid, $lastpostdate) {}
 
 	public function isUnreadThread($thread) {
 		// Falls die Nachricht aelter als readdate ist, gilt sie als gelesen
@@ -38,9 +50,25 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 	public function markReadThread($thread) {
 		// Trage den aktuellen Timestamp ein
 		$this->readthreads[$thread->getThreadID()] = $thread->getLastPostDate();
+		
+		$this->saveReadThread($thread->getThreadID(), $thread->getLastPostDate());
 	}
 
-	// TODO isUnreadGroup / isUnreadBoard
+	public function isUnreadGroup($group) {
+		// "Einfach" alle Threads ueberpruefen ;)
+		foreach ($group->getThreadIDs() as $threadid) {
+			if ($this->isUnreadThread($group->getThread($threadid))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function markReadGroup($group) {
+		foreach ($group->getThreadIDs() as $threadid) {
+			$this->markReadThread($group->getThread($threadid));
+		}
+	}
 
 	public function getNNTPUsername() {
 		return null;
@@ -54,6 +82,8 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 class JuPisAuth extends JuPisAnonAuth {
 	public static function authenticate($user, $pass) {
 		$auth = new JuPisAuth($user, $pass);
+		// TODO eigentlich brauchen wir ja schon auth - aber zum testen ists einfacher so
+		return $auth;
 		// fetchUserDetails() wirft eine AuthException, wenn es Probleme gab
 		$auth->fetchUserDetails();
 		return $auth;
@@ -85,20 +115,36 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	/* ****** */
+	/* TODO daten von extern einholen
+
+	protected function loadReadDate() {
+		
+	}
+
+	protected function loadReadThreads() {
+		
+	}
+
+	protected function saveReadThread($threadid, $lastpostdate) {
+		
+	}
+	*/
+
+	/* ****** */
 
 	public function fetchUserDetails() {
+		// Versuchen wir uns mal anzumelden
 		$link = $this->getLDAPLink();
-		// TODO mailadresse oder so holen
-		// TODO gelesene posts laden
 		$link->done();
 	}
 
 	private function getUserDN() {
-		return "uid=" . $this->username . ",ou=accounts,ou=community,o=Junge Piraten,c=DE";
+		// Escape "gefaehrliche" Teile
+		return "uid=" . preg_replace('/(,|=|\+|<|>|\\\\|"|#)/e', '"\\\\\\".str_pad(dechex(ord("$1")),2,"0")', $this->username) . ",ou=accounts,ou=community,o=Junge Piraten,c=DE";
 	}
 
 	private function getLDAPLink() {
-		$link = Net_LDAP2::connect(array("binddn" => $this->getUserDN(), "bindpw" => $this->password, "port" => 10389) );
+		$link = Net_LDAP2::connect(array("binddn" => $this->getUserDN(), "bindpw" => $this->password, "port" => 389) );
 		if ($link instanceof PEAR_Error) {
 			throw new LoginFailedAuthException($this->username);
 		}

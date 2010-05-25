@@ -9,11 +9,16 @@ abstract class DefaultConfig {
 		return "UTF8";
 	}
 
-	protected function addBoard($parentid, $board) {
-		if (isset($this->boards[$parentid])) {
-			$this->boards[$parentid]->addSubBoard($board);
+	protected function addBoard($board) {
+		if ($this->hasBoard($board->getParentID())) {
+			$parent = $this->getBoard($board->getParentID());
+			$board->setParent($parent);
+			$parent->addSubBoard($board);
 		}
 		$this->boards[$board->getBoardID()] = $board;
+	}
+	public function hasBoard($id = null) {
+		return isset($this->boards[$id]);
 	}
 	public function getBoard($id = null) {
 		if (isset($this->boards[$id])) {
@@ -31,17 +36,6 @@ abstract class DefaultConfig {
 	abstract public function getTemplate($auth);
 
 	abstract public function getMessageIDHost();
-
-	public function getGroups() {
-		$groups = array();
-		foreach ($this->getBoardIDs() AS $boardid) {
-			$board = $this->getBoard($boardid);
-			if ($board->hasGroup()) {
-				$groups[] = $board->getGroup();
-			}
-		}
-		return $groups;
-	}
 }
 
 ?>
