@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../address.class.php");
+require_once(dirname(__FILE__) . "/../../../address.class.php");
 
 class NNTPAddress extends Address {
 	public static function parseObject($addr) {
@@ -8,6 +8,8 @@ class NNTPAddress extends Address {
 	}
 	
 	public static function parsePlain($addr, $charset = "UTF-8") {
+		$name = null;
+		$comment = null;
 		if (preg_match('/^(.*) \((.*?)\)\s*$/', $addr, $m)) {
 			array_shift($m);
 			$addr = trim(array_shift($m));

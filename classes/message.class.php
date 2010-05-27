@@ -40,6 +40,10 @@ class Message {
 	}
 
 	public function setParent($parent) {
+		if (!($parent instanceof Message)) {
+var_dump($parent);
+exit;
+		}
 		$this->setParentID($parent->getMessageID());
 	}
 

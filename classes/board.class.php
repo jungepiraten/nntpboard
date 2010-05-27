@@ -9,12 +9,18 @@ class Board {
 	private $name = "";
 	private $desc = "";
 	private $subboards = array();
+	private $anonMayPost = false;
+	private $authMayPost = true;
+	private $isModerated = false;
 
-	public function __construct($boardid, $parentid, $name, $desc) {
+	public function __construct($boardid, $parentid, $name, $desc, $anonMayPost = false, $authMayPost = true, $isModerated = false) {
 		$this->boardid = $boardid;
 		$this->parentid = $parentid;
 		$this->name = $name;
 		$this->desc = $desc;
+		$this->anonMayPost = $anonMayPost;
+		$this->authMayPost = $authMayPost;
+		$this->isModerated = $isModerated;
 	}
 
 	public function getName() {
@@ -65,17 +71,20 @@ class Board {
 		return $this->subboards[$id];
 	}
 
-	// TODO - dynamischer output und so
 	public function mayRead($auth) {
 		return true;
 	}
 	public function mayPost($auth) {
-		return true;
+		if ($auth === null || $auth->isAnonymous()) {
+			return $this->anonMayPost;
+		}
+		return $this->authMayPost;
 	}
 	public function isModerated() {
-		return false;
+		return $this->isModerated;
 	}
 
+	// Per Default nutzen wir keine Verbindung - Unterklassen sollten eine Zurueckgeben
 	public function hasThreads() {
 		return false;
 	}

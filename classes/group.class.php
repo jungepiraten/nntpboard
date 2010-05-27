@@ -1,97 +1,92 @@
 <?php
 
-class Group {
+interface Group {
+	public function getGroupID();
+	public function getGroupHash();
+
+	public function getMessageIDs();
+	public function getMessageCount();
+	public function hasMessage($msgid);
+	public function getMessage($msgid);
+
+	public function getThreadIDs();
+	public function getThreadCount();
+	public function hasThread($msgid);
+	public function getThread($msgid);
+
+	public function getLastPostMessageID();
+	public function getLastPostThreadID();
+	public function getLastPostSubject($charset = null);
+	public function getLastPostDate();
+	public function getLastPostAuthor();
+
+	public function addMessage($message);
+	public function removeMessage($message);
+}
+
+abstract class AbstractGroup implements Group {
 	private $groupid;
+	private $grouphash;
 
-	// MessageID => Message
-	private $messages = array();
-	// ThreadID => Thread
-	private $threads = array();
-	// MessageID => ThreadID
-	private $threadids = array();
-	private $lastthread;
-
-	public function __construct($groupid) {
+	public function __construct($groupid, $grouphash) {
 		$this->groupid = $groupid;
+		$this->grouphash = $grouphash;
 	}
 
 	public function getGroupID() {
 		return $this->groupid;
 	}
 
-	public function getMessageIDs() {
-		return array_keys($this->messages);
+	public function getGroupHash() {
+		return $this->grouphash;
 	}
+	public function setGroupHash($hash) {
+		$this->grouphash = $hash;
+	}
+
 	public function getMessageCount() {
-		return count($this->messages);
+		return count($this->getMessageIDs());
 	}
-	public function hasMessage($msgid) {
-		return isset($this->messages[$msgid]);
-	}
-	public function getMessage($msgid) {
-		return $this->messages[$msgid];
-	}
-
-	public function getThreadIDs() {
-		return array_keys($this->threads);
-	}
-	public function getThreadCount() {
-		return count($this->threads);
-	}
-	public function hasThread($threadid) {
-		return  isset($this->threads[$threadid])
-		    or (isset($this->threadids[$threadid]) and $this->hasThread($this->threadids[$threadid]));
-	}
-	public function getThread($threadid) {
-		if (isset($this->threads[$threadid])) {
-			return $this->threads[$threadid];
-		}
-		if (isset($this->threadids[$threadid])) {
-			return $this->getThread($this->threadids[$threadid]);
-		}
-	}
-
-	private function getLastThread() {
-		return $this->getThread($this->lastthread);
-	}
-
-	private function hasLastThread() {
-		return $this->hasThread($this->lastthread);
+	public function hasMessage($messageid) {
+		return in_array($messageid, $this->getMessageIDs());
 	}
 	
-	public function getLastPostMessageID() {
-		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getLastPostMessageID();
-		}
+	public function getThreadCount() {
+		return count($this->getThreadIDs());
 	}
 
-	public function getLastPostSubject($charset = null) {
-		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getSubject($charset);
-		}
-	}
-
-	public function getLastPostDate() {
-		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getLastPostDate();
-		}
-	}
-
-	public function getLastPostAuthor($charset = null) {
-		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getLastPostAuthor($charset);
-		}
-	}
+	/** Last Thread **/
+	abstract public function hasLastThread();
+	abstract public function getLastThread();
 
 	public function getLastPostThreadID() {
 		if ($this->hasLastThread()) {
 			return $this->getLastThread()->getThreadID();
 		}
 	}
+	public function getLastPostMessageID() {
+		if ($this->hasLastThread()) {
+			return $this->getLastThread()->getLastPostMessageID();
+		}
+	}
+	public function getLastPostSubject($charset = null) {
+		if ($this->hasLastThread()) {
+			return $this->getLastThread()->getSubject($charset);
+		}
+	}
+	public function getLastPostDate() {
+		if ($this->hasLastThread()) {
+			return $this->getLastThread()->getLastPostDate();
+		}
+	}
+	public function getLastPostAuthor($charset = null) {
+		if ($this->hasLastThread()) {
+			return $this->getLastThread()->getLastPostAuthor($charset);
+		}
+	}
 
+	/** Nachrichten hinzufuegen / verlinken **/
 	public function addMessage($message) {
-		$this->messages[$message->getMessageID()] = $message;
-
 		// Unterpost verlinken
 		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
 			$this->getMessage($message->getParentID())->addChild($message);
@@ -103,19 +98,12 @@ class Group {
 		} else {
 			$thread = new Thread($message);
 		}
-		$this->threadids[$message->getMessageID()] = $thread->getThreadID();
 		$thread->addMessage($message);
-		
 		$this->addThread($thread);
+
+		return $thread;
 	}
-	private function addThread($thread) {
-		$this->threads[$thread->getThreadID()] = $thread;
-		if (!isset($this->lastthread)
-		 or $thread->getLastPostDate() > $this->getLastPostDate())
-		{
-			$this->lastthread = $thread->getThreadID();
-		}
-	}
+	abstract protected function addThread($thread);
 
 	public function removeMessage($messageid) {
 		$message = $this->getMessage($messageid);
@@ -136,11 +124,12 @@ class Group {
 		if ($this->hasThread($message->getMessageID())) {
 			$thread = $this->getThread($message->getMessageID());
 			$thread->removeMessage($message);
+			if ($thread->isEmpty()) {
+				$this->removeThread($thread->getThreadID());
+			}
 		}
-		
-		unset($this->messages[$message->getMessageID()]);
-		unset($this->threadids[$message->getMessageID()]);
 	}
+	abstract protected function removeThread($threadid);
 }
 
 ?>

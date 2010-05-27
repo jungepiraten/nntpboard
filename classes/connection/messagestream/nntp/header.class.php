@@ -13,7 +13,9 @@ class NNTPHeader {
 			while (isset($plain[$i+1]) && preg_match("$^\s$", $plain[$i+1])) {
 				$line .= " ".ltrim($plain[++$i]);
 			}
-			$header->set(NNTPSingleHeader::parsePlain($line));
+			if (!empty($line)) {
+				$header->set(NNTPSingleHeader::parsePlain($line));
+			}
 		}
 		return $header;
 	}
@@ -73,6 +75,11 @@ class NNTPSingleHeader {
 		$value = trim(array_shift($extras));
 		$h = new NNTPSingleHeader(trim($name), $value);
 		foreach ($extras AS $extra) {
+			// Fixe vermeindliche Extra-Header (z.b. Bei User-Agent)
+			if (strpos($extra, "=") === false) {
+				$value .= ";".$extra;
+				continue;
+			}
 			list($name, $value) = explode("=", $extra, 2);
 			$name = trim($name);
 			$value = trim(trim($value),'"');

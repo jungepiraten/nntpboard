@@ -36,7 +36,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["desc"]		= $board->getDesc();
 		// Letzter Post und ungelesenes Forum markieren
 		if ($board->hasThreads()) {
-			$c = $board->getConnection(null);
+			$c = $board->getConnection($this->getAuth());
+			if (true) {
 			$c->open();
 			$group = $c->getGroup();
 			$c->close();
@@ -46,6 +47,16 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$row["lastpostmessageid"]	= $group->getLastPostMessageID();
 			$row["lastpostdate"]		= $group->getLastPostDate();
 			$row["lastpostauthor"]		= $group->getLastPostAuthor($this->getCharset());
+			} else {
+			$c->open();
+			// TODO Group Unread?
+			$row["lastpostsubject"]		= $c->getLastPostSubject($this->getCharset());
+			$row["lastpostthreadid"]	= $c->getLastPostThreadID();
+			$row["lastpostmessageid"]	= $c->getLastPostMessageID();
+			$row["lastpostdate"]		= $c->getLastPostDate();
+			$row["lastpostauthor"]		= $c->getLastPostAuthor();
+			$c->close();
+			}
 		}
 		// Unterforen einbinden
 		if ($board->hasSubBoards()) {
@@ -258,8 +269,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	public function viewpostmoderated($board, $thread, $message) {
-		$smarty->assign("board", $this->parseBoard($board));
-		$smarty->assign("message", $this->parseMessage($message));
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("message", $this->parseMessage($message));
 		$this->smarty->display("postmoderated.html.tpl");
 		exit;
 	}

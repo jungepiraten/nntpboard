@@ -43,7 +43,7 @@ class Thread {
 				return $a["date"] - $b["date"];
 			}
 		}
-		uasort($this->messages, cmpMessageArray);
+		uasort($this->messages, "cmpMessageArray");
 	}
 
 	public function removeMessage($message) {
@@ -71,6 +71,10 @@ class Thread {
 	
 	public function getPosts() {
 		return count($this->messages);
+	}
+
+	public function isEmpty() {
+		return empty($this->messages);
 	}
 	
 	public function getLastPostMessageID() {

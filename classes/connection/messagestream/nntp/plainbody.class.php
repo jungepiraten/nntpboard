@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/header.class.php");
-require_once(dirname(__FILE__) . "/../../attachment.class.php");
+require_once(dirname(__FILE__) . "/../../../attachment.class.php");
 
 if (!function_exists("quoted_printable_encode")) {
 	// aus http://de.php.net/quoted_printable_decode

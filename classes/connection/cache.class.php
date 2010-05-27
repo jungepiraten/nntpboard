@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)."/../connection.class.php");
+require_once(dirname(__FILE__)."/../group/static.class.php");
 /* Die Klassen müssen vor dem unserialize eingebunden sein, da PHP sonst
  * incomplete Objekte erstellt.
  * vgl. http://mrfoo.de/archiv/120-The-script-tried-to-execute-a-method-or-access-a-property-of-an-incomplete-object.html
@@ -19,7 +20,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 **/
 	private $uplink;
 	
-	public function __construct($uplink = null) {
+	public function __construct($uplink) {
 		parent::__construct();
 		
 		$this->uplink = $uplink;
@@ -36,50 +37,19 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 * Solange ist die Nachricht nur im Forum sichtbar.
 	 **/
 	public function post($message) {
-		// Falls vorhanden, posten wir das erstmal woanders (evtl kommen dabei ja Exceptions)
-		if ($this->uplink !== null) {
-			$this->uplink->open();
-			// Die Berechtigungen prueft der Uplink selbst
-			$resp = $this->uplink->post($message);
-			// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-			// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
-			if ($resp != "m") {
-				$this->getGroup()->addMessage($message);
-			}
-			$this->uplink->close();
-		} else {
+		$this->uplink->open();
+		// Die Berechtigungen prueft der Uplink selbst
+		$resp = $this->uplink->post($message);
+		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
+		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
+		if ($resp != "m") {
 			$this->getGroup()->addMessage($message);
 		}
-	}
-	
-	/**
-	 * Hole neue Daten vom Uplink / Cache-Update
-	 **/
-	public function loadMessages() {
-		if ($this->uplink == null) {
-			return;
-		}
-		
-		$this->uplink->open();
-		// Wenn die hoechste ArtikelNum sich nicht veraendert hat, hat sich gar nix getan (spart sortieren)
-		if ($this->uplink->getMessageCount() <= 0
-		 || $this->uplink->getMessageCount() == $this->getMessageCount()) {
-			$this->uplink->close();
-			return;
-		}
-		$this->setGroup($this->uplink->getGroup());
 		$this->uplink->close();
-
 	}
 
-	/**
-	 * getGroup() - wird von anderen CacheConnections ueberschrieben und hier
-	 * nur rudimentaer implementiert
-	 **/
 	public function getGroup() {
-		$group = parent::getGroup();
-		// TODO neue nachrichten vom Uplink einfuegen
-		return $group;
+		return new StaticGroup($this->getGroupID(), $this->getGroupHash());
 	}
 
 	public function setGroup($group) {
@@ -97,6 +67,49 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		foreach ($oldmessages as $messageid) {
 			$cachegroup->removeMessage($messageid);
 		}
+
+		$cachegroup->setGroupHash($group->getGroupHash());
+	}
+
+	public function updateGroup() {
+		$cachegroup = $this->getGroup();
+		
+		// Liste mit neuen Nachrichten aufstellen
+		$newmessages = array_diff($this->uplink->getMessageIDs(), $cachegroup->getMessageIDs());
+		foreach ($newmessages as $messageid) {
+			$message = $this->uplink->getMessage($messageid);
+			$cachegroup->addMessage($message);
+		}
+
+		// Veraltete Nachrichten ausstreichen (z.b. Cancel)
+		$oldmessages = array_diff($cachegroup->getMessageIDs(), $this->uplink->getMessageIDs());
+		foreach ($oldmessages as $messageid) {
+			$cachegroup->removeMessage($messageid);
+		}
+
+		$cachegroup->setGroupHash($this->uplink->getGroupHash());
+	}
+
+	abstract protected function setGroupHash($hash);
+	
+	/**
+	 * Hole neue Daten vom Uplink / Cache-Update
+	 **/
+	public function updateCache() {
+		$this->uplink->open();
+		// Gruppenhashes vergleichen
+		if ($this->uplink->getGroupHash() == $this->getGroupHash()) {
+			$this->uplink->close();
+			return;
+		}
+		/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,
+		 * koennen wir uns arbeit sparen. */
+		if ($this->uplink instanceof MessageStream) {
+			$this->updateGroup();
+		} else {
+			$this->setGroup($this->uplink->getGroup());
+		}
+		$this->uplink->close();
 	}
 }
 

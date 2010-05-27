@@ -54,7 +54,7 @@ if (isset($_REQUEST["post"])) {
 		$group = $connection->getGroup();
 		$thread = $group->getThread($message->getMessageID());
 		$connection->close();
-		if ($board->isModerated()) {
+		if ($board->isModerated($auth)) {
 			$template->viewpostmoderated($board, $thread, $message);
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);

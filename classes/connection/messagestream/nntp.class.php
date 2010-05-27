@@ -3,16 +3,12 @@
 // http://pear.php.net/package/Net_NNTP
 require_once("Net/NNTP/Client.php");
 
-require_once(dirname(__FILE__)."/../connection.class.php");
-require_once(dirname(__FILE__)."/../address.class.php");
-require_once(dirname(__FILE__)."/../thread.class.php");
-require_once(dirname(__FILE__)."/../message.class.php");
-require_once(dirname(__FILE__)."/../attachment.class.php");
+require_once(dirname(__FILE__)."/../messagestream.class.php");
 require_once(dirname(__FILE__)."/nntp/header.class.php");
 require_once(dirname(__FILE__)."/nntp/message.class.php");
-require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
+require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
 
-class NNTPConnection extends AbstractConnection {
+class NNTPConnection extends AbstractMessageStreamConnection {
 	private $host;
 	private $group;
 	private $username;
@@ -30,7 +26,6 @@ class NNTPConnection extends AbstractConnection {
 
 		$this->host = $host;
 		$this->group = $group;
-		$this->nexthop = $uplink;
 
 		if (isset($auth)) {
 			$this->username = $auth->getNNTPUsername();
@@ -42,7 +37,7 @@ class NNTPConnection extends AbstractConnection {
 	}
 	
 	public function getGroupID() {
-		return "nntp:".$this->group."@".$this->host;
+		return __CLASS__ . ":" . $this->group . "@" . $this->host;
 	}
 	
 	public function open() {
@@ -119,20 +114,8 @@ class NNTPConnection extends AbstractConnection {
 
 			return $message;
 		}
-		// Letzter Versuch: rekursiv
-		if ($this->nexthop !== null) {
-			return $this->nexthop->getMessage($msgid);
-		}
 		// Diese Nachricht gibt es offensichtlich nicht mehr ;)
 		throw new NotFoundMessageException($msgid, $this->group);
-	}
-
-	public function getGroup() {
-		$group = parent::getGroup();
-		foreach ($this->getMessageIDs() as $messageid) {
-			$group->addMessage($this->getMessage($messageid));
-		}
-		return $group;
 	}
 
 	/**

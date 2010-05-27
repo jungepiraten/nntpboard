@@ -11,7 +11,7 @@
  {if ($mayPost)}<li class="newthread"><a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a></li>{/if}
 </ul>
 
-{if isset($threads)}
+{if isset($threads) && !empty($threads)}
 <ul class="page">
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}

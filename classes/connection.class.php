@@ -3,8 +3,18 @@
 interface Connection {
 	public function open();
 	public function close();
+
+	// Meist sehr Kostenintensiv, da alle Posts geladen werden müssen
 	public function getGroup();
-	public function getMessageCount();
+
+	// Zum Schnellen Cache-Abgleich
+	public function getGroupHash();
+	public function getLastPostSubject($charset = null);
+	public function getLastPostThreadID();
+	public function getLastPostMessageID();
+	public function getLastPostDate();
+	public function getLastPostAuthor();
+
 	public function post($message);
 }
 
@@ -14,13 +24,24 @@ abstract class AbstractConnection implements Connection {
 
 	abstract protected function getGroupID();
 
-	public function getGroup() {
-		return new Group($this->getGroupID());
+	public function getLastPostSubject($charset = null) {
+		return $this->getGroup()->getLastPostSubject($charset);
 	}
 
-	/** Messages / TODO depreaced - nur fuer Cache-Abgleich noch sinnvoll **/
-	public function getMessageCount() {
-		return $this->getGroup()->getMessageCount();
+	public function getLastPostThreadID() {
+		return $this->getGroup()->getLastPostThreadID();
+	}
+
+	public function getLastPostMessageID() {
+		return $this->getGroup()->getLastPostMessageID();
+	}
+
+	public function getLastPostDate() {
+		return $this->getGroup()->getLastPostDate();
+	}
+
+	public function getLastPostAuthor() {
+		return $this->getGroup()->getLastPostAuthor();
 	}
 }
 
