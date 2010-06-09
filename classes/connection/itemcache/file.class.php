@@ -16,7 +16,7 @@ if (!function_exists("mkdir_parents")) {
 class FileItemCacheConnection extends AbstractItemCacheConnection {
 	private $dir;
 
-	private $meta = null;
+	private $index = null;
 	
 	public function __construct($dir, $uplink) {
 		parent::__construct($uplink);
@@ -29,39 +29,63 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 	private function getThreadFilename($threadid) {
 		return $this->dir . "/threads/".md5($threadid).".dat";
 	}
-	private function getMetaFilename() {
-		return $this->dir . "/meta.dat";
+	private function getGroupHashFilename() {
+		return $this->dir . "/hash.dat";
+	}
+	private function getLastThreadFilename() {
+		return $this->dir . "/lastthread.dat";
+	}
+	private function getIndexFilename() {
+		return $this->dir . "/index.dat";
 	}
 
-	private function loadMeta() {
-		if ($this->meta == null) {
-			$filename = $this->getMetaFilename();
+	private function loadIndex() {
+		if ($this->index == null) {
+			$filename = $this->getIndexFilename();
 			if (!file_exists($filename)) {
-				$this->meta = array();
+				$this->index = array();
 				return;
 			}
-			$this->meta = unserialize(file_get_contents($filename));
+			$content = file_get_contents($filename);
+			$this->index = unserialize($content);
 		}
 	}
 
-	private function saveMeta() {
-		if ($this->meta != null) {
-			$filename = $this->getMetaFilename();
+	private function saveIndex() {
+		if ($this->index != null) {
+			$filename = $this->getIndexFilename();
 			mkdir_parents(dirname($filename));
-			file_put_contents($filename, serialize($this->meta));
+			if (file_exists($filename) && !is_writable($filename)) {
+				return false;
+			}
+			file_put_contents($filename, serialize($this->index));
 		}
 	}
 
 	public function loadMessageThreads() {
-		$this->loadMeta();
-		if (isset($this->meta['messagethreads'])) {
-			return $this->meta['messagethreads'];
+		$this->loadIndex();
+		if (isset($this->index['messagethreads'])) {
+			return $this->index['messagethreads'];
 		}
 		return array();
 	}
 	protected function saveMessageThreads($messagethreads) {
-		$this->meta['messagethreads'] = $messagethreads;
-		$this->saveMeta();
+		$this->loadIndex();
+		$this->index['messagethreads'] = $messagethreads;
+		$this->saveIndex();
+	}
+
+	public function loadThreadsLastPost() {
+		$this->loadIndex();
+		if (isset($this->index['threadslastpost'])) {
+			return $this->index['threadslastpost'];
+		}
+		return array();
+	}
+	protected function saveThreadsLastPost($threadslastpost) {
+		$this->loadIndex();
+		$this->index['threadslastpost'] = $threadslastpost;
+		$this->saveIndex();
 	}
 
 	public function loadMessage($messageid) {
@@ -74,19 +98,10 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 	protected function saveMessage($messageid, $message) {
 		$filename = $this->getMessageFilename($messageid);
 		mkdir_parents(dirname($filename));
-		file_put_contents($filename, serialize($message));
-	}
-
-	public function loadThreadIDs() {
-		$this->loadMeta();
-		if (isset($this->meta['threadids'])) {
-			return $this->meta['threadids'];
+		if (file_exists($filename) && !is_writable($filename)) {
+			return false;
 		}
-		return array();
-	}
-	protected function saveThreadIDs($threadids) {
-		$this->meta['threadids'] = $threadids;
-		$this->saveMeta();
+		file_put_contents($filename, serialize($message));
 	}
 
 	public function loadThread($threadid) {
@@ -99,29 +114,42 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 	protected function saveThread($threadid, $thread) {
 		$filename = $this->getThreadFilename($threadid);
 		mkdir_parents(dirname($filename));
+		if (file_exists($filename) && !is_writable($filename)) {
+			return false;
+		}
 		file_put_contents($filename, serialize($thread));
 	}
 
 	protected function loadGroupHash() {
-		$this->loadMeta();
-		if (isset($this->meta['hash'])) {
-			return $this->meta['hash'];
+		$filename = $this->getGroupHashFilename();
+		if (!file_exists($filename)) {
+			return;
 		}
+		return file_get_contents($filename);
 	}
 	protected function saveGroupHash($hash) {
-		$this->meta['hash'] = $hash;
-		$this->saveMeta();
+		$filename = $this->getGroupHashFilename();
+		mkdir_parents(dirname($filename));
+		if (file_exists($filename) && !is_writable($filename)) {
+			return false;
+		}
+		file_put_contents($filename, $hash);
 	}
 
 	protected function loadLastThread() {
-		$this->loadMeta();
-		if (isset($this->meta['lastthread'])) {
-			return $this->meta['lastthread'];
+		$filename = $this->getLastThreadFilename();
+		if (!file_exists($filename)) {
+			return;
 		}
+		return unserialize(file_get_contents($filename));
 	}
 	protected function saveLastThread($thread) {
-		$this->meta['lastthread'] = $thread;
-		$this->saveMeta();
+		$filename = $this->getLastThreadFilename();
+		mkdir_parents(dirname($filename));
+		if (file_exists($filename) && !is_writable($filename)) {
+			return false;
+		}
+		file_put_contents($filename, serialize($thread));
 	}
 }
 

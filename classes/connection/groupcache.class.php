@@ -4,7 +4,6 @@ require_once(dirname(__FILE__) . "/cache.class.php");
 
 abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	private $group;
-	private $groupopen = false;
 	// Meta-Infos ;)
 	private $grouphash;
 	private $lastthread;
@@ -26,9 +25,8 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	}
 
 	public function close() {
-		if ($this->groupopen) {
+		if ($this->group !== null) {
 			$this->saveGroup($this->group);
-			$this->groupopen = false;
 			$this->saveGroupHash($this->group->getGroupHash());
 			$this->saveLastThread($this->group->getLastThread());
 		} else {
@@ -38,9 +36,8 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	}
 
 	public function getGroup() {
-		if (!$this->groupopen) {
+		if ($this->group === null) {
 			$this->group = $this->loadGroup();
-			$this->groupopen = true;
 		}
 		if (!($this->group instanceof Group)) {
 			$this->group = parent::getGroup();
@@ -49,8 +46,6 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	}
 	public function setGroup($group) {
 		$this->group = $group;
-		$this->groupopen = true;
-
 		$this->setGroupHash($group->getGroupHash());
 		$this->setLastThread($group->getLastThread());
 	}
@@ -70,7 +65,6 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	}
 	public function updateGroup() {
 		parent::updateGroup();
-
 		$this->setLastThread($this->getGroup()->getLastThread());
 	}
 }

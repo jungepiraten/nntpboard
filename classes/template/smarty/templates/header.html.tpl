@@ -8,9 +8,9 @@
 <body>
 <div class="seite">
 <div class="headerdiv">
-<img src="images/logo.png">
+<a href="index.php"><img src="images/logo.png" class="logo" /></a>
 <div class="buttondiv">
 <a href="index.php" class="start">Start</a> | 
-{if $ISANONYMOUS}<a href="userpanel.php" class="userpanel">Anmelden{else}{$ADDRESS}</a>{/if}
-{if !$ISANONYMOUS} | <li class="logout"><a class="logout" href="userpanel.php?logout">Abmelden</a>{/if}
+<a href="userpanel.php" class="userpanel">{if $ISANONYMOUS}Anmelden{else}{$ADDRESS}{/if}</a>
+{if !$ISANONYMOUS} | <a class="logout" href="userpanel.php?logout">Abmelden</a>{/if}
 </div></div><h1 class="mainname">{$board.name|escape:html}</h1>

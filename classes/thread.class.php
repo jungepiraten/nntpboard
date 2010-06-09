@@ -8,12 +8,16 @@ class Thread {
 	private $author;
 	private $messages = array();
 	
-	public function __construct($message) {
-		$this->threadid = $message->getMessageID();
-		$this->subject = $message->getSubject();
-		$this->date = $message->getDate();
-		$this->author = $message->getAuthor();
-		$this->charset = $message->getCharset();
+	public static function getByMessage($message) {
+		return new Thread($message->getMessageID(), $message->getSubject(), $message->getDate(), $message->getAuthor(), $message->getCharset());
+	}
+	
+	public function __construct($threadid, $subject, $date, $author, $charset) {
+		$this->threadid = $threadid;
+		$this->subject = $subject;
+		$this->date = $date;
+		$this->author = $author;
+		$this->charset = $charset;
 	}
 	
 	public function getMessageIDs() {

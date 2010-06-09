@@ -8,6 +8,8 @@ a {text-decoration:none; color:#55524E; font-weight:bold;}
 a:hover {color:#FF8800; font-weight:bold;}
 a:focus {color:#FF8800; font-weight:bold;}
 
+.logo	{border:0px;}
+
 .message .meta {
 	vertical-align:top; color:gray; font-weight:normal;
 }
@@ -47,6 +49,11 @@ a:focus {color:#FF8800; font-weight:bold;}
 	-moz-border-radius:5px;
 	-khtml-border-radius:5px;
 	border-top:3px solid #FFAC4C;
+	margin-bottom:15px;
+}
+.boardentryodd td, .boardentryeven td {
+	border-style:none none solid none;
+	border-width:1px;
 }
 .boardentryodd td {
 	padding-top:4px;
@@ -59,51 +66,33 @@ a:focus {color:#FF8800; font-weight:bold;}
 	background-color:#FFEDD9;
 }
 .boardentryfirst td {
-	padding-top:4px;
-	padding-bottom:4px;
-	background-color:#FFE1BF;
 	border-top:1px solid grey;
 }
 .boardicon {
 	padding-left:10px;
 	width:32px;
-	border-style:none none solid none;
-	border-width:1px;
 }
 .boardiconchild {
 	width:32px;
-	border-style:none none solid none;
-	border-width:1px;
 }
 .boardseparator {
-	border-style:none none solid solid;
-	border-width:1px;
 	width:0px;
 }
 .boardiconunread {
 	padding-left:10px;
 	width:32px;
-	border-style:none none solid none;
-	border-width:1px;
 }
 .boardtitle {
 	border-width:1px;
-	border-style:solid none none none;
 	width:50%;
-	border-style:none solid solid none;
-	border-width:1px;
 }
-.boardposts {
+.boardposts, .boardmessagecount {
 	table-layout:fixed;
 	text-align:center;
 	width:80px;
-	border-style:none solid solid none;
-	border-width:1px;
 }
 .boardposter {
 	padding-left:5px;
-	border-style:none solid solid none;
-	border-width:1px;
 }
 .title {
 	font-size:16px;
@@ -231,4 +220,19 @@ a:focus {color:#FF8800; font-weight:bold;}
 	border:1px solid grey;
 	margin:10px;
 	padding:20px;
+}
+.quote {
+	border-left:3px solid black;
+	border-right:3px solid black;
+	margin:0px 2px;
+	padding:5px 2px;
+}
+.quote {
+	border-color:red;
+}
+.quote .quote {
+	border-color:#0c0;
+}
+.quote .quote .quote {
+	border-color:#00c;
 }

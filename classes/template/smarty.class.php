@@ -37,26 +37,18 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		// Letzter Post und ungelesenes Forum markieren
 		if ($board->hasThreads()) {
 			$c = $board->getConnection($this->getAuth());
-			if (true) {
 			$c->open();
 			$group = $c->getGroup();
 			$c->close();
 			$row["unread"]			= $this->auth->isUnreadGroup($group);
+			$row["threadcount"]		= $group->getThreadCount();
+			$row["messagecount"]		= $group->getMessageCount();
+			$row["lastpostboardid"]		= $board->getBoardID();
 			$row["lastpostsubject"]		= $group->getLastPostSubject($this->getCharset());
 			$row["lastpostthreadid"]	= $group->getLastPostThreadID();
 			$row["lastpostmessageid"]	= $group->getLastPostMessageID();
 			$row["lastpostdate"]		= $group->getLastPostDate();
 			$row["lastpostauthor"]		= $group->getLastPostAuthor($this->getCharset());
-			} else {
-			$c->open();
-			// TODO Group Unread?
-			$row["lastpostsubject"]		= $c->getLastPostSubject($this->getCharset());
-			$row["lastpostthreadid"]	= $c->getLastPostThreadID();
-			$row["lastpostmessageid"]	= $c->getLastPostMessageID();
-			$row["lastpostdate"]		= $c->getLastPostDate();
-			$row["lastpostauthor"]		= $c->getLastPostAuthor();
-			$c->close();
-			}
 		}
 		// Unterforen einbinden
 		if ($board->hasSubBoards()) {
@@ -69,6 +61,17 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				// Markiere auch obere Hierarchien ungelesen
 				if ($child["unread"] == true) {
 					$row["unread"] = $child["unread"];
+				}
+				$row["threadcount"]	+= $child["threadcount"];
+				$row["messagecount"]	+= $child["messagecount"];
+				if (!$board->hasThreads()
+				 and $row["lastpostdate"] < $child["lastpostdate"]) {
+					$row["lastpostboardid"]   = $child["lastpostboardid"];
+					$row["lastpostsubject"]	  = $child["lastpostsubject"];
+					$row["lastpostthreadid"]  = $child["lastpostthreadid"];
+					$row["lastpostmessageid"] = $child["lastpostmessageid"];
+					$row["lastpostdate"]      = $child["lastpostdate"];
+					$row["lastpostauthor"]    = $child["lastpostauthor"];
 				}
 			}
 		}
@@ -125,7 +128,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private function formatMessage($message) {
 		if ($message->hasHTMLBody()) {
 			$text = $message->getHTMLBody($this->getCharset());
-			// Nur "gutes" HTML durchlassen / TODO weitere "gute" tags sammeln ;)
+			// Nur "gutes" HTML durchlassen
 			$text = strip_tags($text, "<b><i><u><a><tt><small><big>");
 		} else {
 			$text = $message->getTextBody($this->getCharset());
@@ -168,6 +171,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$text = preg_replace('$(\s)(/[^\s]+/)(\s)$', '$1<i>$2</i>$3', $text);
 			$text = preg_replace('$(\s)(_[^\s]+_)(\s)$', '$1<u>$2</u>$3', $text);
 
+			// Links
+			$text = preg_replace('$([a-zA-Z]{3,6}:[^\s]{6,})$', '<a href="$1">$1</a>', $text);
+
 			// Zeilenumbrueche
 			$text = nl2br(trim($text));
 		}
@@ -181,7 +187,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 	
-	public function viewboard($board, $group, $threadobjs = null, $mayPost = false) {
+	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false) {
 		$threads = array();
 		if (is_array($threadobjs)) {
 			foreach ($threadobjs AS $thread) {
@@ -189,27 +195,17 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			}
 		}
 		
-		$page = 0;
-		$pages = ceil(count($threads) / $this->getThreadsPerPage());
-		if (isset($_REQUEST["page"])) {
-			$page = intval($_REQUEST["page"]);
-		}
-		// Vorsichtshalber erlauben wir nur Seiten, auf dennen auch Nachrichten stehen
-		if ($page < 0 || $page > $pages) {
-			$page = 0;
-		}
-		
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pages", $pages);
 
 		$this->smarty->assign("board", $this->parseBoard($board));
-		$this->smarty->assign("threads", array_slice($threads, $page * $this->getThreadsPerPage(), $this->getThreadsPerPage()));
+		$this->smarty->assign("threads", $threads);
 		$this->smarty->assign("mayPost", $mayPost);
 		$this->smarty->display("viewboard.html.tpl");
 		exit;
 	}
 	
-	public function viewthread($board, $thread, $messagesobjs, $mayPost = false) {
+	public function viewthread($board, $thread, $page, $pages, $messagesobjs, $mayPost = false) {
 		$messages = array();
 		if (is_array($messagesobjs)) {
 			foreach ($messagesobjs AS $message) {
@@ -217,21 +213,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			}
 		}
 		
-		$page = 0;
-		$pages = ceil(count($messages) / $this->getMessagesPerPage());
-		if (isset($_REQUEST["page"])) {
-			$page = intval($_REQUEST["page"]);
-		}
-		// Vorsichtshalber erlauben wir nur Seiten, auf dennen auch Nachrichten stehen
-		if ($page < 0 || $page > $pages) {
-			$page = 0;
-		}
-		
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pages", $pages);
+		
 		$this->smarty->assign("board", $this->parseBoard($board));
 		$this->smarty->assign("thread", $this->parseThread($thread));
-		$this->smarty->assign("messages", array_slice($messages, $page * $this->getMessagesPerPage(), $this->getMessagesPerPage()));
+		$this->smarty->assign("messages", $messages);
 		$this->smarty->assign("mayPost", $mayPost);
 		$this->smarty->display("viewthread.html.tpl");
 		exit;
@@ -253,6 +240,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
 			$this->smarty->assign("reference", $reference->getMessageID());
+			$body  = $reference->getAuthor() . " schrieb:" . "\r\n";
+			$lines = explode("\n", $reference->getTextBody());
+			foreach ($lines as $line) {
+				$body .= "> " . rtrim($line) . "\r\n";
+			}
+			$this->smarty->assign("body", $body);
 			$this->smarty->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
 		}
 

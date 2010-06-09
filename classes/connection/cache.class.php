@@ -22,7 +22,6 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	
 	public function __construct($uplink) {
 		parent::__construct();
-		
 		$this->uplink = $uplink;
 	}
 
@@ -103,7 +102,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			return;
 		}
 		/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,
-		 * koennen wir uns arbeit sparen. */
+		 * muessen wir nicht erst die komplette Gruppe laden */
 		if ($this->uplink instanceof MessageStream) {
 			$this->updateGroup();
 		} else {

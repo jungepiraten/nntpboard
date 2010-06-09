@@ -26,22 +26,13 @@ interface Group {
 
 abstract class AbstractGroup implements Group {
 	private $groupid;
-	private $grouphash;
 
-	public function __construct($groupid, $grouphash) {
+	public function __construct($groupid) {
 		$this->groupid = $groupid;
-		$this->grouphash = $grouphash;
 	}
 
 	public function getGroupID() {
 		return $this->groupid;
-	}
-
-	public function getGroupHash() {
-		return $this->grouphash;
-	}
-	public function setGroupHash($hash) {
-		$this->grouphash = $hash;
 	}
 
 	public function getMessageCount() {
@@ -96,7 +87,7 @@ abstract class AbstractGroup implements Group {
 		if ($message->hasParent() && $this->hasThread($message->getParentID())) {
 			$thread = $this->getThread($message->getParentID());
 		} else {
-			$thread = new Thread($message);
+			$thread = Thread::getByMessage($message);
 		}
 		$thread->addMessage($message);
 		$this->addThread($thread);

@@ -17,20 +17,27 @@ if ($connection !== null) {
 	$connection->open();
 	$group = $connection->getGroup();
 	$connection->close();
+	
+	$pages = ceil($group->getThreadCount() / $config->getThreadsPerPage());
+	$page = 0;
+	if (isset($_REQUEST["page"])) {
+		$page = intval($_REQUEST["page"]);
+	}
+	// Vorsichtshalber erlauben wir nur Seiten, auf dennen auch Nachrichten stehen
+	if ($page < 0 || $page > $pages) {
+		$page = 0;
+	}
 
 	$threads = array();
-	foreach ($group->getThreadIDs() AS $threadid) {
+	/** getThreadIDs() gibt alle ThreadIDs in der Reihenfolge Alt => Neu
+	 * zurueck. In der Forendarstellung wollen wir die neuesten x Threads
+	 * von Neu => Alt. */
+	$threadids = array_slice(array_reverse($group->getThreadIDs()), $page * $config->getThreadsPerPage(), $config->getThreadsPerPage());
+	foreach ($threadids AS $threadid) {
 		$threads[] = $group->getThread($threadid);
 	}
 
-	if (!function_exists("cmpThreads")) {
-		function cmpThreads($a, $b) {
-			return $b->getLastPostDate() - $a->getLastPostDate();
-		}
-	}
-	uasort($threads, cmpThreads);
-	
-	$template->viewboard($board, $group, $threads, $board->mayPost($session->getAuth()));
+	$template->viewboard($board, $group, $page, $pages, $threads, $board->mayPost($session->getAuth()));
 } else {
 	$template->viewboard($board, $group);
 }

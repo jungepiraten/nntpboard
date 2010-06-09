@@ -14,8 +14,8 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 
 	abstract public function loadMessageThreads();
 	abstract protected function saveMessageThreads($messagethreads);
-	abstract public function loadThreadIDs();
-	abstract protected function saveThreadIDs($messageids);
+	abstract public function loadThreadsLastPost();
+	abstract protected function saveThreadsLastPost($messageids);
 	abstract public function loadMessage($messageid);
 	abstract protected function saveMessage($messageid, $message);
 	abstract public function loadThread($threadid);
@@ -28,15 +28,17 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	public function open() {
 		$this->grouphash = $this->loadGroupHash();
 		$this->lastthread = $this->loadLastThread();
+		if (!($this->lastthread instanceof Thread)) {
+			$this->lastthread = null;
+		}
 	}
 	
 	public function close() {
-		/**
 		$this->saveGroupHash($this->grouphash);
 		$this->saveLastThread($this->lastthread);
 		if ($this->group !== null) {
 			$this->saveMessageThreads($this->group->getMessageThreads());
-			$this->saveThreadIDs($this->group->getThreadIDs());
+			$this->saveThreadsLastPost($this->group->getThreadsLastPost());
 			foreach ($this->group->getNewMessagesIDs() AS $messageid) {
 				$this->saveMessage($messageid, $this->group->getMessage($messageid));
 			}
@@ -44,7 +46,6 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 				$this->saveThread($threadid, $this->group->getThread($threadid));
 			}
 		}
-		**/
 	}
 
 	public function getGroup() {
@@ -52,6 +53,10 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 			$this->group = new DynamicGroup($this);
 		}
 		return $this->group;
+	}
+	public function setGroup($group) {
+		parent::setGroup($group);
+		$this->setLastThread($group->getLastThread());
 	}
 
 	public function getGroupHash() {
@@ -69,7 +74,6 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	public function updateGroup() {
 		parent::updateGroup();
-
 		$this->setLastThread($this->getGroup()->getLastThread());
 	}
 }

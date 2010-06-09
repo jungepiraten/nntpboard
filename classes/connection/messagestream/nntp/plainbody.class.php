@@ -18,6 +18,7 @@ class NNTPPlainBody {
 	}
 
 	public static function parseObject($attachment) {
+		// TODO nicht immer ist base64 das beste ;)
 		$header = new NNTPHeader;
 		$header->set(	new NNTPSingleHeader("Content-Type",			$attachment->getMimeType()));
 		$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"base64"));

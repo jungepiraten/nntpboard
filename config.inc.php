@@ -22,11 +22,12 @@ class PrauscherConfig extends DefaultConfig {
 		$this->addBoard(new FileCachedNNTPBoard(120, 100, "Testboard", "Anderes Board", false, true, false, $nntphost, $nntpprefix.".test"));
 
 		$this->addBoard(new Board(200, null, "Prauscher", ""));
-		$this->addBoard(new FileCachedNNTPBoard(210, 200, "Testbasis", false, true, true, "Prauschers Testbasis. MODERIERT!", $nntphost, "prauscher.test"));
+		$this->addBoard(new FileCachedNNTPBoard(210, 200, "Testbasis", "Prauschers Testbasis. MODERIERT!", false, true, true, $nntphost, "prauscher.test"));
 
-		$this->addBoard(new FileCachedNNTPBoard(300, null, "de.comp.misc", false, true, true, "VIEL INHALT!", new Host("news.arcor-ip.de"), "de.comp.misc"));
+		$this->addBoard(new MemCachedNNTPBoard(300, null, "de.comp.misc", "VIEL INHALT!", false, true, false, new Host("news.arcor-ip.de"), "de.comp.misc"));
 
-		$this->addBoard(new FileCachedNNTPBoard(400, null, "de.comp.os.unix.linux.misc", false, true, true, "VIEL INHALT!", new Host("news.arcor-ip.de"), "de.comp.os.unix.linux.misc"));
+		//$this->addBoard(new MemCachedNNTPBoard(400, null, "de.comp.os.unix.linux.misc", "VIEL INHALT!", false, true, false, new Host("news.arcor-ip.de"), "de.comp.os.unix.linux.misc"));
+		$this->addBoard(new MemCachedNNTPBoard(500, null, "Allgemeines", "VIEL INHALT!", false, true, false, new Host("news.junge-piraten.de"), "pirates.youth.de.test.misc3"));
 	}
 
 	public function getTemplate($auth) {
@@ -48,6 +49,7 @@ class PrauscherConfig extends DefaultConfig {
 
 class JuPiConfig extends DefaultConfig {
 	public function __construct() {
+		parent::__construct();
 		$this->addBoard(new Board(null, null, "Junge Piraten", "Junge Piraten Forum"));
 
 		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", "Moderiertes Forum für Ankündigungen.",
@@ -78,14 +80,14 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function getNNTPGroup($name) {
-		return "pirates.youth.de.{$name}";
+		return "pirates.youth.de.test.delta.{$name}";
 	}
 
 	private function addAGStruktur($id, $parentid) {
 		$this->addBoard(new Board(5, $parentid, "Arbeitsgruppen", "Unterforen der Arbeitsgruppen"));
-		$this->addAGBoard( 7, 5, "it",		"AG IT",
+		$this->addAGBoard( 7, 5, "it",			"AG IT",
 								$this->getWikiLink("AG_IT"));
-		$this->addAGBoard(12, 5, "oe",		"AG Öffentlichkeitsarbeit",
+		$this->addAGBoard(12, 5, "oe",			"AG Öffentlichkeitsarbeit",
 								$this->getWikiLink("AG_Öffentlichkeitsarbeit"));
 		$this->addAGBoard( 9, 5, "programm",		"AG Programm",
 								$this->getWikiLink("AG_Programm"));
@@ -93,8 +95,12 @@ class JuPiConfig extends DefaultConfig {
 								$this->getWikiLink("AG_Struktur"));
 		$this->addAGBoard(72, 5, "satzung",		"AG Satzung",
 								$this->getWikiLink("AG_Satzung"));
-		$this->addAGBoard(73, 5, "fs",		"AG Freie Software",
+		$this->addAGBoard(73, 5, "soziales",		"AG Soziales",
+								$this->getWikiLink("AG_Soziales"));
+		$this->addAGBoard(73, 5, "fs",			"AG Freie Software",
 								$this->getWikiLink("AG_Freie_Software"));
+		$this->addAGBoard(73, 5, "umwelt+energie",	"AG Umwelt und Energie",
+								$this->getWikiLink("AG_Umwelt_und_Energie"));
 		$this->addAGBoard(38, 5, "international",	"AG International",
 								$this->getWikiLink("AG_International"));
 	}
@@ -185,6 +191,6 @@ class JuPiConfig extends DefaultConfig {
 	}
 }
 
-$config = new PrauscherConfig;
+$config = new JuPiConfig;
 
 ?>

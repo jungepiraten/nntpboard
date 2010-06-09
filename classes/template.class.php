@@ -3,8 +3,8 @@
 interface Template {
 	public function viewexception($exception);
 
-	public function viewboard($board, $group, $threads = null, $mayPost = false);
-	public function viewthread($board, $thread, $messages, $mayPost = false);
+	public function viewboard($board, $group, $page = 0, $pages = 0, $threads = null, $mayPost = false);
+	public function viewthread($board, $thread, $page, $pages, $messages, $mayPost = false);
 	public function viewmessage($board, $thread, $message, $mayPost = false);
 
 	public function viewpostform($board, $reference = null);

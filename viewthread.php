@@ -40,9 +40,20 @@ if ($thread === null) {
 	$template->viewexception(new Exception("Thread nicht gefunden!"));
 }
 
+$pages = ceil($thread->getMessageCount() / $config->getMessagesPerPage());
+$page = 0;
+if (isset($_REQUEST["page"])) {
+	$page = intval($_REQUEST["page"]);
+}
+// Vorsichtshalber erlauben wir nur Seiten, auf dennen auch Nachrichten stehen
+if ($page < 0 || $page > $pages) {
+	$page = 0;
+}
+
 // Nachrichten laden
+$messageids = array_slice($thread->getMessageIDs(), $page * $config->getMessagesPerPage(), $config->getMessagesPerPage());
 $messages = array();
-foreach ($thread->getMessageIDs() AS $messageid) {
+foreach ($messageids AS $messageid) {
 	$messages[] = $group->getMessage($messageid);
 }
 $connection->close();
@@ -51,6 +62,6 @@ if (!is_array($messages) || count($messages) < 1) {
 }
 
 $session->getAuth()->markReadThread($thread);
-$template->viewthread($board, $thread, $messages, $board->mayPost($session->getAuth()));
+$template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()));
 
 ?>

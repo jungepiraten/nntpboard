@@ -3,21 +3,31 @@
 require_once(dirname(__FILE__) . "/../group.class.php");
 
 class DynamicGroup extends AbstractGroup {
-	private $threadids;
-	private $messagethreads;
 	private $messages = array();
+	private $messagethreads;
 	private $threads = array();
+	private $threadslastpost;
 	
 	private $connection;
 	
 	public function __construct(AbstractItemCacheConnection $connection) {
-		parent::__construct($connection->getGroupID(), $connection->getGroupHash());
+		parent::__construct($connection->getGroupID());
 		$this->connection = $connection;
 		$this->messagethreads = $connection->loadMessageThreads();
+		if (!is_array($this->messagethreads)) {
+			$this->messagethreads = array();
+		}
+		$this->threadslastpost = $connection->loadThreadsLastPost();
+		if (!is_array($this->threadslastpost)) {
+			$this->threadslastpost = array();
+		}
 	}
 
-	public function getMessageThreads() {
-		return $this->messagethreads;
+	public function getGroupHash() {
+		return $this->connection->getGroupHash();
+	}
+	public function setGroupHash($hash) {
+		$this->connection->setGroupHash($hash);
 	}
 
 	/** Message **/
@@ -33,14 +43,7 @@ class DynamicGroup extends AbstractGroup {
 
 	/** Threads **/
 	public function getThreadIDs() {
-		if ($this->threadids === null) {
-			$this->threadids = array();
-			$threadids = $this->connection->loadThreadIDs();
-			foreach ($threadids as $threadid) {
-				$this->threadids[$threadid] = true;
-			}
-		}
-		return array_keys($this->threadids);
+		return array_keys($this->threadslastpost);
 	}
 	public function hasThread($messageid) {
 		return isset($this->messagethreads[$messageid]) and in_array($this->messagethreads[$messageid], $this->getThreadIDs());
@@ -54,7 +57,7 @@ class DynamicGroup extends AbstractGroup {
 	}
 
 	public function hasLastThread() {
-		return $this->connection->getLastThread() !== null;
+		return $this->getLastThread() !== null;
 	}
 	public function getLastThread() {
 		return $this->connection->getLastThread();
@@ -67,10 +70,11 @@ class DynamicGroup extends AbstractGroup {
 	}
 	protected function addThread($thread) {
 		$this->threads[$thread->getThreadID()] = $thread;
-		$this->threadids[$thread->getThreadID()] = true;
+		$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
 		if ($thread->getLastPostDate() > $this->getLastPostDate()) {
 			$this->connection->setLastThread($thread);
 		}
+		asort($this->threadslastpost);
 	}
 
 	public function removeMessage($messageid) {
@@ -80,8 +84,18 @@ class DynamicGroup extends AbstractGroup {
 	}
 	protected function removeThread($threadid) {
 		unset($this->threads[$threadid]);
+		unset($this->threadslastpost[$threadid]);
 	}
 
+	/**
+	 * Gebe die IDs durch, die sich geaendert haben (effizientes Speichern)
+	 **/
+	public function getMessageThreads() {
+		return $this->messagethreads;
+	}
+	public function getThreadsLastPost() {
+		return $this->threadslastpost;
+	}
 	public function getNewMessagesIDs() {
 		return array_keys($this->messages);
 	}

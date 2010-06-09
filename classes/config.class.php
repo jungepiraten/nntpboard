@@ -5,8 +5,17 @@ require_once(dirname(__FILE__)."/exceptions/board.exception.php");
 abstract class DefaultConfig {
 	private $boards;
 	
+	public function __construct() {}
+	
 	public function getCharset() {
 		return "UTF8";
+	}
+
+	public function getThreadsPerPage() {
+		return 20;
+	}
+	public function getMessagesPerPage() {
+		return 15;
 	}
 
 	protected function addBoard($board) {

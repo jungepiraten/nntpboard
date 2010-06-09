@@ -4,18 +4,12 @@
 
 <p class="desc">{$board.desc}</p>
 {if isset($board.childs)}
-<table class="maintable">
-<thead>
-<tr>
- <th colspan=4 style="padding-left:10px;">Forum</th>
- <th>Themen</th>
- <th>Letzte Antwort</th>
-</tr>
-</thead>
-<tbody>
-{include file=board_boards.html.tpl subboards=$board.childs}
-</tbody>
-</table>
+{include file=board_boards.html.tpl name="Foren" boards=$board.childs}
+{foreach from=$board.childs item=child}
+{if isset($child.childs)}
+{include file=board_boards.html.tpl boardid=$child.boardid name=$child.name boards=$child.childs}
+{/if}
+{/foreach}
 {/if}
 
 {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
@@ -43,8 +37,8 @@ Seite {$page+1} von {$pages} &bull;
 </thead>
 <tbody>
 {foreach from=$threads item=thread name=counter}
-{if $smarty.foreach.counter.first}<tr class="boardentryfirst">{else}<tr class="boardentry{cycle values="even,odd"}">{/if}
- <td class="boardseparator">&nbsp;</td><td class="boardicon"><img src="images/flagge.png{if $board.unread}unread{/if}"></td>
+ <tr class="boardentry{cycle values="even,odd"} {if $smarty.foreach.counter.first}boardentryfirst{/if}">
+ <td class="boardseparator">&nbsp;</td><td class="boardicon"><img src="images/flagge{if $thread.unread}_unread{/if}.png"></td>
  <td class="boardtitle">
   <a class="subject" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}">{$thread.subject}</a>
   </td>
@@ -65,7 +59,7 @@ Seite {$page+1} von {$pages} &bull;
 </table>
 
 <span class="page">
-Seite X von Y
+Seite {$page+1} von {$pages} &bull; 
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
 {if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}

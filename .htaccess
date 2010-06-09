@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteBase /~prauscher/nntpboard/
+RewriteCond %{QUERY_STRING} f=([0-9]+)
+RewriteRule viewforum.php viewboard.php?boardid=%1 [L]
+RewriteCond %{QUERY_STRING} f=([0-9]+)&t=([0-9]+)
+RewriteRule viewtopic.php viewthread.php?boardid=%1&threadid=<%2@phpbb.junge-piraten.de> [L]

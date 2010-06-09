@@ -3,16 +3,27 @@
 require_once(dirname(__FILE__) . "/../group.class.php");
 
 class StaticGroup extends AbstractGroup {
+	private $grouphash;
+
 	// MessageID => Message
 	private $messages = array();
+	// MessageID => ThreadID
+	private $messagethreads = array();
 	// ThreadID => Thread
 	private $threads = array();
-	// MessageID => ThreadID
-	private $threadids = array();
-	private $lastthread;
+	// ThreadID => LastPostDate
+	private $threadslastpost;
 
 	public function __construct($groupid, $grouphash) {
-		parent::__construct($groupid, $grouphash);
+		parent::__construct($groupid);
+		$this->grouphash = $grouphash;
+	}
+
+	public function getGroupHash() {
+		return $this->grouphash;
+	}
+	public function setGroupHash($hash) {
+		$this->grouphash = $hash;
 	}
 
 	/** Messages **/
@@ -28,23 +39,23 @@ class StaticGroup extends AbstractGroup {
 		return array_keys($this->threads);
 	}
 	public function hasThread($threadid) {
-		return  isset($this->threadids[$threadid]) and $this->hasThread($this->threadids[$threadid]);
+		return  isset($this->messagethreads[$threadid]) and $this->hasThread($this->messagethreads[$threadid]);
 	}
 	public function getThread($threadid) {
 		if (isset($this->threads[$threadid])) {
 			return $this->threads[$threadid];
 		}
-		if (isset($this->threadids[$threadid])) {
-			return $this->getThread($this->threadids[$threadid]);
+		if (isset($this->messagethreads[$threadid])) {
+			return $this->getThread($this->messagethreads[$threadid]);
 		}
 	}
 
 	/** Last Thread **/
 	public function hasLastThread() {
-		return $this->hasThread($this->lastthread);
+		return $this->hasThread($this->getLastThread());
 	}
 	public function getLastThread() {
-		return $this->getThread($this->lastthread);
+		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
 	}
 
 	/** Hinzufuegen **/
@@ -52,27 +63,23 @@ class StaticGroup extends AbstractGroup {
 		$thread = parent::addMessage($message);
 		
 		$this->messages[$message->getMessageID()] = $message;
-		$this->threadids[$message->getMessageID()] = $thread->getThreadID();
+		$this->messagethreads[$message->getMessageID()] = $thread->getThreadID();
 	}
 	protected function addThread($thread) {
 		$this->threads[$thread->getThreadID()] = $thread;
-		if (!isset($this->lastthread)
-		 or $thread->getLastPostDate() > $this->getLastPostDate())
-		{
-			$this->lastthread = $thread->getThreadID();
-		}
+		$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
+		asort($this->threadslastpost);
 	}
 
 	/** Entfernen **/
 	public function removeMessage($messageid) {
 		parent::removeMessage($messageid);
-
 		unset($this->messages[$messageid]);
-		unset($this->threadids[$messageid]);
+		unset($this->messagethreads[$messageid]);
 	}
 	protected function removeThread($threadid) {
 		unset($this->threads[$threadid]);
-		// TODO ggf. neuen LastThread suchen
+		unset($this->threadslastpost[$threadid]);
 	}
 }
 

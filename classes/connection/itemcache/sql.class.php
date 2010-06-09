@@ -2,59 +2,51 @@
 
 require_once(dirname(__FILE__) . "/../itemcache.class.php");
 
-class SQLItemCacheConnection extends AbstractItemCacheConnection {
-	private $host;
-	private $user;
-	private $passwort;
-	private $db;
+abstract class AbstractSQLItemCacheConnection extends AbstractItemCacheConnection {
 	private $prefix;
 	
 	private $link;
 	
-	public function __construct($host, $user, $passwort, $db, $prefix, $uplink) {
+	public function __construct($prefix, $uplink) {
 		parent::__construct($uplink);
+		$this->prefix = $prefix;
 	}
 	
-	private function getLink() {
-		if ($this->link === null) {
-			$this->link = new MySQLi("p:" . $this->host, $this->user, $this->passwort, $this->db);
-		}
-		return $this->link;
-	}
+	abstract protected function query($sql);
 
 	/** TODO SQL-funktionen implementieren **/
 	public function loadMessageThreads() {
-		return false;
+		return array();
 	}
 	protected function saveMessageThreads($messagethreads) {
 	}
 
 	public function loadMessage($messageid) {
-		return false;
+		return null;
 	}
 	protected function saveMessage($messageid, $message) {
 	}
 
-	public function loadThreadIDs() {
-		return false;
+	public function loadThreadsLastPost() {
+		return array();
 	}
-	protected function saveThreadIDs($threadids) {
+	protected function saveThreadsLastPost($threadids) {
 	}
 
 	public function loadThread($threadid) {
-		return false;
+		return null;
 	}
 	protected function saveThread($threadid, $thread) {
 	}
 
 	protected function loadGroupHash() {
-		return false;
+		return null;
 	}
 	protected function saveGroupHash($hash) {
 	}
 
 	protected function loadLastThread() {
-		return false;
+		return null;
 	}
 	protected function saveLastThread($thread) {
 	}
