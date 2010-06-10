@@ -56,7 +56,7 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 
 	public function isUnreadGroup($group) {
 		// "Einfach" alle Threads ueberpruefen ;)
-		return false;
+		//return false;
 		// TODO diese methode ist laaaaangsam *g*
 		foreach ($group->getThreadIDs() as $threadid) {
 			if ($this->isUnreadThread($group->getThread($threadid))) {

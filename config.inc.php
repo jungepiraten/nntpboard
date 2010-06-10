@@ -31,7 +31,7 @@ class PrauscherConfig extends DefaultConfig {
 	}
 
 	public function getTemplate($auth) {
-		return new NNTPBoardSmarty($this->getCharset(), $auth);
+		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
 	}
 
 	public function getAuth($user, $pass) {
@@ -80,7 +80,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function getNNTPGroup($name) {
-		return "pirates.youth.de.test.delta.{$name}";
+		return "pirates.youth.de.test.epsilon.{$name}";
 	}
 
 	private function addAGStruktur($id, $parentid) {
@@ -175,7 +175,7 @@ class JuPiConfig extends DefaultConfig {
 
 
 	public function getTemplate($auth) {
-		return new NNTPBoardSmarty($this->getCharset(), $auth);
+		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
 	}
 
 	public function getAuth($user, $pass) {

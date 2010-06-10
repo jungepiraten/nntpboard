@@ -11,11 +11,8 @@ require_once("/usr/share/php/smarty/libs/Smarty.class.php");
 class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private $smarty;
 	
-	public function __construct($charset, $auth, $threadsperpage = null, $messagesperpage = null) {
-		parent::__construct($charset, $auth, $threadsperpage, $messagesperpage);
-		$this->config = $config;
-		$this->charset = $charset;
-		$this->auth = $auth;
+	public function __construct($config, $charset, $auth) {
+		parent::__construct($config, $charset, $auth);
 
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
@@ -40,7 +37,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$c->open();
 			$group = $c->getGroup();
 			$c->close();
-			$row["unread"]			= $this->auth->isUnreadGroup($group);
+			$row["unread"]			= $this->getAuth()->isUnreadGroup($group);
 			$row["threadcount"]		= $group->getThreadCount();
 			$row["messagecount"]		= $group->getMessageCount();
 			$row["lastpostboardid"]		= $board->getBoardID();
@@ -225,7 +222,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 	
 	public function viewmessage($board, $thread, $message, $mayPost = false) {
-		$page = floor($thread->getMessagePosition($message) / $this->getMessagesPerPage());
+		$page = floor($thread->getMessagePosition($message) / $this->getConfig()->getMessagesPerPage());
 		$location = "viewthread.php?boardid=" . urlencode($board->getBoardID()) .
 		            "&threadid=" . urlencode($thread->getThreadID()) .
 		            "&page=" . intval($page) . "#article" . 

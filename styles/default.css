@@ -1,3 +1,240 @@
+/**
+body {
+	margin:0px;
+	padding:0px;
+	font-size:12px;
+	background-color:#DDD9D9;
+}
+a {text-decoration:none; color:#55524E; font-weight:bold;}
+a:hover {color:#FF8800; font-weight:bold;}
+a:focus {color:#FF8800; font-weight:bold;}
+
+.message .meta {
+	vertical-align:top; color:gray; font-weight:normal;
+}
+.seite {
+	margin:20px;
+}
+.headerdiv {
+	padding:10px;
+	Background-color:#FFAC4C ;
+	-moz-border-radius:5px;
+	-khtml-border-radius:5px;
+}
+.buttondiv {
+	width:200px;
+	float:right;
+	vertical-align:top;
+	text-align:right;
+	color:#000000;
+}
+.buttondiv a {
+	color:#000000;
+	text-decoration:none;
+	font-weight:bold;
+}
+
+.buttondiv a:hover {color:#FFFFFF;}
+
+.maintable thead{
+	background-color:#FFAC4C;
+	color:#55524E;
+	text-align:left;
+}
+.maintable {
+	width:100%;
+	border-spacing:0px;
+	border:5px solid #FFAC4C;
+	-moz-border-radius:5px;
+	-khtml-border-radius:5px;
+	border-top:3px solid #FFAC4C;
+}
+.boardentryodd td {
+	padding-top:4px;
+	padding-bottom:4px;
+	background-color:#FFE1BF;
+}
+.boardentryeven td {
+	padding-top:4px;
+	padding-bottom:4px;
+	background-color:#FFEDD9;
+}
+.boardentryfirst td {
+	padding-top:4px;
+	padding-bottom:4px;
+	background-color:#FFE1BF;
+	border-top:1px solid grey;
+}
+.boardicon {
+	padding-left:10px;
+	width:32px;
+	border-style:none none solid none;
+	border-width:1px;
+}
+.boardiconchild {
+	width:32px;
+	border-style:none none solid none;
+	border-width:1px;
+}
+.boardseparator {
+	border-style:none none solid solid;
+	border-width:1px;
+	width:0px;
+}
+.boardiconunread {
+	padding-left:10px;
+	width:32px;
+	border-style:none none solid none;
+	border-width:1px;
+}
+.boardtitle {
+	border-width:1px;
+	border-style:solid none none none;
+	width:50%;
+	border-style:none solid solid none;
+	border-width:1px;
+}
+.boardposts {
+	table-layout:fixed;
+	text-align:center;
+	width:80px;
+	border-style:none solid solid none;
+	border-width:1px;
+}
+.boardposter {
+	padding-left:5px;
+	border-style:none solid solid none;
+	border-width:1px;
+}
+.title {
+	font-size:16px;
+	color:#55524E;
+	font-weight:bold;
+}
+.title:hover {
+	text-decoration:underline;
+}
+.titlebeschr {
+	font-size:12px;
+	color:#55524E;
+}
+.date {
+	font-size:11px;
+}
+.poster {
+	font-size:13px;
+}
+.arrowright {
+	font-weight:bold;
+	font-size:14px;
+}
+.mainname {
+	margin:8px;
+}
+.page {
+	float:right;
+	margin-right:8px;
+	margin-bottom:5px;
+	margin-top:5px;
+}
+.selected-page {
+	background-color:#FFAC4C;
+	border:1px solid #FFAC4C;
+	margin-right:2px;
+	padding:1px;
+}
+.pagenumber {
+	background-color:#d9d9d9;
+	border:1px solid #a6a6a6;
+	margin-right:2px;
+	padding:1px;
+}
+.pagenumber:hover {
+	background-color:#FFAC4C;
+	border:1px solid #FFAC4C;
+	color:#55524E;
+}
+.newthread {
+	font-size:14px;
+}
+.mainmessagetable {
+	width:100%;
+	border-spacing:0px;
+	border:5px solid #FFAC4C;
+	-moz-border-radius:5px;
+	-khtml-border-radius:5px;
+}
+.messagehead td {
+	padding:5px;
+	background-color:#ffd5a6;
+	border-style:none solid none solid;
+	border-width:1px;
+}
+.messageheadfirst td {
+	padding:5px;
+	background-color:#ffd5a6;
+	border-style:solid solid none solid;
+	border-width:1px;
+}
+.messageodd td {
+	padding:5px;
+	padding-bottom:10px;
+	background-color:#FFE1BF;
+	border-style:none solid solid solid;
+	border-width:1px;
+}
+.messageeven td {
+	padding:5px;
+	padding-bottom:10px;
+	background-color:#FFEDD9;
+	border-style:none solid solid solid;
+	border-width:1px;
+}
+.reply {
+	float:right;
+	padding-right:5px;
+}
+.attachmentbox {
+	border:1px dashed grey;
+	padding:5px;
+	width:auto;
+	clear:left;
+	float:left;
+}
+.attachmentsep {
+	height:1px;
+	color:black;
+	background-color:black;
+}
+.subject {
+	font-size:16px;
+	font-weight:bold;
+	color:#55524E;
+}
+.messageinfo {
+	font-size:11px;
+	color:#55524E;
+}
+.author {
+	font-size:15px;
+	font-weight:bold;
+	color:#55524E;
+}
+.date {
+	font-size:13px;
+	color:#55524E;
+	font-weight:normal;
+}
+.date:hover {
+	font-weight:normal;
+}
+.posttable {
+	border:1px solid grey;
+	margin:10px;
+	padding:20px;
+}
+**/
+
 body {
 	margin:0px;
 	padding:0px;
@@ -195,7 +432,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	background-color:black;
 }
 .subject {
-	font-size:19px;
+	font-size:16px;
 	font-weight:bold;
 	color:#55524E;
 }
@@ -204,7 +441,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	color:#55524E;
 }
 .author {
-	font-size:16px;
+	font-size:15px;
 	font-weight:bold;
 	color:#55524E;
 }

@@ -20,8 +20,11 @@ abstract class NNTPMimeBody {
 			$mimetype = $header->get("Content-Type")->getValue();
 			$boundary = $header->get("Content-Type")->getExtra("boundary");
 			$mimeparts = explode("--" . $boundary, $body);
-			// Der erste (This is an multipart ...) und letzte Teil (--) besteht nur aus Sinnlosem Inhalt
-			array_pop($mimeparts);
+			// Normalerweise bestehen der erste (This is an multipart ...) und letzte Teil (-- nur aus Sinnlosem Inhalt
+			// Falls das nicht so ist, fixen wir das halt ...
+			if (($last = trim(array_pop($mimeparts))) != "--") {
+				array_push($mimeparts, $last);
+			}
 			array_shift($mimeparts);
 			
 			foreach ($mimeparts AS $mimepart) {
@@ -33,7 +36,7 @@ abstract class NNTPMimeBody {
 			// Singlepart-Nachricht
 			$parts[] = NNTPPlainBody::parsePlain($header, $body);
 		}
-		
+
 		switch ($mimetype) {
 		case "multipart/signed":
 			return new NNTPSignedMimeBody($header, $parts);

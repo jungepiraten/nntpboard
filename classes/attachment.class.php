@@ -45,7 +45,7 @@ class Attachment {
 	}
 
 	public function isInline() {
-		return (strtolower($this->disposition) == 'inline');
+		return $this->isImage() || (strtolower($this->disposition) == 'inline');
 	}
 	
 	public function isAttachment() {
