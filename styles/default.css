@@ -459,17 +459,35 @@ a.reply, a.quote {
 	padding:20px;
 }
 div.quote {
-	border-left:3px solid black;
-	border-right:3px solid black;
-	margin:0px 2px;
+	border-left:3px solid #000;
+	border-right:3px solid #000;
+	border-top:1px dotted #000;
+	border-bottom:1px dotted #000;
+	background-color:gray;
+	margin:-15px 2px 0px 2px;
 	padding:5px 2px;
 }
-.quote {
-	border-color:red;
+div.quote {
+	border-color:#c00;
+	background-color:#fcc;
 }
-.quote .quote {
+div.quote div.quote {
 	border-color:#0c0;
+	background-color:#cfc;
 }
-.quote .quote .quote {
+div.quote div.quote div.quote {
 	border-color:#00c;
+	background-color:#ccf;
+}
+div.quote div.quote div.quote div.quote {
+	border-color:#cc0;
+	background-color:#ffc;
+}
+div.quote div.quote div.quote div.quote div.quote {
+	border-color:#0cc;
+	background-color:#cff;
+}
+div.quote div.quote div.quote div.quote div.quote div.quote {
+	border-color:#c0c;
+	background-color:#fcf;
 }
