@@ -78,6 +78,8 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		foreach (array_keys($this->readgroups[$group->getGroupID()][$group->getGroupHash()]) as $threadid) {
 			if ($this->isUnreadThread($group->getThread($threadid))) {
 				return true;
+			} else {
+				unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
 			}
 		}
 		return false;

@@ -245,7 +245,9 @@ a {text-decoration:none; color:#55524E; font-weight:bold;}
 a:hover {color:#FF8800; font-weight:bold;}
 a:focus {color:#FF8800; font-weight:bold;}
 
-.logo	{border:0px;}
+.logo	{
+	border:0px;
+}
 
 .message .meta {
 	vertical-align:top; color:gray; font-weight:normal;
@@ -256,12 +258,11 @@ a:focus {color:#FF8800; font-weight:bold;}
 .headerdiv, .footerdiv {
 	clear:both;
 	padding:10px;
-	Background-color:#FFAC4C ;
+	background-color:#FFAC4C;
 	-moz-border-radius:5px;
 	-khtml-border-radius:5px;
 }
 .buttondiv {
-	width:200px;
 	float:right;
 	vertical-align:top;
 	text-align:right;
@@ -272,10 +273,11 @@ a:focus {color:#FF8800; font-weight:bold;}
 	text-decoration:none;
 	font-weight:bold;
 }
+.buttondiv a:hover {
+	color:#FFFFFF;
+}
 
-.buttondiv a:hover {color:#FFFFFF;}
-
-.maintable thead{
+.maintable thead {
 	background-color:#FFAC4C;
 	color:#55524E;
 	text-align:left;
@@ -444,9 +446,6 @@ span.titlebeschr {
 .date {
 	font-size:13px;
 	color:#55524E;
-	font-weight:normal;
-}
-.date:hover {
 	font-weight:normal;
 }
 .posttable {
