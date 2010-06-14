@@ -6,7 +6,6 @@ require_once(dirname(__FILE__)."/config.inc.php");
  * Fuehre hier den Cache-Tausch durch
  *  - Nachrichten in den Cache herunterladen
  **/
-$start = microtime(true);
 foreach ($config->getBoardIDs() as $boardid) {
 	// Benutze keine Authentifikation
 	$cache = $config->getBoard($boardid)->getConnection(NULL);
@@ -27,6 +26,5 @@ foreach ($config->getBoardIDs() as $boardid) {
 		echo "<pre>".$e->getMessage()."</pre>";
 	}
 }
-var_dump(microtime(true) - $start);
 
 ?>

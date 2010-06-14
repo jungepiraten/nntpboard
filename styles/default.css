@@ -399,23 +399,27 @@ span.titlebeschr {
 	border-style:solid solid none solid;
 	border-width:1px;
 }
-.messageodd td {
+.message.odd td {
 	padding:5px;
 	padding-bottom:10px;
 	background-color:#FFE1BF;
 	border-style:none solid solid solid;
 	border-width:1px;
 }
-.messageeven td {
+.message.even td {
 	padding:5px;
 	padding-bottom:10px;
 	background-color:#FFEDD9;
 	border-style:none solid solid solid;
 	border-width:1px;
 }
-.messagebuttondiv {
+.message.buttondiv {
 	float:right;
 	padding-right:5px;
+}
+.message.info {
+	font-size:11px;
+	color:#55524E;
 }
 .attachmentbox {
 	border:1px dashed grey;
@@ -432,10 +436,6 @@ span.titlebeschr {
 .subject {
 	font-size:16px;
 	font-weight:bold;
-	color:#55524E;
-}
-.messageinfo {
-	font-size:11px;
 	color:#55524E;
 }
 .author {
