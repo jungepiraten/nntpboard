@@ -1,5 +1,4 @@
 {include file=header.html.tpl}
-<h1>Login</h1>
 
 {if $loginfailed}
 <p class="error">Login fehlgeschlagen!</p>

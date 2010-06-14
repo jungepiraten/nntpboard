@@ -1,8 +1,8 @@
-{include file=header.html.tpl}
+{include file=header.html.tpl title=$board.name}
 
 {include file=board_breadcrumb.html.tpl board=$board}
 
-<p class="desc">{$board.desc}</p>
+{if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
 {if isset($board.childs)}
 {include file=board_boards.html.tpl name="Foren" boards=$board.childs}
 {foreach from=$board.childs item=child}
@@ -15,7 +15,7 @@
 {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
 
 {if isset($threads) && !empty($threads)}
-<span class="page">
+<div class="page">
 {if $pages > 1}
 Seite {$page+1} von {$pages} &bull; 
 {/if}
@@ -23,7 +23,7 @@ Seite {$page+1} von {$pages} &bull;
 {assign var=p value=$smarty.section.page.index}
 {if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
-</span>
+</div>
 
 
 <table class="maintable">
@@ -58,13 +58,13 @@ Seite {$page+1} von {$pages} &bull;
 </tbody>
 </table>
 
-<span class="page">
+<div class="page">
 Seite {$page+1} von {$pages} &bull; 
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
 {if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
-</span>
+</div>
 {/if}
 
 {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}

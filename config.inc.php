@@ -50,7 +50,7 @@ class PrauscherConfig extends DefaultConfig {
 class JuPiConfig extends DefaultConfig {
 	public function __construct() {
 		parent::__construct();
-		$this->addBoard(new Board(null, null, "Junge Piraten", "Junge Piraten Forum"));
+		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
 
 		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", "Moderiertes Forum für Ankündigungen.",
 				false, true, true, $this->getNNTPHost(), $this->getNNTPGroup("announce")));

@@ -1,9 +1,8 @@
-{include file=header.html.tpl}
-<h1>{$thread.subject}</h1>
+{include file=header.html.tpl title=$thread.subject}
 
 {include file=thread_breadcrumb.html.tpl board=$board thread=$thread}
 
-<span class="page">
+<div class="page">
 {if $pages > 1}
 Seite {$page+1} von {$pages} &bull; 
 {/if}
@@ -11,7 +10,7 @@ Seite {$page+1} von {$pages} &bull;
 {assign var=p value=$smarty.section.page.index}
 {if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
-</span>
+</div>
 
 <table class="mainmessagetable">
 {foreach from=$messages item=message name=counter}
@@ -44,7 +43,7 @@ Seite {$page+1} von {$pages} &bull;
 </td></tr>
 </table>
 
-<span class="page">
+<div class="page">
 {if $pages > 1}
 Seite {$page+1} von {$pages} &bull; 
 {/if}
@@ -52,6 +51,6 @@ Seite {$page+1} von {$pages} &bull;
 {assign var=p value=$smarty.section.page.index}
 {if $page!=$p}<a href="viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
-</span>
+</div>
 
 {include file=footer.html.tpl}

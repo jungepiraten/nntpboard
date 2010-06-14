@@ -253,7 +253,8 @@ a:focus {color:#FF8800; font-weight:bold;}
 .seite {
 	margin:20px;
 }
-.headerdiv {
+.headerdiv, .footerdiv {
+	clear:both;
 	padding:10px;
 	Background-color:#FFAC4C ;
 	-moz-border-radius:5px;

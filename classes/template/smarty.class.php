@@ -167,12 +167,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$quoted--;
 			}
 			// Formatierung
-			$text = preg_replace('$(\s)(\*[^\s]+\*)(\s)$', '$1<b>$2</b>$3', $text);
-			$text = preg_replace('$(\s)(/[^\s]+/)(\s)$', '$1<i>$2</i>$3', $text);
-			$text = preg_replace('$(\s)(_[^\s]+_)(\s)$', '$1<u>$2</u>$3', $text);
+			$text = preg_replace('%(\s|^)(\*[^\s]+\*)(\s|$)%', '$1<b>$2</b>$3', $text);
+			$text = preg_replace('%(\s|^)(/[^\s]+/)(\s|$)%', '$1<i>$2</i>$3', $text);
+			$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
 
 			// Links
-			$text = preg_replace('$([a-zA-Z]{3,6}:[^\s]{6,})$', '<a href="$1">$1</a>', $text);
+			$text = preg_replace('$(<|)([a-zA-Z]{3,6}:[^\s>]{6,})(>|)$', '$1<a href="$2">$2</a>$3', $text);
 
 			// Zeilenumbrueche
 			$text = nl2br(trim($text));

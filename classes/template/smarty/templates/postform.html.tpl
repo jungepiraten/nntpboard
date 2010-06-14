@@ -1,9 +1,6 @@
-{include file=header.html.tpl}
-<h1>{$board.name}</h1>
+{include file=header.html.tpl title=$board.name}
 
 {include file=board_breadcrumb.html.tpl board=$board}
-
-
 
 <form action="post.php" method="post" accept-charset="{$CHARSET}" class="post">
   <input type="hidden" name="charset" value="{$CHARSET}" />
