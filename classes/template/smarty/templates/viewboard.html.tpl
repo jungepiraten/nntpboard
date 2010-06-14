@@ -14,7 +14,7 @@
 
 {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
 
-{if isset($threads) && !empty($threads)}
+{if isset($threads)}
 <div class="page">
 {if $pages > 1}
 Seite {$page+1} von {$pages} &bull; 
@@ -24,7 +24,6 @@ Seite {$page+1} von {$pages} &bull;
 {if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
 </div>
-
 
 <table class="maintable">
 <thead>
@@ -37,21 +36,26 @@ Seite {$page+1} von {$pages} &bull;
 </thead>
 <tbody>
 {foreach from=$threads item=thread name=counter}
- <tr class="boardentry {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}"><td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" /></td>
+ <tr class="boardentry {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('thread{$smarty.foreach.counter.iteration}').href;">
+  <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" /></td>
   <td class="title">
-  <a class="subject" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}">{$thread.subject}</a>
+  <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}">{$thread.subject}</a>
   </td>
   <td class="postcount">
   <span class="posts">{$thread.posts}</span>
   </td>
   <td class="poster">
-  <span class="messageinfo">von </span><span class="author">{include file=address.html.tpl address=$thread.author}</span>
-  <br><span class="messageinfo">am </span><span class="date">{$thread.date|date_format:"%d.%m.%Y %H:%M"}</span>
+  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.author}</span>
+  <br><span class="info">am </span><span class="date">{$thread.date|date_format:"%d.%m.%Y %H:%M"}</span>
   </td>
   <td class="lastpost">
-  <span class="messageinfo">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
-  <br><span class="messageinfo">am </span><a class="date" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$thread.lastpostmessageid}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
+  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
+  <br><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$thread.lastpostmessageid}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   </td>
+ </tr>
+{foreachelse}
+ <tr class="boardentry boardempty">
+  <td colspan="5">Es wurden noch keine Threads verfasst.</td>
  </tr>
 {/foreach}
 </tbody>

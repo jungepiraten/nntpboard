@@ -136,6 +136,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			// Inline-GPG ausschneiden (RFC 2440)
 			$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
 			
+			// Erkenne auch nicht ausgezeichnete Links
+			$text = preg_replace('$([^<])((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>])$', '$1<$2>$4', $text);
+			
 			// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
 			$text = iconv("UTF-8", $this->getCharset(),
 			              htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
@@ -175,7 +178,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
 
 			// Links
-			$text = preg_replace('$(<|)([a-zA-Z]{3,6}:[^\s>]{6,})(>|)$', '$1<a href="$2">$2</a>$3', $text);
+			$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '$1<a href="$2">$2</a>$3', $text);
 
 			// Zeilenumbrueche
 			$text = nl2br(trim($text));
@@ -191,8 +194,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 	
 	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false) {
-		$threads = array();
+		$threads = null;
 		if (is_array($threadobjs)) {
+			$threads = array();
 			foreach ($threadobjs AS $thread) {
 				$threads[] = $this->parseThread($thread);
 			}

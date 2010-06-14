@@ -240,10 +240,11 @@ body {
 	padding:0px;
 	font-size:12px;
 	background-color:#DDD9D9;
+	font-family:sans-serif;
 }
 a {text-decoration:none; color:#55524E; font-weight:bold;}
-a:hover {color:#FF8800; font-weight:bold;}
-a:focus {color:#FF8800; font-weight:bold;}
+a:hover {color:#FF8800;}
+a:focus {color:#FF8800;}
 
 .logo	{
 	border:0px;
@@ -344,9 +345,6 @@ span.titlebeschr {
 .date {
 	font-size:11px;
 }
-.poster {
-	font-size:13px;
-}
 .arrowright {
 	font-weight:bold;
 	font-size:14px;
@@ -417,7 +415,7 @@ span.titlebeschr {
 	float:right;
 	padding-right:5px;
 }
-.message.info {
+.info {
 	font-size:11px;
 	color:#55524E;
 }
