@@ -289,58 +289,53 @@ a:focus {color:#FF8800; font-weight:bold;}
 	border-top:3px solid #FFAC4C;
 	margin-bottom:15px;
 }
-.boardentryodd td, .boardentryeven td {
-	border-style:none none solid none;
-	border-width:1px;
+.maintable th.title {
+	padding-left:10px;
 }
-.boardentryodd td {
+.boardentry td {
+	border-bottom:1px solid grey;
+}
+.boardentry.odd td {
 	padding-top:4px;
 	padding-bottom:4px;
 	background-color:#FFE1BF;
 }
-.boardentryeven td {
+.boardentry.even td {
 	padding-top:4px;
 	padding-bottom:4px;
 	background-color:#FFEDD9;
 }
-.boardentryfirst td {
+.boardentry.first td {
 	border-top:1px solid grey;
 }
-.boardicon {
+tr.boardentry:hover td {
+	background-color:#ccc;
+}
+.boardentry td.icon {
 	padding-left:10px;
 	width:32px;
 }
-.boardiconchild {
-	width:32px;
+.boardentry td.icon.unread {
 }
-.boardseparator {
-	width:0px;
-}
-.boardiconunread {
-	padding-left:10px;
-	width:32px;
-}
-.boardtitle {
+.boardentry td.title {
 	border-width:1px;
 	width:50%;
 }
-.boardposts, .boardmessagecount {
+.boardentry td.threadcount, .boardentry td.postcount {
 	table-layout:fixed;
 	text-align:center;
 	width:80px;
 }
-.boardposter {
+.boardentry td.lastpost {
 	padding-left:5px;
 }
-.title {
+
+span.title {
 	font-size:16px;
 	color:#55524E;
 	font-weight:bold;
 }
-.title:hover {
-	text-decoration:underline;
-}
-.titlebeschr {
+span.titlebeschr {
 	font-size:12px;
 	color:#55524E;
 }
@@ -396,7 +391,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	border-style:none solid none solid;
 	border-width:1px;
 }
-.messageheadfirst td {
+.messagehead.first td {
 	padding:5px;
 	background-color:#ffd5a6;
 	border-style:solid solid none solid;
@@ -416,7 +411,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	border-style:none solid solid solid;
 	border-width:1px;
 }
-a.reply, a.quote {
+.messagebuttondiv {
 	float:right;
 	padding-right:5px;
 }
@@ -459,6 +454,7 @@ a.reply, a.quote {
 	margin:10px;
 	padding:20px;
 }
+
 div.quote {
 	border-left:3px solid #000;
 	border-right:3px solid #000;

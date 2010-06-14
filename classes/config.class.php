@@ -38,6 +38,10 @@ abstract class DefaultConfig {
 	public function getBoardIDs() {
 		return array_keys($this->boards);
 	}
+
+	public function getAddressLink($address) {
+		return "mailto:" . $address->getAddress();
+	}
 	
 	abstract public function getAuth($user, $pass);
 	abstract public function getAnonymousAuth();

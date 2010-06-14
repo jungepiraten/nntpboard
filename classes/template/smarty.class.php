@@ -19,7 +19,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
-		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress($this->getCharset()));
+		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress());
 	}
 
 
@@ -45,7 +45,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$row["lastpostthreadid"]	= $group->getLastPostThreadID();
 			$row["lastpostmessageid"]	= $group->getLastPostMessageID();
 			$row["lastpostdate"]		= $group->getLastPostDate();
-			$row["lastpostauthor"]		= $group->getLastPostAuthor($this->getCharset());
+			$row["lastpostauthor"]		= $this->parseAddress($group->getLastPostAuthor());
 		}
 		// Unterforen einbinden
 		if ($board->hasSubBoards()) {
@@ -87,7 +87,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["author"]			= $this->parseAddress($thread->getAuthor());
 		$row["lastpostmessageid"]	= $thread->getLastPostMessageID();
 		$row["lastpostdate"]		= $thread->getLastPostDate();
-		$row["lastpostauthor"]		= $thread->getLastPostAuthor($this->getCharset());
+		$row["lastpostauthor"]		= $this->parseAddress($thread->getLastPostAuthor());
 		$row["unread"]			= $this->getAuth()->isUnreadThread($thread);
 		return $row;
 	}
@@ -119,7 +119,10 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($address === null) {
 			return null;
 		}
-		return iconv($address->getCharset(), $this->getCharset(), $address->__toString());
+		$row = array();
+		$row["text"]	= iconv($address->getCharset(), $this->getCharset(), $address->__toString());
+		$row["link"]	= $this->getConfig()->getAddressLink($address);
+		return $row;
 	}
 
 	private function formatMessage($message) {

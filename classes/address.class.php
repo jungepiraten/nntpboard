@@ -17,11 +17,17 @@ class Address {
 		return !empty($this->name);
 	}
 
-	public function getName() {
+	public function getName($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getName());
+		}
 		return $this->name;
 	}
 
-	public function getAddress() {
+	public function getAddress($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getAddress());
+		}
 		return $this->addr;
 	}
 
@@ -29,20 +35,15 @@ class Address {
 		return !empty($this->comment);
 	}
 
-	public function getComment() {
+	public function getComment($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getComment());
+		}
 		return $this->comment;
 	}
 
 	public function getCharset() {
 		return $this->charset;
-	}
-
-	public function hasLink() {
-		return false;
-	}
-
-	public function getLink() {
-		return null;
 	}
 
 	public function __toString() {

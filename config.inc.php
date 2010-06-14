@@ -174,6 +174,10 @@ class JuPiConfig extends DefaultConfig {
 
 
 
+	public function getAddressLink($address) {
+		return $this->getWikiLink("Benutzer:" . ucfirst($address->getName()));
+	}
+
 	public function getTemplate($auth) {
 		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
 	}

@@ -10,10 +10,12 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 	const ZEITFRIST = 10800;	// 3 Stunden
 	private $readdate = null;
 	private $readthreads = array();
+	private $readgroups = array();
 
 	public function __construct() {
 		$this->readdate = $this->loadReadDate();
 		$this->readthreads = $this->loadReadThreads();
+		$this->readgroups = $this->loadReadGroups();
 	}
 
 	public function getAddress() {
@@ -26,6 +28,10 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 	}
 
 	protected function loadReadThreads() {
+		return array();
+	}
+
+	protected function loadReadGroups() {
 		return array();
 	}
 
@@ -54,11 +60,22 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		$this->saveReadThread($thread->getThreadID(), $thread->getLastPostDate());
 	}
 
-	public function isUnreadGroup($group) {
-		// "Einfach" alle Threads ueberpruefen ;)
-		//return false;
-		// TODO diese methode ist laaaaangsam *g*
+	public function generateUnreadArray($group) {
+		$unreadthreads = array();
 		foreach ($group->getThreadIDs() as $threadid) {
+			if ($this->isUnreadThread($group->getThread($threadid))) {
+				$unreadthreads[$threadid] = true;
+			}
+		}
+		$this->readgroups[$group->getGroupID()][$group->getGroupHash()] = $unreadthreads;
+	}
+
+	public function isUnreadGroup($group) {
+		if (!isset($this->readgroups[$group->getGroupID()][$group->getGroupHash()])) {
+			$this->generateUnreadArray($group);
+		}
+		// Cache alle Thread-IDs, die in der Vergangenheit ungelesen waren
+		foreach (array_keys($this->readgroups[$group->getGroupID()][$group->getGroupHash()]) as $threadid) {
 			if ($this->isUnreadThread($group->getThread($threadid))) {
 				return true;
 			}

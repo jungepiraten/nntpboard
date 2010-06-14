@@ -14,15 +14,15 @@ Seite {$page+1} von {$pages} &bull;
 
 <table class="mainmessagetable">
 {foreach from=$messages item=message name=counter}
-{if $smarty.foreach.counter.first}<tr class="messageheadfirst">{else}<tr class="messagehead">{/if}
+<tr class="messagehead {if $smarty.foreach.counter.first}first{/if}">
 <td>
  <a name="article{$message.messageid|escape:html}" class="anchor"></a>
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
  <span class="messageinfo">von</span>
- <span class="author">{$message.author|escape:html}</span>
+ <span class="author">{include file=address.html.tpl address=$message.author}</span>
  <span class="messageinfo">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
- {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a>{/if}
+ {if ($mayPost)}<span class="messagebuttondiv"><a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a></span>{/if}
  </td></tr>
  <tr class="message{cycle values="odd,even"}"><td>
  <p class="body">{$message.body}</p>
