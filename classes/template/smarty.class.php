@@ -232,18 +232,20 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 
-	public function viewpostform($board, $reference = null) {
+	public function viewpostform($board, $reference = null, $quote = false) {
 		$subject = "";
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
-			$this->smarty->assign("reference", $reference->getMessageID());
-			$body  = $reference->getAuthor() . " schrieb:" . "\r\n";
-			$lines = explode("\n", $reference->getTextBody());
-			foreach ($lines as $line) {
-				$body .= "> " . rtrim($line) . "\r\n";
-			}
-			$this->smarty->assign("body", $body);
 			$this->smarty->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
+			$this->smarty->assign("reference", $reference->getMessageID());
+			if ($quote == true) {
+				$body  = $reference->getAuthor() . " schrieb:" . "\r\n";
+				$lines = explode("\n", $reference->getTextBody());
+				foreach ($lines as $line) {
+					$body .= "> " . rtrim($line) . "\r\n";
+				}
+				$this->smarty->assign("body", $body);
+			}
 		}
 
 		$this->smarty->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
@@ -266,6 +268,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 	
 	public function viewloginform() {
+		$this->smarty->assign("referer", $_SERVER["HTTP_REFERER"]);
 		$this->smarty->display("loginform.html.tpl");
 		exit;
 	}
@@ -280,7 +283,13 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		// Da sich nach einem erfolgreichen Login das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->smarty->assign("auth", $auth);
 		
-		header("Location: userpanel.php");
+		if (isset($_REQUEST["redirect"])) {
+			header("Location: " . stripslashes($_REQUEST["redirect"]));
+		} elseif (isset($_SERVER["HTTP_REFERER"])) {
+			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
+		} else {
+			header("Location: userpanel.php");
+		}
 		exit;
 	}
 
@@ -288,7 +297,13 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		// Da sich nach einem erfolgreichen Logout das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->smarty->assign("auth", null);
 		
-		header("Location: userpanel.php");
+		if (isset($_REQUEST["redirect"])) {
+			header("Location: " . stripslashes($_REQUEST["redirect"]));
+		} elseif (isset($_SERVER["HTTP_REFERER"])) {
+			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
+		} else {
+			header("Location: userpanel.php");
+		}
 		exit;
 	}
 	

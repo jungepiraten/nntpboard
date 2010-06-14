@@ -9,7 +9,17 @@ $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
-$reference = !empty($_REQUEST["reference"]) ? stripslashes($_REQUEST["reference"]) : null;
+$reference = null;
+if (!empty($_REQUEST["quote"])) {
+	$reference = stripslashes($_REQUEST["quote"]);
+}
+if (!empty($_REQUEST["reply"])) {
+	$reference = stripslashes($_REQUEST["reply"]);
+}
+if (!empty($_REQUEST["reference"])) {
+	$reference = stripslashes($_REQUEST["reference"]);
+}
+$quote = isset($_REQUEST["quote"]);
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
@@ -64,6 +74,6 @@ if (isset($_REQUEST["post"])) {
 	}
 }
 
-$template->viewpostform($board, $reference);
+$template->viewpostform($board, $reference, $quote);
 
 ?>

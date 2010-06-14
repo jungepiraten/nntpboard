@@ -12,5 +12,6 @@
 <div class="buttondiv">
 <a href="index.php" class="start">Start</a> | 
 <a href="userpanel.php" class="userpanel">{if $ISANONYMOUS}Anmelden{else}{$ADDRESS}{/if}</a>
-{if !$ISANONYMOUS} | <a class="logout" href="userpanel.php?logout">Abmelden</a>{/if}
+{if $ISANONYMOUS} | <a class="register" href="http://wiki.junge-piraten.de/w/index.php?title=Spezial:Anmelden&amp;type=signup">Registrieren</a>
+{else} | <a class="logout" href="userpanel.php?logout">Abmelden</a>{/if}
 </div></div><h1 class="mainname">{$board.name|escape:html}</h1>

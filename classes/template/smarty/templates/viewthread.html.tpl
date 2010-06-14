@@ -23,7 +23,7 @@ Seite {$page+1} von {$pages} &bull;
  <span class="author">{$message.author|escape:html}</span>
  <span class="messageinfo">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
- {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;reference={$message.messageid}" class="reply">Antworten</a>{/if}
+ {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a>{/if}
  </td></tr>
  <tr class="message{cycle values="odd,even"}"><td>
  <p class="body">{$message.body}</p>

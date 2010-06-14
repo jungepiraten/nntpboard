@@ -415,7 +415,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	border-style:none solid solid solid;
 	border-width:1px;
 }
-.reply {
+a.reply, a.quote {
 	float:right;
 	padding-right:5px;
 }
@@ -458,7 +458,7 @@ a:focus {color:#FF8800; font-weight:bold;}
 	margin:10px;
 	padding:20px;
 }
-.quote {
+div.quote {
 	border-left:3px solid black;
 	border-right:3px solid black;
 	margin:0px 2px;
