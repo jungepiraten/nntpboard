@@ -119,7 +119,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($address === null) {
 			return null;
 		}
-		return $address->__toString($this->getCharset());
+		return iconv($address->getCharset(), $this->getCharset(), $address->__toString());
 	}
 
 	private function formatMessage($message) {

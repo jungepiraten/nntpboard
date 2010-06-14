@@ -37,6 +37,14 @@ class Address {
 		return $this->charset;
 	}
 
+	public function hasLink() {
+		return false;
+	}
+
+	public function getLink() {
+		return null;
+	}
+
 	public function __toString() {
 		return $this->hasName() ? $this->getName() : ($this->hasComment() ? $this->getComment() : $this->getAddress());
 	}

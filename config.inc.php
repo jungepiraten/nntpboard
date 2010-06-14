@@ -12,7 +12,7 @@ require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
 class PrauscherConfig extends DefaultConfig {
 	public function __construct() {
-		$this->addBoard(new Board(null, null, "NNTPBoard", "Junge Piraten Forum ..."));
+		$this->addBoard(new Board(null, null, "NNTPBoard", ""));
 
 		$nntphost = new Host("news.nerdnacht.de");
 		$nntpprefix = "nerdnacht";

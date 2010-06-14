@@ -18,7 +18,7 @@ Seite {$page+1} von {$pages} &bull;
 {if $smarty.foreach.counter.first}<tr class="messageheadfirst">{else}<tr class="messagehead">{/if}
 <td>
  <a name="article{$message.messageid|escape:html}" class="anchor"></a>
- <span class="subject">{$message.subject|escape:html}</span>
+ <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
  <span class="messageinfo">von</span>
  <span class="author">{$message.author|escape:html}</span>
  <span class="messageinfo">am</span>
