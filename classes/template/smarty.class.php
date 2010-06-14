@@ -149,13 +149,16 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 					$line = ltrim(substr($line,4));
 					$quoted_loc++;
 				}
-				while ($quoted < $quoted_loc) {
-					$text .= "<div class=\"quote\">";
-					$quoted++;
-				}
-				while ($quoted > $quoted_loc) {
-					$text .= "</div>";
-					$quoted--;
+				
+				if (trim($line) != "") {
+					while ($quoted < $quoted_loc) {
+						$text .= "<div class=\"quote\">";
+						$quoted++;
+					}
+					while ($quoted > $quoted_loc) {
+						$text .= "</div>";
+						$quoted--;
+					}
 				}
 				$text .= $line . "\r\n";
 			}
