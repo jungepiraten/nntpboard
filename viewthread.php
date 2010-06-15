@@ -26,7 +26,7 @@ $group = $connection->getGroup();
 $connection->close();
 if ($threadid === null && $messageid !== null) {
 	$message = $group->getMessage($messageid);
-	if ($message === null) {
+	if (!($message instanceof Message)) {
 		// viewexception beendet das Script
 		$connection->close();
 		$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
@@ -36,7 +36,7 @@ if ($threadid === null && $messageid !== null) {
 }
 
 $thread = $group->getThread($threadid);
-if ($thread === null) {
+if (!($thread instanceof Thread)) {
 	$template->viewexception(new Exception("Thread nicht gefunden!"));
 }
 

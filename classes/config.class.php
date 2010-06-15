@@ -8,7 +8,7 @@ abstract class DefaultConfig {
 	public function __construct() {}
 	
 	public function getCharset() {
-		return "UTF8";
+		return "UTF-8";
 	}
 
 	public function getThreadsPerPage() {

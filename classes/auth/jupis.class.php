@@ -124,11 +124,11 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	public function getAddress() {
-		return new Address($this->username, $this->username . "@community.junge-piraten.de");
+		return new Address($this->username, $this->getNNTPUsername() . "@community.junge-piraten.de");
 	}
 
 	public function getNNTPUsername() {
-		return $this->username;
+		return str_replace(" ", "_", $this->username);
 	}
 
 	public function getNNTPPassword() {

@@ -23,6 +23,10 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 
+	private function sendHeaders() {
+		header("Content-Type: text/html; Charset={$this->getCharset()}");
+	}
+
 	private function parseBoard($board, $parseParent = true) {
 		$row = array();
 		$row["boardid"]		= $board->getBoardID();
@@ -137,7 +141,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
 			
 			// Erkenne auch nicht ausgezeichnete Links
-			$text = preg_replace('$([^<])((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>])$', '$1<$2>$4', $text);
+			$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
 			
 			// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
 			$text = iconv("UTF-8", $this->getCharset(),
@@ -189,6 +193,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 
 	public function viewexception($exception) {
 		$this->smarty->assign("message", $exception->getMessage());
+		$this->sendHeaders();
 		$this->smarty->display("exception.html.tpl");
 		exit;
 	}
@@ -208,6 +213,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("board", $this->parseBoard($board));
 		$this->smarty->assign("threads", $threads);
 		$this->smarty->assign("mayPost", $mayPost);
+		$this->sendHeaders();
 		$this->smarty->display("viewboard.html.tpl");
 		exit;
 	}
@@ -227,6 +233,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("thread", $this->parseThread($thread));
 		$this->smarty->assign("messages", $messages);
 		$this->smarty->assign("mayPost", $mayPost);
+		$this->sendHeaders();
 		$this->smarty->display("viewthread.html.tpl");
 		exit;
 	}
@@ -238,6 +245,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		            "&page=" . intval($page) . "#article" . 
 		            urlencode($message->getMessageID());
 		header("Location: " . $location);
+		$this->sendHeaders();
 		echo "<a href=\"".htmlentities($location)."\">Weiter</a>";
 		exit;
 	}
@@ -261,11 +269,13 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
 		
 		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->sendHeaders();
 		$this->smarty->display("postform.html.tpl");
 		exit;
 	}
 
 	public function viewpostsuccess($board, $thread, $message) {
+		$this->sendHeaders();
 		$this->viewmessage($board, $thread, $message, true);
 		exit;
 	}
@@ -273,18 +283,21 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	public function viewpostmoderated($board, $thread, $message) {
 		$this->smarty->assign("board", $this->parseBoard($board));
 		$this->smarty->assign("message", $this->parseMessage($message));
+		$this->sendHeaders();
 		$this->smarty->display("postmoderated.html.tpl");
 		exit;
 	}
 	
 	public function viewloginform() {
 		$this->smarty->assign("referer", $_SERVER["HTTP_REFERER"]);
+		$this->sendHeaders();
 		$this->smarty->display("loginform.html.tpl");
 		exit;
 	}
 
 	public function viewloginfailed() {
 		$this->smarty->assign("loginfailed", true);
+		$this->sendHeaders();
 		$this->smarty->display("loginform.html.tpl");
 		exit;
 	}
@@ -300,6 +313,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		} else {
 			header("Location: userpanel.php");
 		}
+		$this->sendHeaders();
 		exit;
 	}
 
@@ -314,10 +328,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		} else {
 			header("Location: userpanel.php");
 		}
+		$this->sendHeaders();
 		exit;
 	}
 	
 	public function viewuserpanel() {
+		$this->sendHeaders();
 		$this->smarty->display("userpanel.html.tpl");
 		exit;
 	}
