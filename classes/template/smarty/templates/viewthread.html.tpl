@@ -12,9 +12,9 @@ Seite {$page+1} von {$pages} &bull;
 {/section}
 </div>
 
-<table class="mainmessagetable">
 {foreach from=$messages item=message name=counter}
-<tr class="messagehead {if $smarty.foreach.counter.first}first{/if}">
+<table class="mainmessagetable {if $smarty.foreach.counter.first}first{/if} {cycle values="odd,even"}">
+<tr class="messagehead">
 <td>
  <a name="article{$message.messageid|escape:html}" class="anchor"></a>
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
@@ -23,8 +23,9 @@ Seite {$page+1} von {$pages} &bull;
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  {if ($mayPost)}<span class="buttondiv"><a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a></span>{/if}
- </td></tr>
- <tr class="message {cycle values="odd,even"}"><td>
+ </td>
+</tr>
+<tr class="message"><td>
  <p class="body">{$message.body}</p>
  {if $message.attachments}
  <dl class="attachmentbox">
@@ -39,9 +40,9 @@ Seite {$page+1} von {$pages} &bull;
  {/foreach}
 </dl>
 {/if}
-{/foreach}
 </td></tr>
 </table>
+{/foreach}
 
 <div class="page">
 {if $pages > 1}

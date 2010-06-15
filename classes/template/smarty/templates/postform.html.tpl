@@ -10,10 +10,10 @@
 	<tr>
 		<td>  <label for="user">Benutzer:</label></td>
   {if isset($address)}
-   <td><span>{$address|escape:html}</span></td>
+   <td><span>{include file=address.html.tpl address=$address}</span></td>
 	</tr>
   {else}
-   <td><input type="text" name="user" size ="30" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" />
+   <td><input type="text" name="user" size="30" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" />
  		</td><td>
    <label for="user" style="float:right">E-Mail:</label></td>
    <td style="width:180px"><input type="text" name="email" size ="30" style="float:right" value="{if isset($smarty.request.email)}{$smarty.request.email|stripslashes|escape:html}{else}{$email|escape:html}{/if}" />
