@@ -12,6 +12,7 @@ interface Auth {
 	public function markReadThread($thread);
 	public function isUnreadGroup($group);
 	public function markReadGroup($group);
+	public function saveRead();
 }
 
 abstract class AbstractAuth implements Auth {
@@ -20,21 +21,26 @@ abstract class AbstractAuth implements Auth {
 	private $readthreads = array();
 	private $readgroups = array();
 
-	public function __construct() {
-		$this->readdate = $this->loadReadDate();
-		$this->readthreads = $this->loadReadThreads();
-		$this->readgroups = $this->loadReadGroups();
-	}
+	public function __construct() {}
 
 	public function getReadDate() {
+		if ($this->readdate == null) {
+			$this->readdate = $this->loadReadDate();
+		}
 		return $this->readdate;
 	}
 
 	public function getReadThreads() {
+		if ($this->readthreads == null) {
+			$this->readthreads = $this->loadReadThreads();
+		}
 		return $this->readthreads;
 	}
 
 	public function getReadGroups() {
+		if ($this->readgroups == null) {
+			$this->readgroups = $this->loadReadGroups();
+		}
 		return $this->readgroups;
 	}
 
@@ -58,9 +64,21 @@ abstract class AbstractAuth implements Auth {
 
 	public function transferRead($auth) {
 		if ($auth instanceof AbstractAuth) {
-			$this->readdate = $auth->getReadDate();
-			$this->readthreads = $auth->getReadThreads();
-			$this->readgroups = $auth->getReadGroups();
+			$this->readdate = min($this->readdate, $auth->getReadDate());
+			// Fasse $readthreads zusammen
+			foreach ($auth->getReadThreads() as $threadid => $lastpostdate) {
+				if ($lastpostdate > $this->readthreads[$threadid]) {
+					$this->readthreads[$threadid] = $lastpostdate;
+				}
+			}
+			// Merge $readgroups
+			foreach ($auth->getReadGroups() as $groupid => $groupinfo) {
+				foreach ($groupinfo as $grouphash => $threadids) {
+					foreach ($threadids as $threadid => $dummy) {
+						$this->readgroups[$groupid][$grouphash][$threadid] = $dummy;
+					}
+				}
+			}
 		}
 	}
 
@@ -83,8 +101,6 @@ abstract class AbstractAuth implements Auth {
 	public function markReadThread($thread) {
 		// Trage den aktuellen Timestamp ein
 		$this->readthreads[$thread->getThreadID()] = $thread->getLastPostDate();
-		
-		$this->saveReadThreads($this->readthreads);
 	}
 
 	public function generateUnreadArray($group) {
@@ -95,7 +111,6 @@ abstract class AbstractAuth implements Auth {
 			}
 		}
 		$this->readgroups[$group->getGroupID()][$group->getGroupHash()] = $unreadthreads;
-		$this->saveReadGroups($this->readgroups);
 	}
 
 	public function isUnreadGroup($group) {
@@ -108,7 +123,6 @@ abstract class AbstractAuth implements Auth {
 				return true;
 			} else {
 				unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
-				$this->saveReadGroups($this->readgroups);
 			}
 		}
 		return false;
@@ -119,6 +133,16 @@ abstract class AbstractAuth implements Auth {
 			$this->markReadThread($group->getThread($threadid));
 			unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
 		}
+	}
+
+	public function saveRead() {
+		$this->saveReadDate($this->readdate);
+		$this->saveReadThreads($this->readthreads);
+		$this->saveReadGroups($this->readgroups);
+	}
+
+	public function __destruct() {
+		$this->saveRead();
 	}
 
 	public function isAnonymous() {

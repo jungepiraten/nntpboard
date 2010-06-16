@@ -51,9 +51,10 @@ class JuPisAuth extends JuPisAnonAuth {
 	private $data;
 
 	public function __construct($username, $password) {
-		parent::__construct();
 		$this->username = $username;
 		$this->password = $password;
+		$this->loadData();
+		parent::__construct();
 	}
 
 	public function getAddress() {
@@ -123,7 +124,6 @@ class JuPisAuth extends JuPisAnonAuth {
 			$this->loadData();
 		}
 		$this->data["readdate"] = $date;
-		$this->saveData();
 	}
 
 	protected function saveReadThreads($data) {
@@ -131,7 +131,6 @@ class JuPisAuth extends JuPisAnonAuth {
 			$this->loadData();
 		}
 		$this->data["readthreads"] = $data;
-		$this->saveData();
 	}
 
 	protected function saveReadGroups($data) {
@@ -139,6 +138,10 @@ class JuPisAuth extends JuPisAnonAuth {
 			$this->loadData();
 		}
 		$this->data["readgroups"] = $data;
+	}
+
+	public function saveRead() {
+		parent::saveRead();
 		$this->saveData();
 	}
 
