@@ -161,7 +161,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addTalkStruktur($id, $parentid) {
-		$this->addBoard(new Board($id, $parentid, "Unterhaltung", "Allgemeine Unterhaltungen zu Politik & Co."));
+		$this->addBoard(new Board($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co."));
 		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"");
 		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"");
 		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!");

@@ -20,7 +20,7 @@ if (isset($_REQUEST["login"])) {
 }
 
 if (isset($_REQUEST["logout"])) {
-	$session->logout();
+	$session->login($config->getAnonymousAuth());
 	$template->viewlogoutsuccess();
 }
 

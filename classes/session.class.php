@@ -9,16 +9,15 @@ class Session {
 	}
 	
 	public function login($auth) {
+		if (isset($_SESSION["auth"])) {
+			$auth->transferRead($_SESSION["auth"]);
+		}
 		$_SESSION["auth"] = $auth;
-	}
-
-	public function logout() {
-		unset($_SESSION["auth"]);
 	}
 
 	public function getAuth() {
 		if (!isset($_SESSION["auth"])) {
-			$_SESSION["auth"] = $this->config->getAnonymousAuth();
+			$this->login($this->config->getAnonymousAuth());
 		}
 		return $_SESSION["auth"];
 	}

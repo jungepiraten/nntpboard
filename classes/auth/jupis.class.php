@@ -22,6 +22,18 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		return null;
 	}
 
+	public function getReadDate() {
+		return $this->readdate;
+	}
+
+	public function getReadThreads() {
+		return $this->readthreads;
+	}
+
+	public function getReadGroups() {
+		return $this->readgroups;
+	}
+
 	protected function loadReadDate() {
 		// Alle Posts vor dem Login sind schon gelesen ;)
 		return time() - self::ZEITFRIST;
@@ -35,7 +47,21 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		return array();
 	}
 
+	protected function saveReadDate($date) {}
+
 	protected function saveReadThread($threadid, $lastpostdate) {}
+
+	protected function saveReadGroup($groupid, $grouphash, $threadid) {}
+
+	protected function saveUnreadGroup($groupid, $grouphash, $threadid) {}
+
+	public function transferRead($auth) {
+		if ($auth instanceof JuPisAnonAuth) {
+			$this->readdate = $auth->getReadDate();
+			$this->readthreads = $auth->getReadThreads();
+			$this->readgroups = $auth->getReadGroups();
+		}
+	}
 
 	public function isUnreadThread($thread) {
 		// Falls die Nachricht aelter als readdate ist, gilt sie als gelesen
@@ -65,6 +91,7 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		foreach ($group->getThreadIDs() as $threadid) {
 			if ($this->isUnreadThread($group->getThread($threadid))) {
 				$unreadthreads[$threadid] = true;
+				$this->saveUnreadGroup($group->getGroupID(), $group->getGroupHash(), $threadid);
 			}
 		}
 		$this->readgroups[$group->getGroupID()][$group->getGroupHash()] = $unreadthreads;
@@ -80,6 +107,7 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 				return true;
 			} else {
 				unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
+				$this->saveUnreadGroup($group->getGroupID(), $group->getGroupHash(), $threadid);
 			}
 		}
 		return false;
@@ -88,6 +116,7 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 	public function markReadGroup($group) {
 		foreach ($group->getThreadIDs() as $threadid) {
 			$this->markReadThread($group->getThread($threadid));
+			unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
 		}
 	}
 
@@ -139,14 +168,34 @@ class JuPisAuth extends JuPisAnonAuth {
 	/* TODO daten von extern einholen
 
 	protected function loadReadDate() {
-		
+		return time();
 	}
 
 	protected function loadReadThreads() {
+		return array();
+	}
+
+	protected function loadReadGroups() {
+		return array();
+	}
+
+	protected function saveReadDate($date) {
 		
 	}
 
 	protected function saveReadThread($threadid, $lastpostdate) {
+		
+	}
+
+	protected function loadReadGroups() {
+		return array();
+	}
+
+	protected function saveReadGroup($groupid, $grouphash, $threadid) {
+		
+	}
+
+	protected function saveUnreadGroup($groupid, $grouphash, $threadid) {
 		
 	}
 	*/

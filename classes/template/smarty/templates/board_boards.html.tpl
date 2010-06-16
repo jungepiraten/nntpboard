@@ -10,7 +10,7 @@
 <tbody>
 {foreach from=$boards item=board name=counter}
 {if $zeigekategorien || $board.hasthreads}
- <tr class="boardentry {cycle values='even,odd'} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('board{$smarty.foreach.counter.iteration}').href;">
+ <tr class="boardentry board {cycle values='even,odd'} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('board{$smarty.foreach.counter.iteration}').href;">
   <td class="icon"><img src="images/flagge{if $board.unread}_unread{/if}.png" /></td>
   <td class="title">
   <a class="name" id="board{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>

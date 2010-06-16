@@ -36,7 +36,7 @@ Seite {$page+1} von {$pages} &bull;
 </thead>
 <tbody>
 {foreach from=$threads item=thread name=counter}
- <tr class="boardentry {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('thread{$smarty.foreach.counter.iteration}').href;">
+ <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('thread{$smarty.foreach.counter.iteration}').href;">
   <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" /></td>
   <td class="title">
   <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}">{$thread.subject}</a>

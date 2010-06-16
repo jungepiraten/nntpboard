@@ -7,6 +7,7 @@ interface Auth {
 	public function getNNTPUsername();
 	public function getNNTPPassword();
 
+	public function transferRead($auth);
 	public function isUnreadThread($thread);
 	public function markReadThread($thread);
 	public function isUnreadGroup($group);
