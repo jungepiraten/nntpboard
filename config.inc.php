@@ -39,7 +39,7 @@ class PrauscherConfig extends DefaultConfig {
 	}
 
 	public function getAnonymousAuth() {
-		return JuPisAuth::getAnonymousAuth();
+		return new JuPisAnonAuth();
 	}
 
 	public function getMessageIDHost() {
@@ -199,7 +199,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	public function getAnonymousAuth() {
-		return JuPisAuth::getAnonymousAuth();
+		return new JuPisAnonAuth();
 	}
 
 	public function getMessageIDHost() {
