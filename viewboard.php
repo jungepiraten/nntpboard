@@ -12,9 +12,6 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-// TODO dirty hack
-$session->getAuth()->saveRead();
-
 $connection = $board->getConnection($session->getAuth());
 if ($connection !== null) {
 	$connection->open();

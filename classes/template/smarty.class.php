@@ -17,6 +17,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
+		// TODO fest-einprogrammierte Revision ist ungut ^^
+		$this->smarty->assign("VERSION", "r45");
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
 		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress());

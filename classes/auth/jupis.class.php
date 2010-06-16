@@ -51,6 +51,8 @@ class JuPisAuth extends JuPisAnonAuth {
 	private $data;
 
 	public function __construct($username, $password) {
+		/* Nicht andersherum eintragen, da sonst getFilename()
+		 * ohne $this->username aufgerufen wird => ungut */
 		$this->username = $username;
 		$this->password = $password;
 		$this->loadData();
@@ -90,9 +92,6 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 	
 	protected function loadReadDate() {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		if (isset($this->data["readdate"])) {
 			return $this->data["readdate"];
 		}
@@ -100,9 +99,6 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	protected function loadReadThreads() {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		if (isset($this->data["readthreads"])) {
 			return $this->data["readthreads"];
 		}
@@ -110,9 +106,6 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	protected function loadReadGroups() {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		if (isset($this->data["readgroups"])) {
 			return $this->data["readgroups"];
 		}
@@ -120,23 +113,14 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	protected function saveReadDate($date) {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		$this->data["readdate"] = $date;
 	}
 
 	protected function saveReadThreads($data) {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		$this->data["readthreads"] = $data;
 	}
 
 	protected function saveReadGroups($data) {
-		if (!isset($this->data)) {
-			$this->loadData();
-		}
 		$this->data["readgroups"] = $data;
 	}
 

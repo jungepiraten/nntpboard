@@ -32,6 +32,13 @@ a:focus
 .headerdiv a:hover, .footerdiv a:hover {
 	color:gray;
 }
+.headerdiv p, .footerdiv p {
+	margin:0px;
+	padding:0px;
+}
+.version {
+	float:right;
+}
 .buttondiv {
 	float:right;
 	vertical-align:top;
