@@ -12,36 +12,26 @@ Seite {$page+1} von {$pages} &bull;
 {/section}
 </div>
 
+{literal}
+<script type="text/javascript">
+<!--
+
+function toggleSignature(id) {
+	if (document.getElementById("signature" + id).style.display == "none") {
+		document.getElementById("signaturelink" + id).innerHTML = "Signatur verstecken";
+		document.getElementById("signature" + id).style.display = "block";
+	} else {
+		document.getElementById("signaturelink" + id).innerHTML = "Signatur anzeigen";
+		document.getElementById("signature" + id).style.display = "none";
+	}
+}
+
+//-->
+</script>
+{/literal}
+
 {foreach from=$messages item=message name=counter}
-<table class="mainmessagetable {if $smarty.foreach.counter.first}first{/if} {cycle values="odd,even"}">
-<tr class="messagehead">
-<td>
- <a name="article{$message.messageid|escape:html}" class="anchor"></a>
- <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
- <span class="info">von</span>
- <span class="author">{include file=address.html.tpl address=$message.author}</span>
- <span class="info">am</span>
- <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
- {if ($mayPost)}<span class="buttondiv"><a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a></span>{/if}
- </td>
-</tr>
-<tr class="message"><td>
- <p class="body">{$message.body}</p>
- {if $message.attachments}
- <dl class="attachmentbox">
- <dt>Dateianhänge</dt>
- {foreach from=$message.attachments key=partid item=part}
-  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;partid={$partid}{/capture}
-  {if $part.isinline && $part.isimage}
-  <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" /></a>
-  {else}
-  <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
-  {/if}
- {/foreach}
-</dl>
-{/if}
-</td></tr>
-</table>
+{include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
 {/foreach}
 
 <div class="page">

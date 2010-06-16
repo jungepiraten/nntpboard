@@ -55,7 +55,11 @@ abstract class NNTPMimeBody {
 
 		// Text-Teil
 		if ($message->hasTextBody()) {
-			$parts[] = NNTPPlainBody::parse("text/plain", $message->getCharset(), "base64", $message->getTextBody());
+			$text = $message->getTextBody();
+			if ($message->hasSignature()) {
+				$text .= "\r\n-- \r\n" . $message->getSignature();
+			}
+			$parts[] = NNTPPlainBody::parse("text/plain", $message->getCharset(), "base64", $text);
 		}
 		// HTML-Teil
 		if ($message->hasHTMLBody()) {

@@ -39,7 +39,10 @@ abstract class DefaultConfig {
 		return array_keys($this->boards);
 	}
 
-	public function getAddressLink($address) {
+	public function getAddressText($address, $charset) {
+		return iconv($address->getCharset(), $charset, $address->__toString());
+	}
+	public function getAddressLink($address, $charset) {
 		return "mailto:" . $address->getAddress();
 	}
 	

@@ -9,6 +9,7 @@
 </thead>
 <tbody>
 {foreach from=$boards item=board name=counter}
+{if $zeigekategorien || $board.hasthreads}
  <tr class="boardentry {cycle values='even,odd'} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('board{$smarty.foreach.counter.iteration}').href;">
   <td class="icon"><img src="images/flagge{if $board.unread}_unread{/if}.png" /></td>
   <td class="title">
@@ -38,9 +39,8 @@
   <span> - </span>
   {/if}
   </td>
-  {if false && !empty($board.childs)}{include file=board_boards.html.tpl subboards=$board.childs}{/if}
-
   </tr>
+{/if}
 {/foreach}
 </tbody>
 </table>

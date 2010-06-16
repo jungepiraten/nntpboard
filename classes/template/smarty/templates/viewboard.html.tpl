@@ -7,7 +7,7 @@
 {include file=board_boards.html.tpl name="Foren" boards=$board.childs}
 {foreach from=$board.childs item=child}
 {if isset($child.childs)}
-{include file=board_boards.html.tpl boardid=$child.boardid name=$child.name boards=$child.childs}
+{include file=board_boards.html.tpl boardid=$child.boardid name=$child.name boards=$child.childs zeigekategorien=true}
 {/if}
 {/foreach}
 {/if}

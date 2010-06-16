@@ -41,6 +41,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$c->open();
 			$group = $c->getGroup();
 			$c->close();
+			$row["hasthreads"]		= true;
 			$row["unread"]			= $this->getAuth()->isUnreadGroup($group);
 			$row["threadcount"]		= $group->getThreadCount();
 			$row["messagecount"]		= $group->getMessageCount();
@@ -97,6 +98,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	private function parseMessage($message) {
+		if ($message == null) {
+			return null;
+		}
 		$row = array();
 		$row["messageid"]	= $message->getMessageID();
 		$row["subject"]		= $message->getSubject($this->getCharset());
@@ -106,6 +110,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["attachments"]	= array();
 		foreach ($message->getAttachments() AS $partid => $attachment) {
 			$row["attachments"][$partid] = $this->parseAttachment($attachment);
+		}
+		if ($message->hasSignature()) {
+			$row["signature"] = $message->getSignature();
 		}
 		return $row;
 	}
@@ -124,8 +131,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			return null;
 		}
 		$row = array();
-		$row["text"]	= iconv($address->getCharset(), $this->getCharset(), $address->__toString());
-		$row["link"]	= $this->getConfig()->getAddressLink($address);
+		$row["text"]	= $this->getConfig()->getAddressText($address, $this->getCharset());
+		$row["link"]	= $this->getConfig()->getAddressLink($address, $this->getCharset());
 		return $row;
 	}
 
@@ -250,7 +257,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 
-	public function viewpostform($board, $reference = null, $quote = false) {
+	public function viewpostform($board, $reference = null, $quote = false, $preview = null) {
 		$subject = "";
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
@@ -269,6 +276,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
 		
 		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("preview", $this->parseMessage($preview));
 		$this->sendHeaders();
 		$this->smarty->display("postform.html.tpl");
 		exit;

@@ -38,9 +38,7 @@ if ($reference !== null) {
 	$connection->close();
 }
 
-if (isset($_REQUEST["post"])) {
-	// TODO Sperre gegen F5
-
+function generateMessage($config, $session, $reference) {
 	$messageid = "<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">";
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->isAnonymous()
@@ -56,8 +54,18 @@ if (isset($_REQUEST["post"])) {
 
 	$textbody = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
 
-	$message = new Message($messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
-	
+	return new Message($messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
+}
+
+$preview = null;
+if (isset($_REQUEST["preview"])) {
+	$preview = generateMessage($config, $session, $reference);
+}
+
+if (isset($_REQUEST["post"])) {
+	// TODO Sperre gegen F5
+	$message = generateMessage($config, $session, $reference);
+
 	try {
 		$connection->open();
 		$connection->post($message);
@@ -74,6 +82,6 @@ if (isset($_REQUEST["post"])) {
 	}
 }
 
-$template->viewpostform($board, $reference, $quote);
+$template->viewpostform($board, $reference, $quote, $preview);
 
 ?>

@@ -2,6 +2,28 @@
 
 {include file=board_breadcrumb.html.tpl board=$board}
 
+{literal}
+<script type="text/javascript">
+<!--
+
+function toggleSignature(id) {
+	if (document.getElementById("signature" + id).style.display == "none") {
+		document.getElementById("signaturelink" + id).innerHTML = "Signatur verstecken";
+		document.getElementById("signature" + id).style.display = "block";
+	} else {
+		document.getElementById("signaturelink" + id).innerHTML = "Signatur anzeigen";
+		document.getElementById("signature" + id).style.display = "none";
+	}
+}
+
+//-->
+</script>
+{/literal}
+
+{if isset($preview)}
+{include file=message.html.tpl message=$preview first=1 id="post"}
+{/if}
+
 <form action="post.php" method="post" accept-charset="{$CHARSET}" class="post">
   <input type="hidden" name="charset" value="{$CHARSET}" />
   <input type="hidden" name="boardid" value="{$board.boardid|escape:html}" />
@@ -26,7 +48,7 @@
   <tr><td style="vertical-align:top;"><label for="body" >Text:</label></td>
   <td colspan=3><textarea name="body" cols="80" rows="20">{if isset($smarty.request.body)}{$smarty.request.body|stripslashes|escape:html}{else}{$body|escape:html}{/if}</textarea>
   </td></tr>
-  <tr><td></td><td><input type="submit" name="post" value="Schreiben" /></td></tr>
+  <tr><td></td><td><input type="submit" name="post" value="Schreiben" /><input type="submit" name="preview" value="Vorschau" /></td></tr>
 </table>
 </form>
 

@@ -11,12 +11,13 @@ class Message {
 	private $date;
 	private $author;
 	private $textbody;
+	private $signature;
 	private $htmlbody;
 	
 	private $attachments = array();
 	private $childs = array();
 	
-	public function __construct($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $htmlbody = null) {
+	public function __construct($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $signature = null, $htmlbody = null) {
 		$this->messageid = $messageid;
 		$this->date = $date;
 		$this->author = $author;
@@ -24,6 +25,7 @@ class Message {
 		$this->charset = $charset;
 		$this->parentid = $parentid;
 		$this->textbody = $textbody;
+		$this->signature = $signature;
 		$this->htmlbody = $htmlbody;
 	}
 	
@@ -35,12 +37,14 @@ class Message {
 		return $this->parentid !== null;
 	}
 
-	public function setParentID($parentid) {
-		$this->parentid = $parentid;
+	public function setParent($parent) {
+		if ($parent !== null) {
+			$this->setParentID($parent->getMessageID());
+		}
 	}
 
-	public function setParent($parent) {
-		$this->setParentID($parent->getMessageID());
+	public function setParentID($parentid) {
+		$this->parentid = $parentid;
 	}
 
 	public function getParentID() {
@@ -74,6 +78,17 @@ class Message {
 			return iconv($this->getCharset(), $charset, $this->getTextBody());
 		}
 		return $this->textbody;
+	}
+
+	public function hasSignature() {
+		return isset($this->signature) && trim($this->signature) != "";
+	}
+
+	public function getSignature($charset = null) {
+		if ($charset !== null) {
+			return iconv($this->getCharset(), $charset, $this->getSignature());
+		}
+		return $this->signature;
 	}
 
 	public function hasHTMLBody() {

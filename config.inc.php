@@ -80,7 +80,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function getNNTPGroup($name) {
-		return "pirates.youth.de.test.epsilon.{$name}";
+		return "pirates.youth.de.{$name}";
 	}
 
 	private function addAGStruktur($id, $parentid) {
@@ -173,9 +173,21 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 
-
-	public function getAddressLink($address) {
-		return $this->getWikiLink("Benutzer:" . ucfirst($address->getName()));
+	public function getAddressText($addres, $charset) {
+		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
+		list($name, $host) = explode("@", $mailto);
+		if ($host == "community.junge-piraten.de") {
+			return ucfirst($name);
+		}
+		return parent::getAddressText($addres, $charset);
+	}
+	public function getAddressLink($addres, $charset) {
+		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
+		list($name, $host) = explode("@", $mailto);
+		if ($host == "community.junge-piraten.de") {
+			return $this->getWikiLink("Benutzer:" . ucfirst($name));
+		}
+		return parent::getAddressLink($addres, $charset);
 	}
 
 	public function getTemplate($auth) {

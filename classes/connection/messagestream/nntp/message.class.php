@@ -66,10 +66,14 @@ class NNTPMessage {
 		$messageid =	$this->getHeader()->get("Message-ID")->getValue($charset);
 		$subject =	$this->getHeader()->get("Subject")->getValue($charset);
 		$date =		strtotime($this->getHeader()->get("Date")->getValue($charset));
-		// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
-		$author =	NNTPAddress::parsePlain(
-					array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
-					)->getObject();
+		if ($this->getHeader()->has("Sender")) {
+			$author =	NNTPAddress::parsePlain($this->getHeader()->get("Sender")->getValue($charset))->getObject();
+		} else {
+			// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
+			$author =	NNTPAddress::parsePlain(
+						array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
+						)->getObject();
+		}
 
 		// References (per Default als neuer Thread)
 		$parentid = null;
@@ -79,10 +83,15 @@ class NNTPMessage {
 		}
 
 		// Nachrichteninhalt
-		$textbody = $this->body->getBodyPart("text/plain", $charset);
+		$textbodys = explode("\n--", $this->body->getBodyPart("text/plain", $charset), 2);
+		$signature = null;
+		if (count($textbodys) >= 2) {
+			$signature = array_pop($textbodys);
+		}
+		$textbody = implode("\n--", $textbodys);
 		$htmlbody = $this->body->getBodyPart("text/html", $charset);
 		
-		$message = new Message($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $htmlbody);
+		$message = new Message($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $signature, $htmlbody);
 		
 		/* Strukturanalyse des Bodys */
 		foreach ($this->body->getAttachmentParts() AS $attachment) {
