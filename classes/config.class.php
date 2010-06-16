@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)."/exceptions/board.exception.php");
+require_once(dirname(__FILE__)."/../libs/xtea.class.php");
 
 abstract class DefaultConfig {
 	private $boards;
@@ -52,6 +53,17 @@ abstract class DefaultConfig {
 	abstract public function getTemplate($auth);
 
 	abstract public function getMessageIDHost();
+
+	abstract protected function getSecretKey();
+	private function getXTEA() {
+		return new XTEA($this->getSecretKey());
+	}
+	public function encryptString($string) {
+		return $this->getXTEA()->encrypt($string);
+	}
+	public function decryptString($string) {
+		return $this->getXTEA()->decrypt($string);
+	}
 }
 
 ?>

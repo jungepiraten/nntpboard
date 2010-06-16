@@ -10,43 +10,6 @@ require_once(dirname(__FILE__)."/classes/board/sqlcachednntp.class.php");
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
-class PrauscherConfig extends DefaultConfig {
-	public function __construct() {
-		$this->addBoard(new Board(null, null, "NNTPBoard", ""));
-
-		$nntphost = new Host("news.nerdnacht.de");
-		$nntpprefix = "nerdnacht";
-
-		$this->addBoard(new Board(100, null, "Nerdnacht", ""));
-		$this->addBoard(new FileCachedNNTPBoard(110, 100, "Deutsch", "Zum testen halt ;)", false, true, false, $nntphost, $nntpprefix.".de"));
-		$this->addBoard(new FileCachedNNTPBoard(120, 100, "Testboard", "Anderes Board", false, true, false, $nntphost, $nntpprefix.".test"));
-
-		$this->addBoard(new Board(200, null, "Prauscher", ""));
-		$this->addBoard(new FileCachedNNTPBoard(210, 200, "Testbasis", "Prauschers Testbasis. MODERIERT!", false, true, true, $nntphost, "prauscher.test"));
-
-		$this->addBoard(new MemCachedNNTPBoard(300, null, "de.comp.misc", "VIEL INHALT!", false, true, false, new Host("news.arcor-ip.de"), "de.comp.misc"));
-
-		//$this->addBoard(new MemCachedNNTPBoard(400, null, "de.comp.os.unix.linux.misc", "VIEL INHALT!", false, true, false, new Host("news.arcor-ip.de"), "de.comp.os.unix.linux.misc"));
-		$this->addBoard(new MemCachedNNTPBoard(500, null, "Allgemeines", "VIEL INHALT!", false, true, false, new Host("news.junge-piraten.de"), "pirates.youth.de.test.misc3"));
-	}
-
-	public function getTemplate($auth) {
-		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
-	}
-
-	public function getAuth($user, $pass) {
-		return JuPisAuth::authenticate($user, $pass);
-	}
-
-	public function getAnonymousAuth() {
-		return new JuPisAnonAuth();
-	}
-
-	public function getMessageIDHost() {
-		return "testwebserver.prauscher.homelinux.net";
-	}
-}
-
 class JuPiConfig extends DefaultConfig {
 	public function __construct() {
 		parent::__construct();
@@ -204,6 +167,10 @@ class JuPiConfig extends DefaultConfig {
 
 	public function getMessageIDHost() {
 		return "webnntp.junge-piraten.de";
+	}
+
+	protected function getSecretKey() {
+		return "f1YkN08noJCvnQS9QUnz6dQhOjmjlX7k1pLKDOpbJW6ZLvHm";
 	}
 }
 

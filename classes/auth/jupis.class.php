@@ -11,6 +11,14 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		parent::__construct();
 	}
 
+	public function getUsername() {
+		return null;
+	}
+
+	public function getPassword() {
+		return null;
+	}
+
 	public function getAddress() {
 		return null;
 	}
@@ -57,6 +65,14 @@ class JuPisAuth extends JuPisAnonAuth {
 		$this->password = $password;
 		$this->loadData();
 		parent::__construct();
+	}
+
+	public function getUsername() {
+		return $this->username;
+	}
+
+	public function getPassword() {
+		return $this->password;
 	}
 
 	public function getAddress() {

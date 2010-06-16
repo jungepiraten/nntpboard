@@ -11,6 +11,7 @@
   <input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|stripslashes|escape:html}{/if}" />
   <label for="password" class="password">Passwort:</label>
   <input type="password" class="password" name="password" />
+  <input type="checkbox" class="permanent" name="permanent" /> Dauerhaft anmelden?
 
   <input type="submit" class="submit" name="login" value="Login" />
  </fieldset>

@@ -2,6 +2,8 @@
 
 interface Auth {
 	public function isAnonymous();
+	public function getUsername();
+	public function getPassword();
 
 	public function getAddress();
 	public function getNNTPUsername();
