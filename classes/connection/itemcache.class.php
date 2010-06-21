@@ -28,6 +28,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	public function open() {
 		$this->grouphash = $this->loadGroupHash();
 		$this->lastthread = $this->loadLastThread();
+		// Fallback, falls wir ungueltige Daten bekommen
 		if (!($this->lastthread instanceof Thread)) {
 			$this->lastthread = null;
 		}

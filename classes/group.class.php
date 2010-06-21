@@ -91,10 +91,14 @@ abstract class AbstractGroup implements Group {
 		}
 		$thread->addMessage($message);
 		$this->addThread($thread);
-
-		return $thread;
 	}
-	abstract protected function addThread($thread);
+	public function addThread($thread) {
+		foreach ($thread->getMessageIDs() as $messageid) {
+			if (!$this->hasMessage($messageid)) {
+				$thread->removeMessage($messageid);
+			}
+		}
+	}
 
 	public function removeMessage($messageid) {
 		$message = $this->getMessage($messageid);
@@ -112,15 +116,20 @@ abstract class AbstractGroup implements Group {
 		}
 		
 		// Threading
-		if ($this->hasThread($message->getMessageID())) {
-			$thread = $this->getThread($message->getMessageID());
-			$thread->removeMessage($message);
+		if ($this->hasThread($messageid)) {
+			$thread = $this->getThread($messageid);
+			$thread->removeMessage($messageid);
 			if ($thread->isEmpty()) {
 				$this->removeThread($thread->getThreadID());
 			}
 		}
 	}
-	abstract protected function removeThread($threadid);
+	public function removeThread($threadid) {
+		$thread = $this->getThread($threadid);
+		foreach ($thread->getMessageIDs() as $messageid) {
+			$this->removeMessage($messageid);
+		}
+	}
 }
 
 ?>

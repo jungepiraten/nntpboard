@@ -58,26 +58,31 @@ class StaticGroup extends AbstractGroup {
 		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
 	}
 
-	/** Hinzufuegen **/
+	/** Nachrichten **/
 	public function addMessage($message) {
-		$thread = parent::addMessage($message);
-		
+		parent::addMessage($message);
 		$this->messages[$message->getMessageID()] = $message;
-		$this->messagethreads[$message->getMessageID()] = $thread->getThreadID();
 	}
-	protected function addThread($thread) {
-		$this->threads[$thread->getThreadID()] = $thread;
-		$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
-		asort($this->threadslastpost);
-	}
-
-	/** Entfernen **/
 	public function removeMessage($messageid) {
 		parent::removeMessage($messageid);
 		unset($this->messages[$messageid]);
-		unset($this->messagethreads[$messageid]);
+		unset($this->messagethreads[$messageid]); 
 	}
-	protected function removeThread($threadid) {
+
+	/** Threads **/
+	public function addThread($thread) {
+		$this->threads[$thread->getThreadID()] = $thread;
+		$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
+		asort($this->threadslastpost);
+		foreach ($thread->getMessageIDs() as $messageid) {
+			$this->messagethreads[$messageid] = $thread->getThreadID();
+		}
+	}
+	public function removeThread($threadid) {
+		foreach ($this->getThread($threadid)->getMessageIDs() as $messageid) {
+			unset($this->messagethreads[$messageid]);
+		}
+		parent::removeThread($threadid);
 		unset($this->threads[$threadid]);
 		unset($this->threadslastpost[$threadid]);
 	}

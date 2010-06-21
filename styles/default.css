@@ -101,7 +101,6 @@ tr.boardentry:hover td {
 .boardentry td.icon.unread {
 }
 .boardentry td.title {
-	border-width:1px;
 	width:50%;
 }
 .boardentry td.threadcount, .boardentry td.postcount {

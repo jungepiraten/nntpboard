@@ -50,8 +50,8 @@ class Thread {
 		uasort($this->messages, "cmpMessageArray");
 	}
 
-	public function removeMessage($message) {
-		unset($this->messages[$message->getMessageID()]);
+	public function removeMessage($messageid) {
+		unset($this->messages[$messageid]);
 	}
 	
 	public function getThreadID() {
@@ -78,7 +78,7 @@ class Thread {
 	}
 
 	public function isEmpty() {
-		return empty($this->messages);
+		return $this->getPosts() <= 0;
 	}
 	
 	public function getLastPostMessageID() {
