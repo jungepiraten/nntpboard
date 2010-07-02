@@ -18,16 +18,23 @@ class NNTPPlainBody {
 	}
 
 	public static function parseObject($attachment) {
-		// TODO nicht immer ist base64 das beste ;)
 		$header = new NNTPHeader;
 		$header->set(	new NNTPSingleHeader("Content-Type",			$attachment->getMimeType()));
-		$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"base64"));
 		$header_disposition = new NNTPSingleHeader("Content-Disposition",	$attachment->getDisposition());
 		if ($attachment->hasFilename()) {
 			$header_disposition->addExtra("filename", $attachment->getFilename());
 		}
 		$header->set($header_disposition);
-		return new NNTPPlainBody($header, base64_encode($attachment->getContent()));
+		
+		if ($attachment->isBinary()) {
+			$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"base64"));
+			$content = base64_encode($attachment->getContent());
+		} else {
+			$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"quoted-printable"));
+			$content = quoted_printable_encode($attachment->getContent());
+		}
+		
+		return new NNTPPlainBody($header, $content);
 	}
 
 	public static function parse($mimetype, $charset, $encoding, $body) {
@@ -66,7 +73,8 @@ class NNTPPlainBody {
 	}
 
 	private function getCharset() {
-		if ($this->getHeader()->has("Content-Type") && $this->getHeader()->get("Content-Type")->hasExtra("charset")) {
+		if ($this->getHeader()->has("Content-Type")
+		 && $this->getHeader()->get("Content-Type")->hasExtra("charset")) {
 			return $this->getHeader()->get("Content-Type")->getExtra("charset");
 		}
 		return "UTF-8";
@@ -87,7 +95,7 @@ class NNTPPlainBody {
 		return "7bit";
 	}
 
-	private function getDisposition() {
+	public function getDisposition() {
 		if ($this->getHeader()->has("Content-Disposition")) {
 			return $this->getHeader()->get("Content-Disposition")->getValue();
 		}

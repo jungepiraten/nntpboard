@@ -3,6 +3,8 @@
 require_once(dirname(__FILE__) . "/header.class.php");
 require_once(dirname(__FILE__) . "/address.class.php");
 require_once(dirname(__FILE__) . "/mimebody.class.php");
+require_once(dirname(__FILE__) . "/../../../message.class.php");
+require_once(dirname(__FILE__) . "/../../../acknowledge.class.php");
 
 class NNTPMessage {
 	public static function parsePlain($plain) {
@@ -35,6 +37,38 @@ class NNTPMessage {
 		return new NNTPMessage($header, NNTPMimeBody::parseObject($message));
 	}
 
+	public static function parseAcknowledgeObject($group, $ack, $message) {
+		$charset = $message->getCharset();
+
+		$header = new NNTPHeader;
+		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	NNTPSingleHeader::generate("References",	$message->getReference(), $charset));
+		$header->set(	NNTPSingleHeader::generate("From",
+				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) . "] " . $message->getSubject(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Date",
+				date("r", $ack->getDate()), $charset));
+
+		return new NNTPMessage($header, NNTPMimeBody::parseAcknowledgeObject($ack, $message));
+	}
+
+	public static function parseCancelObject($group, $cancel, $message) {
+		$charset = $message->getCharset();
+
+		$header = new NNTPHeader;
+		$header->set(	NNTPSingleHeader::generate("Message-ID",	$cancel->getMessageID(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	NNTPSingleHeader::generate("From",
+				NNTPAddress::parseObject($cancel->getAuthor())->getPlain(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Control",		"cancel " . $cancel->getReference(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Date",
+				date("r", $cancel->getDate()), $charset));
+
+		return new NNTPMessage($header, NNTPMimeBody::parseCancelObject($cancel, $message));
+	}
+
 	private $header;
 	private $body;
 
@@ -51,6 +85,10 @@ class NNTPMessage {
 		return $this->header;
 	}
 
+	public function isAcknowledge() {
+		return preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"));
+	}
+
 	public function getPlain() {
 		// Nur einen Zeilenumbruch, damit der Body auch noch Content-Header hinzufuegen kann
 		$text  = rtrim($this->header->getPlain()) . "\r\n";
@@ -58,7 +96,7 @@ class NNTPMessage {
 		return $text;
 	}
 
-	public function getObject() {
+	public function getObject($connection) {
 		// Diktatorisch beschlossen :P
 		$charset = "UTF-8";
 		
@@ -80,6 +118,18 @@ class NNTPMessage {
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
 			$references = explode(" ", $this->getHeader()->get("References")->getValue($charset));
 			$parentid = array_pop($references);
+		}
+
+		if ($this->isAcknowledge()) {
+			try {
+				$message = $connection->getMessage($parentid);
+				while ($message instanceof Acknowledge) {
+					$parentid = $message->getReference();
+					$message = $connection->getMessage($parentid);
+				}
+				preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"), $match);
+				return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
+			} catch (NotFoundMessageException $e) {}
 		}
 
 		// Nachrichteninhalt

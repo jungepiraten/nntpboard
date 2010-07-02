@@ -11,6 +11,12 @@ interface Template {
 	public function viewpostsuccess($board, $thread, $message);
 	public function viewpostmoderated($board, $thread, $message);
 
+	public function viewacknowledgesuccess($board, $thread, $message, $acknowledge);
+	public function viewacknowledgemoderated($board, $thread, $message, $acknowledge);
+
+	public function viewcancelsuccess($board, $thread, $message, $cancel);
+	public function viewcancelmoderated($board, $thread, $message, $cancel);
+
 	public function viewloginform();
 	public function viewloginfailed();
 	public function viewloginsuccess($auth);

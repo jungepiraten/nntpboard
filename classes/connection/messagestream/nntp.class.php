@@ -46,6 +46,8 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
+		// Zwar unschoen, aber die PEAR-DB laesst keine andere Moeglichkeit
+		$this->nntpclient->cmdModeReader();
 		
 		// ggf. Authentifieren
 		if (isset($this->username)) {
@@ -107,7 +109,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 				throw new NotFoundMessageException($artnr, $this->group);
 			}
 			$message = NNTPMessage::parsePlain(implode("\r\n", $article));
-			$message = $message->getObject();
+			$message = $message->getObject($this);
 			
 			// Schreibe die Nachricht in den Kurzzeit-Cache
 			$this->messages[$msgid] = $message;
@@ -121,8 +123,16 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	/**
 	 * Schreibe eine Nachricht
 	 **/
-	public function post($message) {
-		$nntpmsg = NNTPMessage::parseObject($this->group, $message);
+	public function postMessage($message) {
+		return $this->post(NNTPMessage::parseObject($this->group, $message));
+	}
+	public function postAcknowledge($ack, $message) {
+		return $this->post(NNTPMessage::parseAcknowledgeObject($this->group, $ack, $message));
+	}
+	public function postCancel($cancel, $message) {
+		return $this->post(NNTPMessage::parseCancelObject($this->group, $cancel, $message));
+	}
+	private function post($nntpmsg) {
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {

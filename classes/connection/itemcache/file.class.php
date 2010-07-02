@@ -26,6 +26,9 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 	private function getMessageFilename($messageid) {
 		return $this->dir . "/messages/".md5($messageid).".dat";
 	}
+	private function getAcknowledgesFilename($messageid) {
+		return $this->dir . "/messages/".md5($messageid)."_ack.dat";
+	}
 	private function getThreadFilename($threadid) {
 		return $this->dir . "/threads/".md5($threadid).".dat";
 	}
@@ -60,6 +63,19 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 			}
 			file_put_contents($filename, serialize($this->index));
 		}
+	}
+
+	public function loadMessageIDs() {
+		$this->loadIndex();
+		if (isset($this->index['messageids'])) {
+			return $this->index['messageids'];
+		}
+		return array();
+	}
+	protected function saveMessageIDs($messageids) {
+		$this->loadIndex();
+		$this->index['messageids'] = $messageids;
+		$this->saveIndex();
 	}
 
 	public function loadMessageThreads() {
@@ -103,6 +119,29 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		file_put_contents($filename, serialize($message));
 	}
+	public function removeMessage($messageid) {
+		$filename = $this->getMessageFilename($messageid);
+		if (!file_exists($filename)) {
+			return;
+		}
+		unlink($filename);
+	}
+
+	public function loadAcknowledges($messageid) {
+		$filename = $this->getAcknowledgesFilename($messageid);
+		if (!file_exists($filename)) {
+			return;
+		}
+		return unserialize(file_get_contents($filename));
+	}
+	protected function saveAcknowledges($messageid, $acks) {
+		$filename = $this->getAcknowledgesFilename($messageid);
+		mkdir_parents(dirname($filename));
+		if (file_exists($filename) && !is_writable($filename)) {
+			return false;
+		}
+		file_put_contents($filename, serialize($acks));
+	}
 
 	public function loadThread($threadid) {
 		$filename = $this->getThreadFilename($threadid);
@@ -118,6 +157,13 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 			return false;
 		}
 		file_put_contents($filename, serialize($thread));
+	}
+	public function removeThread($threadid) {
+		$filename = $this->getMessageFilename($threadid);
+		if (!file_exists($filename)) {
+			return;
+		}
+		unlink($filename);
 	}
 
 	protected function loadGroupHash() {

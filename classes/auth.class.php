@@ -68,7 +68,7 @@ abstract class AbstractAuth implements Auth {
 	}
 
 	public function isUnreadThread($thread) {
-		// Falls die Nachricht aelter als readdate ist, gilt sie als gelesen
+		// Ganz alte Posts
 		if ($thread->getLastPostDate() < $this->getReadDate()) {
 			return false;
 		}

@@ -10,9 +10,11 @@
 <div class="headerdiv">
 <div class="buttondiv">
 <a href="index.php" class="start">Start</a> | 
-<a href="userpanel.php" class="userpanel">{if $ISANONYMOUS}Anmelden{else}{$ADDRESS}{/if}</a>
-{if $ISANONYMOUS} | <a class="register" href="http://wiki.junge-piraten.de/w/index.php?title=Spezial:Anmelden&amp;type=signup">Registrieren</a>
-{else} | <a class="logout" href="userpanel.php?logout">Abmelden</a>{/if}
+{if $ISANONYMOUS}
+ <a href="login.php" class="login">Anmelden</a> | <a class="register" href="http://wiki.junge-piraten.de/w/index.php?title=Spezial:Anmelden&amp;type=signup">Registrieren</a>
+{else}
+ <a href="http://wiki.junge-piraten.de/wiki/Spezial:Einstellungen" class="editprofile">{$ADDRESS}</a> | <a class="logout" href="logout.php">Abmelden</a>
+{/if}
 </div>
 <a href="index.php"><img src="images/logo.png" class="logo" /></a>
 </div>

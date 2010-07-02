@@ -7,18 +7,10 @@ abstract class DefaultConfig {
 	private $boards;
 	
 	public function __construct() {}
-	
-	public function getCharset() {
-		return "UTF-8";
-	}
 
-	public function getThreadsPerPage() {
-		return 20;
-	}
-	public function getMessagesPerPage() {
-		return 15;
-	}
-
+	/**
+	 * Board-Verwaltung
+	 **/
 	protected function addBoard($board) {
 		if ($this->hasBoard($board->getParentID())) {
 			$parent = $this->getBoard($board->getParentID());
@@ -39,7 +31,24 @@ abstract class DefaultConfig {
 	public function getBoardIDs() {
 		return array_keys($this->boards);
 	}
+	
+	/**
+	 * Optionen
+	 **/
+	public function getCharset() {
+		return "UTF-8";
+	}
 
+	public function getThreadsPerPage() {
+		return 20;
+	}
+	public function getMessagesPerPage() {
+		return 15;
+	}
+
+	/**
+	 * Erweiterte Optionen
+	 **/
 	public function getAddressText($address, $charset) {
 		return iconv($address->getCharset(), $charset, $address->__toString());
 	}
@@ -50,10 +59,20 @@ abstract class DefaultConfig {
 	abstract public function getAuth($user, $pass);
 	abstract public function getAnonymousAuth();
 
+	/**
+	 * Branding / Style
+	 **/
+	public function getVersion() {
+		// TODO es ist nicht umbedingt schoen, die Versionsnummer hier festzulegen ;)
+		return "1.0RC1";
+		return date("Y-m-d H:i:s", filemtime(dirname(__FILE__) . "/../"));
+	}
+	abstract public function getMessageIDHost();
 	abstract public function getTemplate($auth);
 
-	abstract public function getMessageIDHost();
-
+	/**
+	 * Funktionen zur Verschluesselung der Cookies
+	 **/
 	abstract protected function getSecretKey();
 	private function getXTEA() {
 		return new XTEA($this->getSecretKey());

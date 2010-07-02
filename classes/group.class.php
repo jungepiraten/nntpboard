@@ -20,6 +20,9 @@ interface Group {
 	public function getLastPostDate();
 	public function getLastPostAuthor();
 
+	public function getAcknowledgeMessageIDs($messageid);
+	public function getAcknowledge($messageid);
+
 	public function addMessage($message);
 	public function removeMessage($message);
 }
@@ -44,6 +47,10 @@ abstract class AbstractGroup implements Group {
 	
 	public function getThreadCount() {
 		return count($this->getThreadIDs());
+	}
+
+	public function getAcknowledge($messageid) {
+		return $this->getMessage($messageid);
 	}
 
 	/** Last Thread **/
@@ -78,19 +85,24 @@ abstract class AbstractGroup implements Group {
 
 	/** Nachrichten hinzufuegen / verlinken **/
 	public function addMessage($message) {
-		// Unterpost verlinken
-		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$this->getMessage($message->getParentID())->addChild($message);
-		}
+		if ($message instanceof Message) {
+			// Unterpost verlinken
+			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+				$this->getMessage($message->getParentID())->addChild($message);
+			}
 		
-		// Zum Thread hinzufuegen
-		if ($message->hasParent() && $this->hasThread($message->getParentID())) {
-			$thread = $this->getThread($message->getParentID());
-		} else {
-			$thread = Thread::getByMessage($message);
+			// Zum Thread hinzufuegen
+			if ($message->hasParent() && $this->hasThread($message->getParentID())) {
+				$thread = $this->getThread($message->getParentID());
+			} else {
+				$thread = Thread::getByMessage($message);
+			}
+			$thread->addMessage($message);
+			$this->addThread($thread);
 		}
-		$thread->addMessage($message);
-		$this->addThread($thread);
+		if ($message instanceof Acknowledge) {
+			$this->addAcknowledge($message);
+		}
 	}
 	public function addThread($thread) {
 		foreach ($thread->getMessageIDs() as $messageid) {
@@ -99,29 +111,34 @@ abstract class AbstractGroup implements Group {
 			}
 		}
 	}
+	abstract protected function addAcknowledge($ack);
 
 	public function removeMessage($messageid) {
 		$message = $this->getMessage($messageid);
-
-		// Unterposts hochschieben
-		$parent = null;
-		if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-			$parent = $this->getMessage($message->getParentID());
-			$parent->removeChild($message);
-		}
-		foreach ($message->getChilds() as $childid) {
-			if ($this->hasMessage($childid)) {
-				$this->getMessage($childid)->setParent($parent);
+		if ($message instanceof Message) {
+			// Unterposts hochschieben
+			$parent = null;
+			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
+				$parent = $this->getMessage($message->getParentID());
+				$parent->removeChild($message);
 			}
-		}
+			foreach ($message->getChilds() as $childid) {
+				if ($this->hasMessage($childid)) {
+					$this->getMessage($childid)->setParent($parent);
+				}
+			}
 		
-		// Threading
-		if ($this->hasThread($messageid)) {
-			$thread = $this->getThread($messageid);
-			$thread->removeMessage($messageid);
-			if ($thread->isEmpty()) {
-				$this->removeThread($thread->getThreadID());
+			// Threading
+			if ($this->hasThread($messageid)) {
+				$thread = $this->getThread($messageid);
+				$thread->removeMessage($messageid);
+				if ($thread->isEmpty()) {
+					$this->removeThread($thread->getThreadID());
+				}
 			}
+		}
+		if ($message instanceof Acknowledge) {
+			$this->removeAcknowledge($messageid, $message->getReference());
 		}
 	}
 	public function removeThread($threadid) {
@@ -130,6 +147,7 @@ abstract class AbstractGroup implements Group {
 			$this->removeMessage($messageid);
 		}
 	}
+	abstract protected function removeAcknowledge($ackid, $reference);
 }
 
 ?>

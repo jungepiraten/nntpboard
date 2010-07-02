@@ -24,6 +24,15 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->link;
 	}
 
+	public function loadMessageIDs() {
+		$link = $this->getLink();
+		return $link->get($this->prefix . "messageid");
+	}
+	protected function saveMessageIDs($messageid) {
+		$link = $this->getLink();
+		$link->set($this->prefix . "messageid", $messageid);
+	}
+
 	public function loadMessageThreads() {
 		$link = $this->getLink();
 		return $link->get($this->prefix . "messagethreads");
@@ -40,6 +49,10 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 	protected function saveMessage($messageid, $message) {
 		$link = $this->getLink();
 		$link->set($this->prefix . "message" . md5($messageid), $message);
+	}
+	public function removeMessage($messageid) {
+		$link = $this->getLink();
+		$link->delete($this->prefix . "message" . md5($messageid));
 	}
 
 	public function loadThreadsLastPost() {
@@ -58,6 +71,19 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 	protected function saveThread($threadid, $thread) {
 		$link = $this->getLink();
 		$link->set($this->prefix . "thread" . md5($threadid), $thread);
+	}
+	public function removeThread($threadid) {
+		$link = $this->getLink();
+		$link->delete($this->prefix . "thread" . md5($threadid));
+	}
+
+	public function loadAcknowledges($messageid) {
+		$link = $this->getLink();
+		return $link->get($this->prefix . "acks" . md5($messageid));
+	}
+	protected function saveAcknowledges($messageid, $acks) {
+		$link = $this->getLink();
+		$link->set($this->prefix . "acks" . md5($messageid), $acks);
 	}
 
 	protected function loadGroupHash() {

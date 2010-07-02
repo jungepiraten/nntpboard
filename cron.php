@@ -20,10 +20,10 @@ foreach ($config->getBoardIDs() as $boardid) {
 
 		// Versuche neue Nachrichten zu ergattern
 		$cache->updateCache();
-		
+
 		$cache->close();
 	} catch (Exception $e) {
-		echo "<pre>".$e->getMessage()."</pre>";
+		echo "<pre>".$e->getMessage()."</pre>\n";
 	}
 }
 

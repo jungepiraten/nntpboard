@@ -80,6 +80,9 @@ class Board {
 		}
 		return $this->authMayPost;
 	}
+	public function mayAcknowledge($auth) {
+		return $this->mayPost($auth);
+	}
 	public function isModerated() {
 		return $this->isModerated;
 	}

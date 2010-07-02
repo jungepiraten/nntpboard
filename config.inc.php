@@ -5,7 +5,6 @@ require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/filecachednntp.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
-require_once(dirname(__FILE__)."/classes/board/sqlcachednntp.class.php");
 
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
@@ -136,13 +135,13 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 
-	public function getAddressText($addres, $charset) {
-		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
+	public function getAddressText($address, $charset) {
+		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
 			return ucfirst($name);
 		}
-		return parent::getAddressText($addres, $charset);
+		return parent::getAddressText($address, $charset);
 	}
 	public function getAddressLink($addres, $charset) {
 		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
@@ -174,6 +173,50 @@ class JuPiConfig extends DefaultConfig {
 	}
 }
 
-$config = new JuPiConfig;
+class TestConfig extends DefaultConfig {
+	public function __construct() {
+		parent::__construct();
+		$this->addBoard(new Board(null, null, "Testboards", ""));
+
+		$host = new Host("localhost");
+
+		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
+		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
+				false, true, true, $host, "nms.muh1"));
+		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
+				false, true, false, $host, "nms.muh2"));
+	}
+	
+	public function getTemplate($auth) {
+		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
+	}
+
+	public function getAuth($user, $pass) {
+		return JuPisAuth::authenticate($user, $pass);
+	}
+
+	public function getAnonymousAuth() {
+		return new JuPisAnonAuth();
+	}
+
+	public function getAddressText($address, $charset) {
+		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
+		list($name, $host) = explode("@", $mailto);
+		if ($host == "auth.invalid") {
+			return ucfirst($name);
+		}
+		return parent::getAddressText($address, $charset);
+	}
+
+	public function getMessageIDHost() {
+		return "webnntp.prauscher.homelinux.net";
+	}
+	
+	protected function getSecretKey() {
+		return "f1YkN08noJCvnQS9QUnz6dQhOjmjlX7k1pLKDOpbJW6ZLvHm";
+	}
+}
+
+$config = new TestConfig;
 
 ?>

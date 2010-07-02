@@ -68,6 +68,10 @@ class Attachment {
 	public function isText() {
 		return (strtolower($this->mimetype) == 'text');
 	}
+
+	public function isBinary() {
+		return !$this->isText();
+	}
 	
 	public function isApplication() {
 		return (strtolower($this->mimetype) == 'application');

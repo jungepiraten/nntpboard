@@ -35,16 +35,41 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 * sendMessages() abgearbeitet wird.
 	 * Solange ist die Nachricht nur im Forum sichtbar.
 	 **/
-	public function post($message) {
+	public function postMessage($message) {
 		$this->uplink->open();
 		// Die Berechtigungen prueft der Uplink selbst
-		$resp = $this->uplink->post($message);
+		$resp = $this->uplink->postMessage($message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
 		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
 		if ($resp != "m") {
 			$this->getGroup()->addMessage($message);
 		}
 		$this->uplink->close();
+		return $resp;
+	}
+	public function postAcknowledge($ack, $message) {
+		$this->uplink->open();
+		// Die Berechtigungen prueft der Uplink selbst
+		$resp = $this->uplink->postAcknowledge($ack, $message);
+		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
+		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
+		if ($resp != "m") {
+			$this->getGroup()->addAcknowledge($ack);
+		}
+		$this->uplink->close();
+		return $resp;
+	}
+	public function postCancel($cancel, $message) {
+		$this->uplink->open();
+		// Die Berechtigungen prueft der Uplink selbst
+		$resp = $this->uplink->postCancel($cancel, $message);
+		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
+		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
+		if ($resp != "m") {
+			$this->getGroup()->removeMessage($cancel->getReference());
+		}
+		$this->uplink->close();
+		return $resp;
 	}
 
 	public function getGroup() {
@@ -72,16 +97,19 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 
 	public function updateGroup() {
 		$cachegroup = $this->getGroup();
-		
+
+		$uplinkmessageids = $this->uplink->getMessageIDs();
+		$cachemessageids  = $cachegroup->getMessageIDs();
+
 		// Liste mit neuen Nachrichten aufstellen
-		$newmessages = array_diff($this->uplink->getMessageIDs(), $cachegroup->getMessageIDs());
+		$newmessages = array_diff($uplinkmessageids, $cachemessageids);
 		foreach ($newmessages as $messageid) {
 			$message = $this->uplink->getMessage($messageid);
 			$cachegroup->addMessage($message);
 		}
 
 		// Veraltete Nachrichten ausstreichen (z.b. Cancel)
-		$oldmessages = array_diff($cachegroup->getMessageIDs(), $this->uplink->getMessageIDs());
+		$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
 		foreach ($oldmessages as $messageid) {
 			$cachegroup->removeMessage($messageid);
 		}
@@ -97,7 +125,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	public function updateCache() {
 		$this->uplink->open();
 		// Gruppenhashes vergleichen
-		if ($this->uplink->getGroupHash() == $this->getGroupHash()) {
+		if (false && $this->uplink->getGroupHash() == $this->getGroupHash()) {
 			$this->uplink->close();
 			return;
 		}

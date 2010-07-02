@@ -4,31 +4,54 @@ require_once(dirname(__FILE__) . "/../group.class.php");
 
 class DynamicGroup extends AbstractGroup {
 	private $messages = array();
-	private $messagethreads;
+	private $messagethreads = array();
 	private $threads = array();
-	private $threadslastpost;
+	private $threadslastpost = array();
+	private $acknowledges = array();
 	
 	private $connection;
 	
 	public function __construct(AbstractItemCacheConnection $connection) {
 		parent::__construct($connection->getGroupID());
 		$this->connection = $connection;
-		$this->messagethreads = $connection->loadMessageThreads();
-		$this->sanitizeMessageThreads();
-		$this->threadslastpost = $connection->loadThreadsLastPost();
-		$this->sanitizeThreadsLastPost();
+		$messageids = $this->sanitizeMessageIDs($connection->loadMessageIDs());
+		if (count($messageids) > 0) {
+			$this->messages = array_combine($messageids,
+			                                array_fill(0, count($messageids), null));
+		} else {
+			$this->messages = array();
+		}
+		$this->messagethreads = $this->sanitizeMessageThreads($connection->loadMessageThreads());
+		$this->threadslastpost = $this->sanitizeThreadsLastPost($connection->loadThreadsLastPost());
 	}
 
-	private function sanitizeMessageThreads() {
-		if (!is_array($this->messagethreads)) {
-			$this->messagethreads = array();
+	private function sanitizeMessageThreads($threads) {
+		if (!is_array($threads)) {
+			return array();
 		}
+		return $threads;
 	}
 
-	private function sanitizeThreadsLastPost() {
-		if (!is_array($this->threadslastpost)) {
-			$this->threadslastpost = array();
+	private function sanitizeThreadsLastPost($lastposts) {
+		if (!is_array($lastposts)) {
+			return array();
 		}
+		return $lastposts;
+	}
+
+	private function sanitizeMessage($message) {
+		return $message;
+	}
+
+	private function sanitizeThread($thread) {
+		return $thread;
+	}
+
+	private function sanitizeMessageIDs($messageids) {
+		if (!is_array($messageids)) {
+			return array();
+		}
+		return $messageids;
 	}
 
 	public function getGroupHash() {
@@ -40,11 +63,11 @@ class DynamicGroup extends AbstractGroup {
 
 	/** Message **/
 	public function getMessageIDs() {
-		return array_keys($this->messagethreads);
+		return array_keys($this->messages);
 	}
 	public function getMessage($messageid) {
 		if (!isset($this->messages[$messageid])) {
-			$this->messages[$messageid] = $this->connection->loadMessage($messageid);
+			$this->messages[$messageid] = $this->sanitizeMessage($this->connection->loadMessage($messageid));
 		}
 		return $this->messages[$messageid];
 	}
@@ -61,7 +84,7 @@ class DynamicGroup extends AbstractGroup {
 			$threadid = $this->messagethreads[$threadid];
 		}
 		if (!isset($this->threads[$threadid])) {
-			$this->threads[$threadid] = $this->connection->loadThread($threadid);
+			$this->threads[$threadid] = $this->sanitizeThread($this->connection->loadThread($threadid));
 		}
 		return $this->threads[$threadid];
 	}
@@ -82,6 +105,7 @@ class DynamicGroup extends AbstractGroup {
 		parent::removeMessage($messageid);
 		unset($this->messages[$messageid]);
 		unset($this->messagethreads[$messageid]);
+		$this->connection->removeMessage($messageid);
 	}
 
 	/** Threads **/
@@ -103,6 +127,27 @@ class DynamicGroup extends AbstractGroup {
 		parent::removeThread($threadid);
 		unset($this->threads[$threadid]);
 		unset($this->threadslastpost[$threadid]);
+		$this->connection->removeThread($threadid);
+	}
+
+	/** Acknowledges **/
+	public function getAcknowledgeMessageIDs($messageid) {
+		if (!isset($this->acknowledges[$messageid])) {
+			$this->acknowledges[$messageid] = array_flip($this->sanitizeMessageIDs($this->connection->loadAcknowledges($messageid)));
+		}
+		return array_keys($this->acknowledges[$messageid]);
+	}
+	protected function addAcknowledge($ack) {
+		if (!isset($this->acknowledges[$ack->getReference()])) {
+			$this->acknowledges[$ack->getReference()] = array_flip($this->sanitizeMessageIDs($this->connection->loadAcknowledges($ack->getReference())));
+		}
+		$this->acknowledges[$ack->getReference()][$ack->getMessageID()] = TRUE;
+	}
+	protected function removeAcknowledge($messageid, $reference) {
+		if (!isset($this->acknowledges[$reference])) {
+			$this->acknowledges[$reference] = array_flip($this->sanitizeMessageIDs($this->connection->loadAcknowledges($reference)));
+		}
+		unset($this->acknowledges[$reference][$messageid]);
 	}
 
 	/**
@@ -119,6 +164,9 @@ class DynamicGroup extends AbstractGroup {
 	}
 	public function getNewThreadIDs() {
 		return array_keys($this->threads);
+	}
+	public function getAcknowledgeIDs() {
+		return array_keys($this->acknowledges);
 	}
 }
 

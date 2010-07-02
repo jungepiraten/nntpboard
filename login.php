@@ -16,20 +16,9 @@ if (isset($_REQUEST["login"])) {
 		$template->viewloginsuccess($auth);
 	} catch (AuthException $e) {
 		$template->viewloginfailed();
-		exit;
 	}
 }
 
-if (isset($_REQUEST["logout"])) {
-	$session->logout();
-	$template->viewlogoutsuccess();
-}
-
-if ($session->getAuth()->isAnonymous()) {
-	$template->viewloginform();
-	exit;
-}
-
-$template->viewuserpanel();
+$template->viewloginform();
 
 ?>

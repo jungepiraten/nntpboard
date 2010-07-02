@@ -17,8 +17,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
-		// TODO fest-einprogrammierte Revision ist ungut ^^
-		$this->smarty->assign("VERSION", "r45");
+		$this->smarty->assign("VERSION", $config->getVersion());
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
 		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress());
@@ -99,19 +98,38 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		return $row;
 	}
 
-	private function parseMessage($message) {
+	private function parseMessage($arr) {
+		if (is_array($arr)) {
+			$message = $arr["message"];
+			$acknowledges = $arr["acknowledges"];
+		} else {
+			$message = $arr;
+			$acknowledges = array();
+		}
 		if ($message == null) {
 			return null;
 		}
 		$row = array();
+
 		$row["messageid"]	= $message->getMessageID();
 		$row["subject"]		= $message->getSubject($this->getCharset());
 		$row["author"]		= $this->parseAddress($message->getAuthor());
 		$row["date"]		= $message->getDate();
 		$row["body"]		= $this->formatMessage($message);
 		$row["attachments"]	= array();
-		foreach ($message->getAttachments() AS $partid => $attachment) {
+		foreach ($message->getAttachments() as $partid => $attachment) {
 			$row["attachments"][$partid] = $this->parseAttachment($attachment);
+		}
+		$row["acknowledges"]	= array();
+		$row["nacknowledges"]	= array();
+		if (is_array($acknowledges)) {
+			foreach ($acknowledges as $acknowledge) {
+				if ($acknowledge->getWertung() < 0) {
+					$row["nacknowledges"][] = $this->parseAcknowledge($acknowledge);
+				} else {
+					$row["acknowledges"][] = $this->parseAcknowledge($acknowledge);
+				}
+			}
 		}
 		if ($message->hasSignature()) {
 			$row["signature"] = $message->getSignature();
@@ -128,6 +146,15 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		return $row;
 	}
 
+	private function parseAcknowledge($acknowledge) {
+		$row = array();
+		$row["author"]	= $this->parseAddress($acknowledge->getAuthor());
+		$row["date"]	= $acknowledge->getDate();
+		$row["wertung"]	= ($acknowledge->getWertung() >= 0 ? "+" : "")
+		                 . intval($acknowledge->getWertung());
+		return $row;
+	}
+
 	private function parseAddress($address) {
 		if ($address === null) {
 			return null;
@@ -135,7 +162,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row = array();
 		$row["text"]	= $this->getConfig()->getAddressText($address, $this->getCharset());
 		$row["link"]	= $this->getConfig()->getAddressLink($address, $this->getCharset());
-		return $row;
+	return $row;
 	}
 
 	private function formatMessage($message) {
@@ -207,7 +234,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 	
-	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false) {
+	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false, $mayAcknowledge = false) {
 		$threads = null;
 		if (is_array($threadobjs)) {
 			$threads = array();
@@ -222,15 +249,16 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("board", $this->parseBoard($board));
 		$this->smarty->assign("threads", $threads);
 		$this->smarty->assign("mayPost", $mayPost);
+		$this->smarty->assign("mayAcknowledge", $mayAcknowledge);
 		$this->sendHeaders();
 		$this->smarty->display("viewboard.html.tpl");
 		exit;
 	}
 	
-	public function viewthread($board, $thread, $page, $pages, $messagesobjs, $mayPost = false) {
+	public function viewthread($board, $thread, $page, $pages, $messagesobjs, $mayPost = false, $mayAcknowledge = false) {
 		$messages = array();
 		if (is_array($messagesobjs)) {
-			foreach ($messagesobjs AS $message) {
+			foreach ($messagesobjs as $message) {
 				$messages[] = $this->parseMessage($message);
 			}
 		}
@@ -242,12 +270,13 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("thread", $this->parseThread($thread));
 		$this->smarty->assign("messages", $messages);
 		$this->smarty->assign("mayPost", $mayPost);
+		$this->smarty->assign("mayAcknowledge", $mayAcknowledge);
 		$this->sendHeaders();
 		$this->smarty->display("viewthread.html.tpl");
 		exit;
 	}
 	
-	public function viewmessage($board, $thread, $message, $mayPost = false) {
+	public function viewmessage($board, $thread, $message, $mayPost = false, $mayAcknowledge = false) {
 		$page = floor($thread->getMessagePosition($message) / $this->getConfig()->getMessagesPerPage());
 		$location = "viewthread.php?boardid=" . urlencode($board->getBoardID()) .
 		            "&threadid=" . urlencode($thread->getThreadID()) .
@@ -266,7 +295,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$this->smarty->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
 			$this->smarty->assign("reference", $reference->getMessageID());
 			if ($quote == true) {
-				$body  = $reference->getAuthor() . " schrieb:" . "\r\n";
+				$body  = $this->getConfig()->getAddressText($reference->getAuthor(), $this->getCharset()) . " schrieb:" . "\r\n";
 				$lines = explode("\n", $reference->getTextBody());
 				foreach ($lines as $line) {
 					$body .= "> " . rtrim($line) . "\r\n";
@@ -297,6 +326,34 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->display("postmoderated.html.tpl");
 		exit;
 	}
+
+	public function viewacknowledgesuccess($board, $thread, $message, $ack) {
+		$this->sendHeaders();
+		$this->viewmessage($board, $thread, $message, true);
+		exit;
+	}
+
+	public function viewacknowledgemoderated($board, $thread, $message, $ack) {
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("message", $this->parseMessage($message));
+		$this->sendHeaders();
+		$this->smarty->display("postmoderated.html.tpl");
+		exit;
+	}
+
+	public function viewcancelsuccess($board, $thread, $message, $cancel) {
+		$this->sendHeaders();
+		$this->viewmessage($board, $thread, $message, true);
+		exit;
+	}
+
+	public function viewcancelmoderated($board, $thread, $message, $cancel) {
+		$this->smarty->assign("board", $this->parseBoard($board));
+		$this->smarty->assign("message", $this->parseMessage($message));
+		$this->sendHeaders();
+		$this->smarty->display("postmoderated.html.tpl");
+		exit;
+	}
 	
 	public function viewloginform() {
 		$this->smarty->assign("referer", $_SERVER["HTTP_REFERER"]);
@@ -321,7 +378,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		} elseif (isset($_SERVER["HTTP_REFERER"])) {
 			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
 		} else {
-			header("Location: userpanel.php");
+			header("Location: index.php");
 		}
 		$this->sendHeaders();
 		exit;
@@ -336,7 +393,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		} elseif (isset($_SERVER["HTTP_REFERER"])) {
 			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
 		} else {
-			header("Location: userpanel.php");
+			header("Location: index.php");
 		}
 		$this->sendHeaders();
 		exit;

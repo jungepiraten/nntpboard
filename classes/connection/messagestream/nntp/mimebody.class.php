@@ -85,7 +85,16 @@ abstract class NNTPMimeBody {
 		if (count($parts) > 1) {
 			return new NNTPMixedMimeBody($header, $parts);
 		}
+		// ansonsten nehmen wir einfach dieses eine Attachment
 		return array_shift($parts);
+	}
+
+	public static function parseAcknowledgeObject($ack, $message) {
+		return NNTPPlainBody::parse("text/plain", "UTF-8", "base64", ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()));
+	}
+
+	public static function parseCancelObject($cancel, $message) {
+		return NNTPPlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard\n-----CONTENT WAS-----\n" . $message->getTextBody());
 	}
 	
 	private $header;
@@ -110,8 +119,8 @@ abstract class NNTPMimeBody {
 
 	private function getBoundary() {
 		if ($this->getHeader()->has("Content-Type")
-		 && $header->get("Content-Type")->hasExtra("boundary")) {
-			return $header->get("Content-Type")->getExtra("boundary");
+		 && $this->getHeader()->get("Content-Type")->hasExtra("boundary")) {
+			return $this->getHeader()->get("Content-Type")->getExtra("boundary");
 		}
 		return null;
 	}
@@ -127,7 +136,7 @@ abstract class NNTPMimeBody {
 		if ($this->getMimeType() == null) {
 			return reset($this->parts)->getPlain();
 		}
-		$text  = rtrim($this->getHeader()->getValue()) . "\r\n\r\n";
+		$text  = rtrim($this->getHeader()->getPlain()) . "\r\n\r\n";
 		foreach ($this->parts AS $part) {
 			$text .= "--" . $this->getBoundary() . "\r\n";
 			$text .= rtrim($part->getPlain()) . "\r\n\r\n";

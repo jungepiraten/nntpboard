@@ -7,7 +7,10 @@
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
- {if ($mayPost)}<span class="buttondiv"><a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a></span>{/if}
+ <span class="buttondiv">
+  {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a>{/if}
+  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;wertung=-1" class="nack">-</a>{/if}
+ </span>
  </td>
 </tr>
 <tr class="message"><td>
@@ -30,7 +33,18 @@
   <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
   {/if}
  {/foreach}
-</dl>
-{/if}
+ {/if}
+ {if count($message.acknowledges) >= 1}
+ <dl class="acknowledgebox">
+ <dt>Zustimmungen</dt>
+ {foreach from=$message.acknowledges item=acknowledge name=acks}{if !$smarty.foreach.acks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
+ </dl>
+ {/if}
+ {if count($message.nacknowledges) >= 1}
+ <dl class="acknowledgebox">
+ <dt>Ablehnungen</dt>
+ {foreach from=$message.nacknowledges item=acknowledge name=acks}{if !$smarty.foreach.acks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
+ </dl>
+ {/if}
 </td></tr>
 </table>

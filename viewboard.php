@@ -18,7 +18,8 @@ if ($connection !== null) {
 	$group = $connection->getGroup();
 	$connection->close();
 	
-	$pages = ceil($group->getThreadCount() / $config->getThreadsPerPage());
+	// Erzwinge mindestens eine Seite
+	$pages = max(ceil($group->getThreadCount() / $config->getThreadsPerPage()), 1);
 	$page = 0;
 	if (isset($_REQUEST["page"])) {
 		$page = intval($_REQUEST["page"]);
@@ -37,7 +38,7 @@ if ($connection !== null) {
 		$threads[] = $group->getThread($threadid);
 	}
 
-	$template->viewboard($board, $group, $page, $pages, $threads, $board->mayPost($session->getAuth()));
+	$template->viewboard($board, $group, $page, $pages, $threads, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
 } else {
 	$template->viewboard($board, $group);
 }

@@ -15,7 +15,9 @@ interface Connection {
 	public function getLastPostDate();
 	public function getLastPostAuthor();
 
-	public function post($message);
+	public function postMessage($message);
+	public function postAcknowledge($ack, $message);
+	public function postCancel($cancel, $message);
 }
 
 abstract class AbstractConnection implements Connection {

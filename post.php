@@ -68,11 +68,11 @@ if (isset($_REQUEST["post"])) {
 
 	try {
 		$connection->open();
-		$connection->post($message);
+		$resp = $connection->postMessage($message);
 		$group = $connection->getGroup();
 		$thread = $group->getThread($message->getMessageID());
 		$connection->close();
-		if ($board->isModerated($auth)) {
+		if ($resp == "m") {
 			$template->viewpostmoderated($board, $thread, $message);
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);

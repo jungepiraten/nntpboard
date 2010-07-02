@@ -21,10 +21,9 @@ class NNTPMixedMimeBody extends NNTPMimeBody {
 	public function getAttachmentParts() {
 		$attachments = array();
 		foreach ($this->getParts() as $part) {
-			// TODO besserer attachment-check
 			if ($part instanceof NNTPMimeBody) {
 				$attachments = array_merge($attachments, $part->getAttachmentParts());
-			} else if (!preg_match("#^(text/.*)$#", $part->getMimeType())) {
+			} else if (strtolower($part->getDisposition()) == "attachment") {
 				$attachments[] = $part;
 			}
 		}

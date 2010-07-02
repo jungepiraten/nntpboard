@@ -4,7 +4,7 @@
 <p class="error">Login fehlgeschlagen!</p>
 {/if}
 
-<form action="userpanel.php" method="post" class="login">
+<form action="login.php" method="post" class="login">
  <fieldset>
   <input type="hidden" name="redirect" value="{$referer|escape:html}" />
   <label for="username" class="username">Benutzername:</label>

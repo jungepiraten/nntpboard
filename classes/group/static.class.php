@@ -12,7 +12,9 @@ class StaticGroup extends AbstractGroup {
 	// ThreadID => Thread
 	private $threads = array();
 	// ThreadID => LastPostDate
-	private $threadslastpost;
+	private $threadslastpost = array();
+	// MessageID => Acknowledge[]
+	private $acknowledges = array();
 
 	public function __construct($groupid, $grouphash) {
 		parent::__construct($groupid);
@@ -85,6 +87,17 @@ class StaticGroup extends AbstractGroup {
 		parent::removeThread($threadid);
 		unset($this->threads[$threadid]);
 		unset($this->threadslastpost[$threadid]);
+	}
+
+	/** Acknowledges **/
+	public function getAcknowledgeMessageIDs($messageid) {
+		return array_keys($this->acknowledges[$messageid]);
+	}
+	protected function addAcknowledge($ack) {
+		$this->acknowledges[$ack->getReference()][$ack->getMessageID()] = TRUE;
+	}
+	protected function removeAcknowledge($acknowledgeid, $referenceid) {
+		unset($this->acknowledges[$referenceid][$acknowledgeid]);
 	}
 }
 

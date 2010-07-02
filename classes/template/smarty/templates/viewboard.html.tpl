@@ -4,12 +4,17 @@
 
 {if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
 {if isset($board.childs)}
-{include file=board_boards.html.tpl name="Foren" boards=$board.childs}
+{assign var=restforen value=0}
+{capture assign=childboards}
 {foreach from=$board.childs item=child}
 {if isset($child.childs)}
 {include file=board_boards.html.tpl boardid=$child.boardid name=$child.name boards=$child.childs zeigekategorien=true}
+{else}{assign var=restforen value=1}
 {/if}
 {/foreach}
+{/capture}
+{if $restforen == 1}{include file=board_boards.html.tpl name="Foren" boards=$board.childs}{/if}
+{$childboards}
 {/if}
 
 {if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}

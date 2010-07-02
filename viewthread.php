@@ -27,12 +27,10 @@ $connection->close();
 if ($threadid === null && $messageid !== null) {
 	$message = $group->getMessage($messageid);
 	if (!($message instanceof Message)) {
-		// viewexception beendet das Script
-		$connection->close();
 		$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
 	}
 	$thread = $group->getThread($messageid);
-	$template->viewmessage($board, $thread, $message, $board->mayPost($session->getAuth()));
+	$template->viewmessage($board, $thread, $message, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
 }
 
 $thread = $group->getThread($threadid);
@@ -40,7 +38,8 @@ if (!($thread instanceof Thread)) {
 	$template->viewexception(new Exception("Thread nicht gefunden!"));
 }
 
-$pages = ceil($thread->getMessageCount() / $config->getMessagesPerPage());
+// Erzwinge mindestens eine Seite
+$pages = max(ceil($thread->getMessageCount() / $config->getMessagesPerPage()), 1);
 $page = 0;
 if (isset($_REQUEST["page"])) {
 	$page = intval($_REQUEST["page"]);
@@ -54,7 +53,14 @@ if ($page < 0 || $page > $pages) {
 $messageids = array_slice($thread->getMessageIDs(), $page * $config->getMessagesPerPage(), $config->getMessagesPerPage());
 $messages = array();
 foreach ($messageids AS $messageid) {
-	$messages[] = $group->getMessage($messageid);
+	$message = array();
+	$message["message"] = $group->getMessage($messageid);
+	$message["acknowledges"] = array();
+	$acknowledgeids = $group->getAcknowledgeMessageIDs($messageid);
+	foreach ($acknowledgeids as $acknowledgeid) {
+		$message["acknowledges"][$acknowledgeid] = $group->getAcknowledge($acknowledgeid);
+	}
+	$messages[] = $message;
 }
 $connection->close();
 if (!is_array($messages) || count($messages) < 1) {
@@ -62,6 +68,6 @@ if (!is_array($messages) || count($messages) < 1) {
 }
 
 $session->getAuth()->markReadThread($thread);
-$template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()));
+$template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
 
 ?>
