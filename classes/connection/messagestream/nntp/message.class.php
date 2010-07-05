@@ -43,7 +43,7 @@ class NNTPMessage {
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("References",	$message->getReference(), $charset));
+		$header->set(	NNTPSingleHeader::generate("References",	$ack->getReference(), $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) . "] " . $message->getSubject(), $charset));

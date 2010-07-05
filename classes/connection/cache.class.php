@@ -54,7 +54,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
 		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
 		if ($resp != "m") {
-			$this->getGroup()->addAcknowledge($ack);
+			$this->getGroup()->addMessage($ack);
 		}
 		$this->uplink->close();
 		return $resp;
