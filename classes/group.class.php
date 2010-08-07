@@ -88,7 +88,10 @@ abstract class AbstractGroup implements Group {
 		if ($message instanceof Message) {
 			// Unterpost verlinken
 			if ($message->hasParent() && $this->hasMessage($message->getParentID())) {
-				$this->getMessage($message->getParentID())->addChild($message);
+				$parent = this->getMessage($message->getParentID());
+				if ($parent instanceof Message) {
+					$parent->addChild($message);
+				}
 			}
 		
 			// Zum Thread hinzufuegen
