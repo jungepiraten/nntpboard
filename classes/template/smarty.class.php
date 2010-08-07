@@ -123,11 +123,19 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["acknowledges"]	= array();
 		$row["nacknowledges"]	= array();
 		if (is_array($acknowledges)) {
+			$acks = array();
+			$ackauthors = array();
 			foreach ($acknowledges as $acknowledge) {
-				if ($acknowledge->getWertung() < 0) {
-					$row["nacknowledges"][] = $this->parseAcknowledge($acknowledge);
-				} else {
-					$row["acknowledges"][] = $this->parseAcknowledge($acknowledge);
+				$key = md5($acknowledge->getAuthor());
+				$acks[$key] +=		$acknowledge->getWertung();
+				$ackauthors[$key] =	$this->parseAddress($acknowledge->getAuthor());
+			}
+			foreach ($acks as $key => $wertung) {
+				$row = array("author" => $ackauthors[$key], "wertung" => $wertung);
+				if ($wertung < 0) {
+					$row["nacknowledges"][] = $row;
+				} elseif ($wertung > 0) {
+					$row["acknowledges"][] = $row;
 				}
 			}
 		}
@@ -146,15 +154,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		return $row;
 	}
 
-	private function parseAcknowledge($acknowledge) {
-		$row = array();
-		$row["author"]	= $this->parseAddress($acknowledge->getAuthor());
-		$row["date"]	= $acknowledge->getDate();
-		$row["wertung"]	= ($acknowledge->getWertung() >= 0 ? "+" : "")
-		                 . intval($acknowledge->getWertung());
-		return $row;
-	}
-
 	private function parseAddress($address) {
 		if ($address === null) {
 			return null;
@@ -162,7 +161,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row = array();
 		$row["text"]	= $this->getConfig()->getAddressText($address, $this->getCharset());
 		$row["link"]	= $this->getConfig()->getAddressLink($address, $this->getCharset());
-	return $row;
+		return $row;
 	}
 
 	private function formatMessage($message) {

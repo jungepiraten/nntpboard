@@ -43,7 +43,7 @@
  {if count($message.nacknowledges) >= 1}
  <dl class="acknowledgebox">
  <dt>Ablehnungen</dt>
- {foreach from=$message.nacknowledges item=acknowledge name=acks}{if !$smarty.foreach.acks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
+ {foreach from=$message.nacknowledges item=acknowledge name=nacks}{if !$smarty.foreach.nacks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
  </dl>
  {/if}
 </td></tr>
