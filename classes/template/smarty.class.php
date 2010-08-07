@@ -133,9 +133,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			foreach ($acks as $key => $wertung) {
 				$ackrow = array("author" => $ackauthors[$key], "wertung" => $wertung);
 				if ($wertung < 0) {
-					$ackrow["nacknowledges"][] = $ackrow;
+					$row["nacknowledges"][] = $ackrow;
 				} elseif ($wertung > 0) {
-					$ackrow["acknowledges"][] = $ackrow;
+					$row["acknowledges"][] = $ackrow;
 				}
 			}
 		}
