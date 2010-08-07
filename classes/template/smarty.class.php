@@ -131,11 +131,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$ackauthors[$key] =	$this->parseAddress($acknowledge->getAuthor());
 			}
 			foreach ($acks as $key => $wertung) {
-				$row = array("author" => $ackauthors[$key], "wertung" => $wertung);
+				$ackrow = array("author" => $ackauthors[$key], "wertung" => $wertung);
 				if ($wertung < 0) {
-					$row["nacknowledges"][] = $row;
+					$ackrow["nacknowledges"][] = $ackrow;
 				} elseif ($wertung > 0) {
-					$row["acknowledges"][] = $row;
+					$ackrow["acknowledges"][] = $ackrow;
 				}
 			}
 		}
