@@ -1,6 +1,6 @@
 <table class="mainmessagetable {if $first}first{/if} {cycle values="odd,even"}">
 <tr class="messagehead">
-<td>
+<td colspan="2">
  <a name="article{$message.messageid|escape:html}" class="anchor"></a>
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">von</span>
@@ -13,7 +13,11 @@
  </span>
  </td>
 </tr>
-<tr class="message"><td>
+<tr class="message">
+<td>
+ <img src="{$message.author.image}" width="50px" />
+</td>
+<td>
  <p class="body">{$message.body}</p>
  {if isset($message.signature)}
  <div class="signature">

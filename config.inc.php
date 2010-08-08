@@ -151,6 +151,14 @@ class JuPiConfig extends DefaultConfig {
 		}
 		return parent::getAddressLink($addres, $charset);
 	}
+	public function getAddressImage($address, $charset) {
+		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
+		list($name, $host) = explode("@", $mailto);
+		if ($host == "community.junge-piraten.de") {
+			return "jupisavatar.php?name=" . urlencode(ucfirst($name));
+		}
+		return parent::getAddressLink($addres, $charset);
+	}
 
 	public function getTemplate($auth) {
 		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);

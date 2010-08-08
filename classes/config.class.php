@@ -55,6 +55,9 @@ abstract class DefaultConfig {
 	public function getAddressLink($address, $charset) {
 		return "mailto:" . $address->getAddress();
 	}
+	public function getAddressImage($address, $charset) {
+		return "images/genericperson.png";
+	}
 	
 	abstract public function getAuth($user, $pass);
 	abstract public function getAnonymousAuth();

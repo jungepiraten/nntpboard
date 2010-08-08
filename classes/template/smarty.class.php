@@ -161,6 +161,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row = array();
 		$row["text"]	= $this->getConfig()->getAddressText($address, $this->getCharset());
 		$row["link"]	= $this->getConfig()->getAddressLink($address, $this->getCharset());
+		$row["image"]	= $this->getConfig()->getAddressImage($address, $this->getCharset());
 		return $row;
 	}
 
