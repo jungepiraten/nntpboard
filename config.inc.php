@@ -143,13 +143,13 @@ class JuPiConfig extends DefaultConfig {
 		}
 		return parent::getAddressText($address, $charset);
 	}
-	public function getAddressLink($addres, $charset) {
-		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
+	public function getAddressLink($address, $charset) {
+		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
 			return $this->getWikiLink("Benutzer:" . ucfirst($name));
 		}
-		return parent::getAddressLink($addres, $charset);
+		return parent::getAddressLink($address, $charset);
 	}
 	public function getAddressImage($address, $charset) {
 		$mailto = iconv($addres->getCharset(), $charset, $addres->getAddress());
