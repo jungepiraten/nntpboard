@@ -56,7 +56,7 @@ abstract class DefaultConfig {
 		return "mailto:" . $address->getAddress();
 	}
 	public function getAddressImage($address, $charset) {
-		return "images/genericperson.png";
+		return "images/genericperson.jpg";
 	}
 	
 	abstract public function getAuth($user, $pass);
