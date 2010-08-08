@@ -190,6 +190,9 @@ span.titlebeschr {
 	float:right;
 	padding-right:5px;
 }
+.message .authorpic {
+	width:100px;
+}
 .info {
 	font-size:11px;
 	color:#55524E;

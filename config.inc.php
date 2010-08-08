@@ -157,7 +157,7 @@ class JuPiConfig extends DefaultConfig {
 		if ($host == "community.junge-piraten.de") {
 			return "jupisavatar.php?name=" . urlencode(ucfirst($name));
 		}
-		return parent::getAddressLink($address, $charset);
+		return parent::getAddressImage($address, $charset);
 	}
 
 	public function getTemplate($auth) {

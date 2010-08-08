@@ -14,10 +14,10 @@
  </td>
 </tr>
 <tr class="message">
-<td>
- <img src="{$message.author.image}" width="50px" />
+<td class="authorpic">
+ <img src="{$message.author.image}" width="70px" />
 </td>
-<td>
+<td class="message">
  <p class="body">{$message.body}</p>
  {if isset($message.signature)}
  <div class="signature">
