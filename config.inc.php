@@ -186,13 +186,13 @@ class TestConfig extends DefaultConfig {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Testboards", ""));
 
-		$host = new Host("localhost");
+		$host = new Host("prauscher.homeip.net");
 
 		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
 		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
-				false, true, true, $host, "nms.muh1"));
+				false, true, true, $host, "prauscher.test"));
 		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
-				false, true, false, $host, "nms.muh2"));
+				false, true, false, $host, "prauscher.testing"));
 	}
 	
 	public function getTemplate($auth) {

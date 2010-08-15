@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../mimebody.class.php");
 
 class NNTPRelatedMimeBody extends NNTPMimeBody {
 	private function getRootPart() {
-		if ($this->getHeader->get("Content-Type")->hasExtra("start")) {
+		if ($this->getHeader()->get("Content-Type")->hasExtra("start")) {
 			foreach ($this->getParts() AS $part) {
 				if ($part->getHeader()->has("Content-ID") && $part->getHeader()->get("Content-ID")->getValue() == $this->getHeader->get("Content-Type")->getExtra("start"))
 				{
