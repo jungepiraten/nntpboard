@@ -105,7 +105,7 @@ abstract class NNTPMimeBody {
 		$this->parts = $parts;
 	}
 
-	private function getHeader() {
+	protected function getHeader() {
 		return $this->header;
 	}
 
@@ -117,7 +117,7 @@ abstract class NNTPMimeBody {
 		return null;
 	}
 
-	private function getBoundary() {
+	protected function getBoundary() {
 		if ($this->getHeader()->has("Content-Type")
 		 && $this->getHeader()->get("Content-Type")->hasExtra("boundary")) {
 			return $this->getHeader()->get("Content-Type")->getExtra("boundary");

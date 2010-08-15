@@ -68,11 +68,11 @@ class NNTPPlainBody {
 		$this->body = $body;
 	}
 
-	private function getHeader() {
+	public function getHeader() {
 		return $this->header;
 	}
 
-	private function getCharset() {
+	public function getCharset() {
 		if ($this->getHeader()->has("Content-Type")
 		 && $this->getHeader()->get("Content-Type")->hasExtra("charset")) {
 			return $this->getHeader()->get("Content-Type")->getExtra("charset");
@@ -87,7 +87,7 @@ class NNTPPlainBody {
 		return "text/plain";
 	}
 
-	private function getTransferEncoding() {
+	public function getTransferEncoding() {
 		// See RFC 2045 / Section 6.1.
 		if ($this->getHeader()->has("Content-Transfer-Encoding")) {
 			return strtolower($this->getHeader()->get("Content-Transfer-Encoding")->getValue());
