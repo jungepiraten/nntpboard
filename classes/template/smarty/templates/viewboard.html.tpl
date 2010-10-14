@@ -1,7 +1,7 @@
 {include file=header.html.tpl title=$board.name}
 
-{include file=board_breadcrumb.html.tpl board=$board}
-<a href="unread.php?markread={$board.boardid}" class="markread">Als gelesen markieren</a>
+<p class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</p>
+<p class="markread"><a href="unread.php?markread={$board.boardid}" class="markread">Als gelesen markieren</a></p>
 
 {if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
 {if isset($board.childs)}

@@ -7,16 +7,16 @@ $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
 function recurseMarkRead($board, $auth) {
-	if ($board->hasGroup()) {
-		$auth->markReadGroup($board);
+	if ($board->hasThreads()) {
+		$auth->markReadGroup($board->getConnection($auth)->getGroup());
 	}
-	foreach ($board->getChilds() as $child) {
-		recurseMarkRead($child, $auth);
+	foreach ($board->getSubBoardIDs() as $boardid) {
+		recurseMarkRead($board->getSubBoard($boardid), $auth);
 	}
 }
 
 if (isset($_REQUEST["markread"])) {
-	$boardid = is_numeric($_REQUEST["readall"]) ? intval($_REQUEST["readall"]) : null;
+	$boardid = is_numeric($_REQUEST["markread"]) ? intval($_REQUEST["markread"]) : null;
 	$board = $config->getBoard($boardid);
 	recurseMarkRead($board, $session->getAuth());
 }
