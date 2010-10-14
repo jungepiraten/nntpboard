@@ -19,10 +19,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addBoard(new MemCachedNNTPBoard(2, null, "Allgemeines", $this->getNNTP_UCPLinks("misc", null) . "Globale Themen der Jungen Piraten",
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("misc")));
 
-		$this->addBoard(new Board(100, null, "Struktur", "Unterforen der Arbeitsgruppen"));
-		$this->addAGStruktur(200, 100);
-		$this->addPGStruktur(300, 100);
-
 		$this->addBoard(new Board(400, null, "Gliederungen", "Unterforen der Gebietsgruppen"));
 		$this->addLVStruktur(500, 400);
 		$this->addCrewStruktur(600, 400);
