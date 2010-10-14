@@ -22,4 +22,5 @@
 			</div>
 			<a href="index.php"><img src="images/logo.png" class="logo" /></a>
 		</div>
+		<a href="http://piratenpad.de/jupis-nntpboard-vorschlaege">Bitte hilf mit, NNTPBoard zu verbessern!</a>
 		<h1 class="mainname">{$title|escape:html}</h1>
