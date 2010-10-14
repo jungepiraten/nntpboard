@@ -37,6 +37,7 @@ class JuPiConfig extends DefaultConfig {
 		if ($mlname != null) {
 			$links .= '[<a href="https://lists.junge-piraten.de/listinfo/' . $mlname . '" class="mllink">ML</a>] ';
 		}
+		return $links;
 	}
 
 	private function getWikiLink($topic) {
@@ -103,10 +104,10 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addTalkStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co."));
-		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"");
-		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"");
-		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!");
-		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"");
+		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", null);
+		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", null);
+		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null);
+		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"", null);
 	}
 
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $mlname) {
