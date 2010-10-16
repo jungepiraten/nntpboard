@@ -104,7 +104,7 @@ abstract class AbstractAuth implements Auth {
 		}
 		// Cache alle Thread-IDs, die in der Vergangenheit ungelesen waren
 		foreach (array_keys($this->readgroups[$group->getGroupID()][$group->getGroupHash()]) as $threadid) {
-			if ($this->isUnreadThread($group->getThread($threadid))) {
+			if ($group->hasThread($threadid) && $this->isUnreadThread($group->getThread($threadid))) {
 				return true;
 			} else {
 				unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
