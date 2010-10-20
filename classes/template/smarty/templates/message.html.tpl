@@ -10,6 +10,7 @@
  <span class="buttondiv">
   {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a>{/if}
   {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;wertung=-1" class="nack">-</a>{/if}
+  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid}&amp;messageid={$message.messageid}" class="cancel">L&ouml;schen</a>{/if}
  </span>
  </td>
 </tr>

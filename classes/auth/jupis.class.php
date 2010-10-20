@@ -23,6 +23,10 @@ class JuPisAnonAuth extends AbstractAuth implements Auth {
 		return null;
 	}
 
+	public function mayCancel($message) {
+		return false;
+	}
+
 	public function getNNTPUsername() {
 		return null;
 	}
@@ -77,6 +81,10 @@ class JuPisAuth extends JuPisAnonAuth {
 
 	public function getAddress() {
 		return new Address($this->username, $this->getNNTPUsername() . "@community.junge-piraten.de");
+	}
+
+	public function mayCancel($message) {
+		return in_array(strtolower($this->getUsername), array("prauscher", "viirus", "zuse", "simonimnetz")) or $message->getAuthor()->getAddress("UTF-8") == $this->getAddress()->getAddress("UTF-8");
 	}
 
 	public function getNNTPUsername() {

@@ -9,8 +9,6 @@ $template = $config->getTemplate($session->getAuth());
 $boardid = stripslashes($_REQUEST["boardid"]);
 $messageid = isset($_REQUEST["messageid"]) ? stripslashes($_REQUEST["messageid"]) : null;
 
-// TODO Auth-Checks
-
 $board = $config->getBoard($boardid);
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
@@ -31,6 +29,10 @@ $message = $group->getMessage($messageid);
 $thread = $group->getThread($messageid);
 if (!($message instanceof Message)) {
 	$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
+}
+
+if (!$session->getAuth()->mayCancel($message)) {
+	$template->viewexception(new Exception("Keine Berechtigung!"));
 }
 
 // TODO Zustimmungs-Posts canceln?

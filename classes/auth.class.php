@@ -8,6 +8,7 @@ interface Auth {
 	public function getAddress();
 	public function getNNTPUsername();
 	public function getNNTPPassword();
+	public function mayCancel($message);
 
 	public function transferRead($auth);
 	public function isUnreadThread($thread);
