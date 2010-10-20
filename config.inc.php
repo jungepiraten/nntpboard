@@ -29,19 +29,18 @@ class JuPiConfig extends DefaultConfig {
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("test")));
 	}
 
-	private function getNNTP_UCPLinks($name, $mlname) {
+	private function getNNTP_UCPLinks($name, $mlname, $wiki) {
 		$links = '';
 		if ($name != null) {
 			$links .= '[<a href="nntp://'.$this->getNNTPHost().'/'.$this->getNNTPGroup($name).'" class="nntplink">NNTP</a>] ';
 		}
 		if ($mlname != null) {
-			$links .= '[<a href="https://lists.junge-piraten.de/listinfo/' . $mlname . '" class="mllink">ML</a>] ';
+			$links .= '[<a href="http://lists.junge-piraten.de/listinfo/' . $mlname . '" class="mllink">ML</a>] ';
+		}
+		if ($wiki != null) {
+			$links .= '[<a href="http://wiki.junge-piraten.de/wiki/' . $wiki . '" class="wiki">WIKI</a>] ';
 		}
 		return $links;
-	}
-
-	private function getWikiLink($topic) {
-		return "http://wiki.junge-piraten.de/wiki/{$topic}";
 	}
 
 	private function getNNTPHost() {
@@ -54,52 +53,36 @@ class JuPiConfig extends DefaultConfig {
 	private function addLVStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
 		$this->addBoard(new Board(13, $parentid, "Landesverbände", "Unterforen der Landesverbände"));
-		$this->addLVBoard(14, 13, "be", "Berlin",
-						$this->getWikiLink("BE:Hauptseite"), "berlin");
-		$this->addLVBoard(25, 13, "nw", "Nordrhein-Westfalen",
-						$this->getWikiLink("NRW:Hauptseite"), "nrw");
-		$this->addLVBoard(26, 13, "he", "Hessen",
-						$this->getWikiLink("HE:Hauptseite"), "he");
-		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg",
-						$this->getWikiLink("BW:Hauptseite"), "bw");
-		$this->addLVBoard(32, 13, "ni", "Niedersachsen",
-						$this->getWikiLink("NDS:Hauptseite"), "ni");
-		$this->addLVBoard(35, 13, "by", "Bayern",
-						$this->getWikiLink("BY:Hauptseite"), "by");
-		$this->addLVBoard(45, 13, "bb", "Brandenburg",
-						$this->getWikiLink("BB:Hauptseite"), "bb");
-		$this->addLVBoard(47, 13, "hb", "Bremen",
-						$this->getWikiLink("HB:Hauptseite"), "hb");
-		$this->addLVBoard(49, 13, "hh", "Hamburg",
-						$this->getWikiLink("HH:Hauptseite"), "hamburg");
-		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern",
-						$this->getWikiLink("MV:Hauptseite"), "mv");
-		$this->addLVBoard(53, 13, "rp", "Rheinland-Pfalz",
-						$this->getWikiLink("RLP:Hauptseite"), "rlp");
-		$this->addLVBoard(55, 13, "sl", "Saarland",
-						$this->getWikiLink("SL:Hauptseite"), "sl");
-		$this->addLVBoard(57, 13, "sn", "Sachsen",
-						$this->getWikiLink("SN:Hauptseite"), "sn");
-		$this->addLVBoard(59, 13, "st", "Sachsen Anhalt",
-						$this->getWikiLink("ST:Hauptseite"), "st");
-		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein",
-						$this->getWikiLink("SH:Hauptseite"), "sh");
-		$this->addLVBoard(63, 13, "th", "Thüringen",
-						$this->getWikiLink("TH:Hauptseite"), "th");
+		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "berlin");
+		$this->addLVBoard(25, 13, "nw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
+		$this->addLVBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
+		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
+		$this->addLVBoard(32, 13, "ni", "Niedersachsen", "NDS:Hauptseite", "ni");
+		$this->addLVBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
+		$this->addLVBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
+		$this->addLVBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
+		$this->addLVBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
+		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
+		$this->addLVBoard(53, 13, "rp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
+		$this->addLVBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
+		$this->addLVBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
+		$this->addLVBoard(59, 13, "st", "Sachsen Anhalt", "ST:Hauptseite", "st");
+		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
+		$this->addLVBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
 	}
 
-	private function addLVBoard($id, $parentid, $kuerzel, $name, $wikilink, $mlname) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.lv.{$kuerzel}", $mlname) . "[<a href=\"{$wikilink}\">Wiki: {$name}</a>]", false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.lv.{$kuerzel}")));
+	private function addLVBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.lv.{$kuerzel}", $mlname, $wiki) . $name, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.lv.{$kuerzel}")));
 	}
 
 	private function addCrewStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Crews", "Unterforen der Crews"));
-		$this->addCrewBoard($id+1, $id, "freiburg", "Freiburg",	$this->getWikiLink("BW:Freiburg"), "crew-freiburg");
-		$this->addCrewBoard($id+2, $id, "quadrat", "Mannheim",	$this->getWikiLink("BW:Crew_JuPis%B2"), null);
+		$this->addCrewBoard($id+1, $id, "freiburg", "Freiburg",	"BW:Freiburg", "crew-freiburg");
+		$this->addCrewBoard($id+2, $id, "quadrat", "Mannheim",	"BW:Crew_JuPis%B2", null);
 	}
 
-	private function addCrewBoard($id, $parentid, $kuerzel, $name, $wikilink, $mlname) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.crew.{$kuerzel}", $mlname) . "[<a href=\"{$wikilink}\">Wiki: {$name}</a>]", false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.crew.{$kuerzel}")));
+	private function addCrewBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.crew.{$kuerzel}", $mlname, $wiki) . $name, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.crew.{$kuerzel}")));
 	}
 
 	private function addTalkStruktur($id, $parentid) {
