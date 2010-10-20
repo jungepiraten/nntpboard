@@ -29,7 +29,7 @@ class JuPiConfig extends DefaultConfig {
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("test")));
 	}
 
-	private function getNNTP_UCPLinks($name, $mlname, $wiki) {
+	private function getNNTP_UCPLinks($name = null, $mlname = null, $wiki = null) {
 		$links = '';
 		if ($name != null) {
 			$links .= '[<a href="nntp://'.$this->getNNTPHost().'/'.$this->getNNTPGroup($name).'" class="nntplink">NNTP</a>] ';
