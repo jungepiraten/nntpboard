@@ -14,9 +14,9 @@ class JuPiConfig extends DefaultConfig {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
 
-		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", $this->getNNTP_UCPLinks("announce", "announce") . "Moderiertes Forum für Ankündigungen.",
+		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", $this->getNNTP_UCPLinks("announce", "announce") . "Allgemeine Ankuendigungen",
 				false, true, true, $this->getNNTPHost(), $this->getNNTPGroup("announce")));
-		$this->addBoard(new MemCachedNNTPBoard(2, null, "Allgemeines", $this->getNNTP_UCPLinks("misc", null) . "Globale Themen der Jungen Piraten",
+		$this->addBoard(new MemCachedNNTPBoard(2, null, "Allgemeines", $this->getNNTP_UCPLinks("misc", "aktive") . "Globale Themen der Jungen Piraten",
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("misc")));
 
 		$this->addBoard(new Board(400, null, "Gliederungen", "Unterforen der Gebietsgruppen"));
@@ -59,33 +59,33 @@ class JuPiConfig extends DefaultConfig {
 		$this->addLVBoard(25, 13, "nw", "Nordrhein-Westfalen",
 						$this->getWikiLink("NRW:Hauptseite"), "nrw");
 		$this->addLVBoard(26, 13, "he", "Hessen",
-						$this->getWikiLink("HE:Hauptseite"), null);
+						$this->getWikiLink("HE:Hauptseite"), "he");
 		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg",
 						$this->getWikiLink("BW:Hauptseite"), "bw");
 		$this->addLVBoard(32, 13, "ni", "Niedersachsen",
-						$this->getWikiLink("NDS:Hauptseite"), null);
+						$this->getWikiLink("NDS:Hauptseite"), "ni");
 		$this->addLVBoard(35, 13, "by", "Bayern",
 						$this->getWikiLink("BY:Hauptseite"), "by");
 		$this->addLVBoard(45, 13, "bb", "Brandenburg",
-						$this->getWikiLink("BB:Hauptseite"), null);
+						$this->getWikiLink("BB:Hauptseite"), "bb");
 		$this->addLVBoard(47, 13, "hb", "Bremen",
-						$this->getWikiLink("HB:Hauptseite"), null);
+						$this->getWikiLink("HB:Hauptseite"), "hb");
 		$this->addLVBoard(49, 13, "hh", "Hamburg",
 						$this->getWikiLink("HH:Hauptseite"), "hamburg");
 		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern",
-						$this->getWikiLink("MV:Hauptseite"), null);
+						$this->getWikiLink("MV:Hauptseite"), "mv");
 		$this->addLVBoard(53, 13, "rp", "Rheinland-Pfalz",
 						$this->getWikiLink("RLP:Hauptseite"), "rlp");
 		$this->addLVBoard(55, 13, "sl", "Saarland",
-						$this->getWikiLink("SL:Hauptseite"), null);
+						$this->getWikiLink("SL:Hauptseite"), "sl");
 		$this->addLVBoard(57, 13, "sn", "Sachsen",
-						$this->getWikiLink("SN:Hauptseite"), null);
+						$this->getWikiLink("SN:Hauptseite"), "sn");
 		$this->addLVBoard(59, 13, "st", "Sachsen Anhalt",
-						$this->getWikiLink("ST:Hauptseite"), null);
+						$this->getWikiLink("ST:Hauptseite"), "st");
 		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein",
 						$this->getWikiLink("SH:Hauptseite"), "sh");
 		$this->addLVBoard(63, 13, "th", "Thüringen",
-						$this->getWikiLink("TH:Hauptseite"), null);
+						$this->getWikiLink("TH:Hauptseite"), "th");
 	}
 
 	private function addLVBoard($id, $parentid, $kuerzel, $name, $wikilink, $mlname) {
@@ -104,10 +104,10 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addTalkStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co."));
-		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", null);
-		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", null);
-		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null);
-		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"", null);
+		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", "talk-bildung");
+		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", "talk-umwelt");
+		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", "talk-kekse");
+		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Was sonst nicht relevant waere", "talk-sonstiges");
 	}
 
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $mlname) {

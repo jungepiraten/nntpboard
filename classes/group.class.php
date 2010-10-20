@@ -139,6 +139,8 @@ abstract class AbstractGroup implements Group {
 					$this->removeThread($thread->getThreadID());
 				}
 			}
+
+			// LastThread
 		}
 		if ($message instanceof Acknowledge) {
 			$this->removeAcknowledge($messageid, $message->getReference());
