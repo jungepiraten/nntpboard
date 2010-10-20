@@ -110,7 +110,7 @@ class JuPiConfig extends DefaultConfig {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
-			return $this->getWikiLink("Benutzer:" . ucfirst($name));
+			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . ucfirst($name);
 		}
 		return parent::getAddressLink($address, $charset);
 	}
