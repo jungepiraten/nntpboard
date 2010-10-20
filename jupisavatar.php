@@ -17,6 +17,7 @@ foreach ($matches as $match) {
 	}
 }
 
-header("Location: images/genericperson.jpg");
+header("Content-Type: image/png");
+readfile("images/genericperson.png");
 
 ?>

@@ -14,7 +14,7 @@ class JuPiConfig extends DefaultConfig {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
 
-		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", $this->getNNTP_UCPLinks("announce", null) . "Moderiertes Forum für Ankündigungen.",
+		$this->addBoard(new FileCachedNNTPBoard(4, null, "Ankündigungen", $this->getNNTP_UCPLinks("announce", "announce") . "Moderiertes Forum für Ankündigungen.",
 				false, true, true, $this->getNNTPHost(), $this->getNNTPGroup("announce")));
 		$this->addBoard(new MemCachedNNTPBoard(2, null, "Allgemeines", $this->getNNTP_UCPLinks("misc", null) . "Globale Themen der Jungen Piraten",
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("misc")));

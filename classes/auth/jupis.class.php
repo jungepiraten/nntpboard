@@ -84,7 +84,7 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	public function mayCancel($message) {
-		return in_array(strtolower($this->getUsername()), array("prauscher", "viirus", "zuse", "simonimnetz")) or $message->getAuthor()->getAddress("UTF-8") == $this->getAddress()->getAddress("UTF-8");
+		return in_array(strtolower($this->getUsername()), array("prauscher", "viirus", "gheed", "yuri", "simonimnetz")) or $message->getAuthor()->getAddress("UTF-8") == $this->getAddress()->getAddress("UTF-8");
 	}
 
 	public function getNNTPUsername() {
