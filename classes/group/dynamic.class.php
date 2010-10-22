@@ -89,11 +89,12 @@ class DynamicGroup extends AbstractGroup {
 		return $this->threads[$threadid];
 	}
 
+	/** Last Thread **/
 	public function hasLastThread() {
-		return $this->getLastThread() !== null;
+		return $this->hasThread($this->getLastThread());
 	}
 	public function getLastThread() {
-		return $this->connection->getLastThread();
+		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
 	}
 
 	/** Nachrichten **/
@@ -103,6 +104,12 @@ class DynamicGroup extends AbstractGroup {
 	}
 	public function removeMessage($messageid) {
 		parent::removeMessage($messageid);
+		// LastPost neu arrangieren
+		if ($this->hasThread($messageid)) {
+			$this->threadslastpost[$threadid] = $this->getThread($messageid)->getLastPostDate();
+			asort($this->threadslastpost);
+		}
+
 		unset($this->messages[$messageid]);
 		unset($this->messagethreads[$messageid]);
 		$this->connection->removeMessage($messageid);
@@ -128,6 +135,8 @@ class DynamicGroup extends AbstractGroup {
 		unset($this->threads[$threadid]);
 		unset($this->threadslastpost[$threadid]);
 		$this->connection->removeThread($threadid);
+		// Last post updaten
+		$this->connection->setLastThread($this->getLastThread());
 	}
 
 	/** Acknowledges **/

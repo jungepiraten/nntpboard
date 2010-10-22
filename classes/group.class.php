@@ -140,7 +140,7 @@ abstract class AbstractGroup implements Group {
 				}
 			}
 
-			// LastThread
+			// LastThread muss jede Group selbst können *hoff*
 		}
 		if ($message instanceof Acknowledge) {
 			$this->removeAcknowledge($messageid, $message->getReference());

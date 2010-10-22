@@ -89,8 +89,12 @@ class NNTPSingleHeader {
 	}
 
 	public static function generate($name, $value, $charset) {
-		mb_internal_encoding($charset);
-		return new NNTPSingleHeader($name, mb_encode_mimeheader(str_replace(" ", "_", $value), $charset));
+		// Nur encoden wenn noetig
+		if (preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $input, $matches)) {
+			mb_internal_encoding($charset);
+			$value = mb_encode_mimeheader(str_replace(" ", "_", $value), $charset);
+		}
+		return new NNTPSingleHeader($name, $value);
 	}
 
 	private $name;
