@@ -56,7 +56,7 @@ abstract class DefaultConfig {
 		return "mailto:" . $address->getAddress();
 	}
 	public function getAddressImage($address, $charset) {
-		return "images/genericperson.jpg";
+		return "images/genericperson.png";
 	}
 	
 	abstract public function getAuth($user, $pass);
@@ -67,8 +67,7 @@ abstract class DefaultConfig {
 	 **/
 	public function getVersion() {
 		// TODO es ist nicht umbedingt schoen, die Versionsnummer hier festzulegen ;)
-		return "1.0RC1";
-		return date("Y-m-d H:i:s", filemtime(dirname(__FILE__) . "/../"));
+		return "1.0RC2";
 	}
 	abstract public function getMessageIDHost();
 	abstract public function getTemplate($auth);
