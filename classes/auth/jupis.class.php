@@ -48,6 +48,8 @@ if (!function_exists("mkdir_parents")) {
 }
 
 class JuPisAuth extends JuPisAnonAuth {
+	protected static $MODERATORS = array("prauscher", "viirus", "gheed", "yuri", "simonimnetz");
+
 	public static function authenticate($user, $pass) {
 		$auth = new JuPisAuth($user, $pass);
 		// TODO eigentlich brauchen wir ja schon auth - aber zum testen ists einfacher so
@@ -84,7 +86,7 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	public function mayCancel($message) {
-		return in_array(strtolower($this->getUsername()), array("prauscher", "viirus", "gheed", "yuri", "simonimnetz")) or $message->getAuthor()->getAddress("UTF-8") == $this->getAddress()->getAddress("UTF-8");
+		return in_array(strtolower($this->getUsername()), self::$MODERATORS) or $message->getAuthor()->getAddress("UTF-8") == $this->getAddress()->getAddress("UTF-8");
 	}
 
 	public function getNNTPUsername() {
@@ -102,7 +104,7 @@ class JuPisAuth extends JuPisAnonAuth {
 	private function loadData() {
 		$filename = $this->getFilename();
 		if (!file_exists($filename)) {
-			// Die Gruppe existiert noch nicht - also laden wir auch keine Posts
+			// Der Benutzer ist bisher unbekannt - Also Dummy-Werte
 			$this->data = array();
 			return;
 		}

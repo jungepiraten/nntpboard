@@ -90,7 +90,7 @@ class NNTPSingleHeader {
 
 	public static function generate($name, $value, $charset) {
 		mb_internal_encoding($charset);
-		return new NNTPSingleHeader($name, mb_encode_mimeheader($value, $charset));
+		return new NNTPSingleHeader($name, mb_encode_mimeheader(str_replace(" ", "_", $value), $charset));
 	}
 
 	private $name;
@@ -108,7 +108,7 @@ class NNTPSingleHeader {
 
 	public function getValue($charset = null) {
 		if ($charset != null) {
-			return iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($this->getValue()));
+			return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->getValue())));
 		}
 		return $this->value;
 	}
