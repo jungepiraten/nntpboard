@@ -115,7 +115,7 @@ class JuPiConfig extends DefaultConfig {
 			return ucfirst($name);
 		}
 		if ($host == "junge-piraten.de") {
-			return ucwords(str_replace("."," ",$name)
+			return ucwords(str_replace("."," ",$name));
 		}
 		return parent::getAddressText($address, $charset);
 	}
