@@ -106,7 +106,7 @@ class NNTPMessage {
 		$date =		strtotime($this->getHeader()->get("Date")->getValue($charset));
 		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
 		if ($this->getHeader()->has("Sender")
-		 && ($this->getHeader()->get("From")->getValue("UTF-8") != "Mailman")) {
+		 && ($this->getHeader()->get("Sender")->getValue("UTF-8") != "Mailman")) {
 			$author =	NNTPAddress::parsePlain($this->getHeader()->get("Sender")->getValue($charset))->getObject();
 		} else {
 			// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)

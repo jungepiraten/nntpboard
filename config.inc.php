@@ -88,23 +88,23 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addTalkStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co."));
-		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", "talk-bildung");
-		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", "talk-umwelt");
-		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", "talk-kekse");
-		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Was sonst nicht relevant waere", "talk-sonstiges");
+		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", null, "talk-bildung");
+		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", null, "talk-umwelt");
+		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null, "talk-kekse");
+		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Was sonst nicht relevant waere", null, "talk-sonstiges");
 	}
 
-	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $mlname) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("talk.{$kuerzel}", $mlname) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("talk.{$kuerzel}")));
+	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("talk.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("talk.{$kuerzel}")));
 	}
 
 	private function addEventStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Events", ""));
-		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "pg-jupi-camp");
+		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp", "JuPi-Camp_2011",	"Planungsbereich fuer das JuPi-Camp", "pg-jupi-camp");
 	}
 
-	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $mlname) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("event.{$kuerzel}", $mlname) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("event.{$kuerzel}")));
+	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("event.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("event.{$kuerzel}")));
 	}
 
 

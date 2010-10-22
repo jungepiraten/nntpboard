@@ -92,7 +92,7 @@ abstract class AbstractAuth implements Auth {
 	public function generateUnreadArray($group) {
 		$unreadthreads = array();
 		foreach ($group->getThreadIDs() as $threadid) {
-			if ($this->isUnreadThread($group->getThread($threadid))) {
+			if ($group->hasThread($threadid) && $this->isUnreadThread($group->getThread($threadid))) {
 				$unreadthreads[$threadid] = true;
 			}
 		}
