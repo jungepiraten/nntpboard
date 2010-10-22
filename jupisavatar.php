@@ -67,7 +67,7 @@ if ($image !== null) {
 	}
 	ImagePNG($thumb, $cachename . ".png");
 	ImageDestroy($thumb);
-	header("Location: image/png");
+	header("Content-Type: image/png");
 	readfile($cachename . ".png");
 	exit;
 }
