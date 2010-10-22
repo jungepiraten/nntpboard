@@ -133,7 +133,7 @@ class NNTPMessage {
 		}
 
 		// Nachrichteninhalt
-		$textbodys = explode("\n--", $this->body->getBodyPart("text/plain", $charset), 2);
+		$textbodys = explode("\n-- ", $this->body->getBodyPart("text/plain", $charset), 2);
 		$signature = null;
 		if (count($textbodys) >= 2) {
 			$signature = array_pop($textbodys);
