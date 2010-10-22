@@ -91,7 +91,7 @@ class DynamicGroup extends AbstractGroup {
 
 	/** Last Thread **/
 	public function hasLastThread() {
-		return $this->hasThread($this->getLastThread());
+		return $this->getLastThread() != null;
 	}
 	public function getLastThread() {
 		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
