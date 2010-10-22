@@ -24,6 +24,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addCrewStruktur(600, 400);
 
 		$this->addTalkStruktur(700, null);
+		$this->addEventStruktur(800, null);
 		
 		$this->addBoard(new MemCachedNNTPBoard(666, null, "Test", $this->getNNTP_UCPLinks("test", "test") . "Testforum. Spamgefahr!",
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("test")));
@@ -97,12 +98,24 @@ class JuPiConfig extends DefaultConfig {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("talk.{$kuerzel}", $mlname) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("talk.{$kuerzel}")));
 	}
 
+	private function addEventStruktur($id, $parentid) {
+		$this->addBoard(new Board($id, $parentid, "Events", ""));
+		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "pg-jupi-camp");
+	}
+
+	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("event.{$kuerzel}", $mlname) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("event.{$kuerzel}")));
+	}
+
 
 	public function getAddressText($address, $charset) {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
 			return ucfirst($name);
+		}
+		if ($host == "junge-piraten.de") {
+			return ucwords(str_replace("."," ",$name)
 		}
 		return parent::getAddressText($address, $charset);
 	}
