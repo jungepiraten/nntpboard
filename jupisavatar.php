@@ -59,7 +59,7 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 	if ($origw > $origh) {
 		$thumbw = THUMBWIDTH;
 		$thumbh = $origh * (THUMBWIDTH / $origw);
-	} else if ($origw < $origh) {
+	} else {
 		$thumbw = $origw * (THUMBHEIGHT / $origh);
 		$thumbh = THUMBHEIGHT;
 	}
@@ -69,6 +69,8 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 	ImageCopyResampled($thumb, $img, 0, 0, 0, 0, $thumbw, $thumbh, $origw, $origh);
 } else {
 	$thumb = $img;
+	ImageAlphaBlending($thumb, false);
+	ImageSaveAlpha($thumb, true);
 }
 ImagePNG($thumb, $cachename . ".png");
 ImageDestroy($thumb);
