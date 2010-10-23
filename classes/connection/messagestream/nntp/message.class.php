@@ -26,7 +26,7 @@ class NNTPMessage {
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	base64_decode($message->getMessageID()), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
 		if ($message->hasParent()) {
-			$header->set(	NNTPSingleHeader::generate("References",	$message->getParentID(), $charset));
+			$header->set(	NNTPSingleHeader::generate("References",	base64_decode($message->getParentID()), $charset));
 		}
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($message->getAuthor())->getPlain(), $charset));
@@ -43,7 +43,7 @@ class NNTPMessage {
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	base64_decode($ack->getMessageID()), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("References",	$ack->getReference(), $charset));
+		$header->set(	NNTPSingleHeader::generate("References",	base64_decode($ack->getReference()), $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) . "] " . $message->getSubject(), $charset));
