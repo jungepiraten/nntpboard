@@ -119,7 +119,7 @@ class NNTPMessage {
 		$parentid = null;
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
 			$references = explode(" ", $this->getHeader()->get("References")->getValue($charset));
-			$parentid = array_pop($references);
+			$parentid = base64_encode(array_pop($references));
 		}
 
 		if ($this->isAcknowledge()) {
