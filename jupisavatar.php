@@ -64,7 +64,7 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 		$thumbh = THUMBHEIGHT;
 	}
 	$thumb = ImageCreateTrueColor($thumbw, $thumbh);
-	ImageAlphaBlending($thumb, true);
+	ImageAlphaBlending($thumb, false);
 	ImageSaveAlpha($thumb, true);
 	ImageCopyResampled($thumb, $img, 0, 0, 0, 0, $thumbw, $thumbh, $origw, $origh);
 } else {
