@@ -65,6 +65,9 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 	}
 	$thumb = ImageCreateTrueColor($thumbw, $thumbh);
 	ImageCopyResampled($thumb, $img, 0, 0, 0, 0, $thumbw, $thumbh, $origw, $origh);
+	$t = ImageColorsForIndex($img, ImageColorTransparent($img));
+	$thumbtransparent = ImageColorClosest($thumb, $t[0], $t[1], $t[2]);
+	ImageColorTransparent($thumb, $thumbtransparent);
 } else {
 	$thumb = $img;
 }
