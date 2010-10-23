@@ -1,6 +1,6 @@
 <?php
 
-define("CACHEPERIOD", 3 * 24 * 60 * 60);
+define("CACHEPERIOD", 24 * 60 * 60);
 define("THUMBWIDTH", 100);
 define("THUMBHEIGHT", 100);
 
@@ -39,40 +39,38 @@ if ($image === null) {
 	$image = getImage("Benutzer:" . ucfirst($name));
 }
 
-if ($image !== null) {
-	if (substr($image, -5) == ".jpeg" || substr($image, -4) == ".jpg") {
-		$img = ImageCreateFromJPEG($image);
-	} else if (substr($image, -4) == ".gif") {
-		$img = ImageCreateFromGIF($image);
-	} else if (substr($image, -4) == ".png") {
-		$img = ImageCreateFromPNG($image);
-	}
-	if (!is_resource($img)) {
-		die("Fail!");
-	}
-	$origw = ImageSx($img);
-	$origh = ImageSy($img);
-	if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
-		if ($origw > $origh) {
-			$thumbw = THUMBWIDTH;
-			$thumbh = $origh * (THUMBWIDTH / $origw);
-		} else if ($origw < $origh) {
-			$thumbw = $origw * (THUMBHEIGHT / $origh);
-			$thumbh = THUMBHEIGHT;
-		}
-		$thumb = ImageCreateTrueColor($thumbw, $thumbh);
-		ImageCopyResampled($thumb, $img, 0, 0, 0, 0, $thumbw, $thumbh, $origw, $origh);
-	} else {
-		$thumb = $img;
-	}
-	ImagePNG($thumb, $cachename . ".png");
-	ImageDestroy($thumb);
-	header("Content-Type: image/png");
-	readfile($cachename . ".png");
-	exit;
+if ($image === null) {
+	$image = "images/genericperson.png";
 }
 
+if (substr($image, -5) == ".jpeg" || substr($image, -4) == ".jpg") {
+	$img = ImageCreateFromJPEG($image);
+} else if (substr($image, -4) == ".gif") {
+	$img = ImageCreateFromGIF($image);
+} else if (substr($image, -4) == ".png") {
+	$img = ImageCreateFromPNG($image);
+}
+if (!is_resource($img)) {
+	die("Fail!");
+}
+$origw = ImageSx($img);
+$origh = ImageSy($img);
+if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
+	if ($origw > $origh) {
+		$thumbw = THUMBWIDTH;
+		$thumbh = $origh * (THUMBWIDTH / $origw);
+	} else if ($origw < $origh) {
+		$thumbw = $origw * (THUMBHEIGHT / $origh);
+		$thumbh = THUMBHEIGHT;
+	}
+	$thumb = ImageCreateTrueColor($thumbw, $thumbh);
+	ImageCopyResampled($thumb, $img, 0, 0, 0, 0, $thumbw, $thumbh, $origw, $origh);
+} else {
+	$thumb = $img;
+}
+ImagePNG($thumb, $cachename . ".png");
+ImageDestroy($thumb);
 header("Content-Type: image/png");
-readfile("images/genericperson.png");
+readfile($cachename . ".png");
 
 ?>
