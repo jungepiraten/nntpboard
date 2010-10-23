@@ -32,7 +32,7 @@ if (!($message instanceof Message)) {
 }
 
 // TODO mehrfache zustimmungen?
-$ackid = "<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">";
+$ackid = base64_encode("<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">");
 // TODO autor-input?
 $autor = $session->getAuth()->isAnonymous()
 	? new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])))
