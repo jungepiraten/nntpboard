@@ -38,7 +38,7 @@ if (!$session->getAuth()->mayCancel($message)) {
 // TODO Zustimmungs-Posts canceln?
 
 // TODO mehrfache zustimmungen?
-$cancelid = base64_encode("<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">");
+$cancelid = $config->generateMessageID();
 // TODO autor-input?
 $autor = $session->getAuth()->isAnonymous()
 	? new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])))

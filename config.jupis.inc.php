@@ -120,7 +120,8 @@ class JuPiConfig extends DefaultConfig {
 		if ($host == "junge-piraten.de") {
 			return ucwords(str_replace("."," ",$name));
 		}
-		return parent::getAddressText($address, $charset);
+		return $mailto;
+		#return parent::getAddressText($address, $charset);
 	}
 	public function getAddressLink($address, $charset) {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());

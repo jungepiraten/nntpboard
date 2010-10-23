@@ -39,7 +39,7 @@ if ($reference !== null) {
 }
 
 function generateMessage($config, $session, $reference) {
-	$messageid = base64_encode("<" . uniqid("", true) . "@" . $config->getMessageIDHost() . ">");
+	$messageid = $config->generateMessageID();
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->isAnonymous()
 		? new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])))
