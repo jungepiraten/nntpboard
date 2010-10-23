@@ -74,6 +74,10 @@ abstract class DefaultConfig {
 	}
 	abstract protected function getMessageIDHost();
 	abstract public function getTemplate($auth);
+	public function isAttachmentAllowed($attachment) {
+		// Per Default erlauben wir alle Attachments < 512 KB
+		return $attachment->getLength() < 512 * 1024;
+	}
 
 	/**
 	 * Funktionen zur Verschluesselung der Cookies

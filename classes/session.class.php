@@ -39,6 +39,22 @@ class Session {
 		}
 		return $_SESSION["auth"];
 	}
+
+	public function clearAttachments() {
+		$_SESSION["attachments"] = array();
+	}
+
+	public function getAttachments() {
+		return $_SESSION["attachments"];
+	}
+
+	public function getAttachment($i) {
+		return $_SESSION["attachments"][$i];
+	}
+
+	public function addAttachment(Attachment $a) {
+		$_SESSION["attachments"][] = $a;
+	}
 }
 
 ?>

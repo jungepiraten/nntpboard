@@ -23,10 +23,11 @@ $connection->close();
 
 $message = $group->getMessage($messageid);
 if ($message === null) {
-	die("Nachricht ungueltig!");
+	$attachment = $session->getAttachment($partid);
+} else {
+	$attachment = $message->getAttachment($partid);
 }
 
-$attachment = $message->getAttachment($partid);
 if ($attachment === null) {
 	die("Attachment ungueltig!");
 }

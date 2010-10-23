@@ -77,7 +77,7 @@ abstract class NNTPMimeBody {
 		foreach ($message->getAttachments() AS $attachment) {
 			$header = new NNTPHeader;
 			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
-			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
+			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
 			$parts[] = NNTPPlainBody::parseObject($attachment);
 		}

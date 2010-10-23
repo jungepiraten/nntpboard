@@ -7,7 +7,7 @@ interface Template {
 	public function viewthread($board, $thread, $page, $pages, $messages, $mayPost = false);
 	public function viewmessage($board, $thread, $message, $mayPost = false);
 
-	public function viewpostform($board, $reference = null, $quote = false);
+	public function viewpostform($board, $maxuploadsize, $reference = null, $quote = false, $preview = null, $attachments = null);
 	public function viewpostsuccess($board, $thread, $message);
 	public function viewpostmoderated($board, $thread, $message);
 
