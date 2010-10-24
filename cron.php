@@ -2,6 +2,11 @@
 
 require_once(dirname(__FILE__)."/config.inc.php");
 
+if ($config->isCronRunning()) {
+	die("Cronjob already running.");
+}
+$config->markCronRunning();
+
 /**
  * Fuehre hier den Cache-Tausch durch
  *  - Nachrichten in den Cache herunterladen
@@ -26,5 +31,7 @@ foreach ($config->getBoardIDs() as $boardid) {
 		echo "<pre>".$e->getMessage()."</pre>\n";
 	}
 }
+
+$config->markCronFinished();
 
 ?>

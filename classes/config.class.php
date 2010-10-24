@@ -92,6 +92,19 @@ abstract class DefaultConfig {
 	public function decryptString($string) {
 		return $this->getXTEA()->decrypt($string);
 	}
+
+	/**
+	 * Cronjob-Funktionen
+	 **/
+	public function isCronRunning() {
+		return file_exists(dirname(__FILE__)."/../cron_running.txt");
+	}
+	public function markCronRunning() {
+		touch(file_exists(dirname(__FILE__)."/../cron_running.txt"));
+	}
+	public function markCronFinished() {
+		unlink(file_exists(dirname(__FILE__)."/../cron_running.txt"));
+	}
 }
 
 ?>
