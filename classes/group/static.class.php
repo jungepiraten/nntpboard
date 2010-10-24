@@ -69,7 +69,8 @@ class StaticGroup extends AbstractGroup {
 		parent::removeMessage($messageid);
 		// LastPost neu arrangieren
 		if ($this->hasThread($messageid)) {
-			$this->threadslastpost[$threadid] = $this->getThread($messageid)->getLastPostDate();
+			$thread = $this->getThread($messageid);
+			$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
 			asort($this->threadslastpost);
 		}
 
