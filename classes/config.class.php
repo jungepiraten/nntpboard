@@ -103,7 +103,7 @@ abstract class DefaultConfig {
 		@file_put_contents(dirname(__FILE__)."/../cron_running.txt", date("Y-m-d H:i:s"));
 	}
 	public function markCronFinished() {
-		@unlink(file_exists(dirname(__FILE__)."/../cron_running.txt"));
+		@unlink(dirname(__FILE__)."/../cron_running.txt");
 	}
 }
 

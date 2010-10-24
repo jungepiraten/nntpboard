@@ -141,7 +141,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			}
 		}
 		if ($message->hasSignature()) {
-			$row["signature"] = $this->formatMessage($message->getSignature());
+			$row["signature"] = $this->formatText($message->getSignature());
 		}
 		return $row;
 	}
@@ -173,57 +173,61 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$text = strip_tags($text, "<b><i><u><a><tt><small><big>");
 		} else {
 			$text = $message->getTextBody($this->getCharset());
-			
-			// Inline-GPG ausschneiden (RFC 2440)
-			$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
-			
-			// Erkenne auch nicht ausgezeichnete Links
-			$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
-			
-			// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
-			$text = iconv("UTF-8", $this->getCharset(),
-			              htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
-
-			// Zitate sind eine fiese sache ...
-			$lines = explode("\n", $text);
-			$text = "";
-			$quoted = 0;
-			for ($i=0; $i<count($lines); $i++) {
-				$line = rtrim($lines[$i]);
-				$quoted_loc = 0;
-				// Wir haben vorher schon htmlentities rausgeparst ...
-				while (substr($line,0,4) == "&gt;") {
-					$line = ltrim(substr($line,4));
-					$quoted_loc++;
-				}
-				
-				if (trim($line) != "") {
-					while ($quoted < $quoted_loc) {
-						$text .= "<div class=\"quote\">";
-						$quoted++;
-					}
-					while ($quoted > $quoted_loc) {
-						$text .= "</div>";
-						$quoted--;
-					}
-				}
-				$text .= $line . "\r\n";
-			}
-			while ($quoted > 0) {
-				$text .= "</div>";
-				$quoted--;
-			}
-			// Formatierung
-			$text = preg_replace('%(\s|^)(\*[^\s]+\*)(\s|$)%', '$1<b>$2</b>$3', $text);
-			$text = preg_replace('%(\s|^)(/[^\s]+/)(\s|$)%', '$1<i>$2</i>$3', $text);
-			$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
-
-			// Links
-			$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '$1<a href="$2">$2</a>$3', $text);
-
-			// Zeilenumbrueche
-			$text = nl2br(trim($text));
+			$text = $this->formatText($text);
 		}
+		return $text;
+	}
+
+	private function formatText($text) {
+		// Inline-GPG ausschneiden (RFC 2440)
+		$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
+		
+		// Erkenne auch nicht ausgezeichnete Links
+		$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
+		
+		// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
+		$text = iconv("UTF-8", $this->getCharset(),
+		htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
+
+		// Zitate sind eine fiese sache ...
+		$lines = explode("\n", $text);
+		$text = "";
+		$quoted = 0;
+		for ($i=0; $i<count($lines); $i++) {
+			$line = rtrim($lines[$i]);
+			$quoted_loc = 0;
+			// Wir haben vorher schon htmlentities rausgeparst ...
+			while (substr($line,0,4) == "&gt;") {
+				$line = ltrim(substr($line,4));
+				$quoted_loc++;
+			}
+			
+			if (trim($line) != "") {
+				while ($quoted < $quoted_loc) {
+					$text .= "<div class=\"quote\">";
+					$quoted++;
+				}
+				while ($quoted > $quoted_loc) {
+					$text .= "</div>";
+					$quoted--;
+				}
+			}
+			$text .= $line . "\r\n";
+		}
+		while ($quoted > 0) {
+			$text .= "</div>";
+			$quoted--;
+		}
+		// Formatierung
+		$text = preg_replace('%(\s|^)(\*[^\s]+\*)(\s|$)%', '$1<b>$2</b>$3', $text);
+		$text = preg_replace('%(\s|^)(/[^\s]+/)(\s|$)%', '$1<i>$2</i>$3', $text);
+		$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
+
+		// Links
+		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '$1<a href="$2">$2</a>$3', $text);
+
+		// Zeilenumbrueche
+		$text = nl2br(trim($text));
 		return $text;
 	}
 
