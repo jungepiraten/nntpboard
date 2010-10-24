@@ -100,10 +100,10 @@ abstract class DefaultConfig {
 		return file_exists(dirname(__FILE__)."/../cron_running.txt");
 	}
 	public function markCronRunning() {
-		touch(file_exists(dirname(__FILE__)."/../cron_running.txt"));
+		@file_put_contents(file_exists(dirname(__FILE__)."/../cron_running.txt"), date("Y-m-d H:i:s"));
 	}
 	public function markCronFinished() {
-		unlink(file_exists(dirname(__FILE__)."/../cron_running.txt"));
+		@unlink(file_exists(dirname(__FILE__)."/../cron_running.txt"));
 	}
 }
 
