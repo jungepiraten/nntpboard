@@ -16,12 +16,12 @@ if (file_exists($cachename . ".png") && filemtime($cachename . ".png") > time() 
 
 // Funktion zum Laden eines Bildes aus der Wikiseite
 function getImage($page) {
-	$link = "http://wiki.junge-piraten.de/w/api.php?action=query&prop=images&&format=xml&titles=" . urlencode($page);
+	$link = "http://wiki.junge-piraten.de/w/api.php?action=query&prop=images&format=xml&titles=" . urlencode($page);
 	$blacklist = array("Politischer Kompass.svg", "Edit add.svg", "Zebramitstern.png");
 
 	$xml = file_get_contents($link);
 
-	preg_match_all('#<im\s+ns="6"\s+title="Datei:(.*(\.jpg|\.jpeg|\.gif|\.png))"[\s/]*>#Ui', $xml, $matches, PREG_SET_ORDER);
+	preg_match_all('#<im\s+ns="6"\s+title="Datei:([^"]*(\.jpg|\.jpeg|\.gif|\.png))"[\s/]*>#Ui', $xml, $matches, PREG_SET_ORDER);
 
 	foreach ($matches as $match) {
 		$file = $match[1];
