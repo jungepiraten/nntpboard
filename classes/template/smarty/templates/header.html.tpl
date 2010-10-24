@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" dir="ltr">
 	<head>
-		<meta name="Content-Type" value="text/html; charset={$CHARSET}" />
+		<meta name="Content-Type" content="text/html; charset={$CHARSET}" />
 		<link rel="stylesheet" href="styles/default.css" type="text/css" />
 		<link rel="icon" type="image/png" href="images/favicon.png" />
 		<title>Junge Piraten &bull; {$title|escape:html}</title>
@@ -20,7 +20,7 @@
 				| <a class="logout" href="logout.php">Abmelden</a>
 				{/if}
 			</div>
-			<a href="index.php"><img src="images/logo.png" class="logo" /></a>
+			<a href="index.php"><img src="images/logo.png" class="logo" alt="Zur Forenübersicht"/></a>
 		</div>
 		<a href="http://piratenpad.de/jupis-nntpboard-vorschlaege">Bitte hilf mit, NNTPBoard zu verbessern!</a>
 		<h1 class="mainname">{$title|escape:html}</h1>

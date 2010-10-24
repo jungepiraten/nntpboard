@@ -1,7 +1,7 @@
 <table class="mainmessagetable {if $first}first{/if} {cycle values="odd,even"}">
 <tr class="messagehead">
 <td colspan="2">
- <a name="article{$message.messageid|escape:html}" class="anchor"></a>
+ <a id="article{$message.messageid|escape:html}" class="anchor"></a>
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">von</span>
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
