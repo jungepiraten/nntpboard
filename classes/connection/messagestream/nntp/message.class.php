@@ -140,7 +140,7 @@ class NNTPMessage {
 		if (count($textbodys) >= 2) {
 			$signature = array_pop($textbodys);
 		}
-		$textbody = implode("\n--", $textbodys);
+		$textbody = implode("\n-- ", $textbodys);
 		$htmlbody = $this->body->getBodyPart("text/html", $charset);
 		
 		$message = new Message($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $signature, $htmlbody);

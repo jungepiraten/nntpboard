@@ -141,7 +141,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			}
 		}
 		if ($message->hasSignature()) {
-			$row["signature"] = $message->getSignature();
+			$row["signature"] = $this->formatMessage($message->getSignature());
 		}
 		return $row;
 	}
