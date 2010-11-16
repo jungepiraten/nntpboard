@@ -70,7 +70,7 @@ abstract class DefaultConfig {
 		return "1.0RC2";
 	}
 	public function generateMessageID() {
-		return base64_encode("<" . uniqid("", true) . "@" . $this->getMessageIDHost() . ">");
+		return "<" . uniqid("", true) . "@" . $this->getMessageIDHost() . ">";
 	}
 	abstract protected function getMessageIDHost();
 	abstract public function getTemplate($auth);
@@ -91,6 +91,12 @@ abstract class DefaultConfig {
 	}
 	public function decryptString($string) {
 		return $this->getXTEA()->decrypt($string);
+	}
+	public function encodeMessageID($messageid) {
+		return base64_encode($messageid);
+	}
+	public function decodeMessageID($messageid) {
+		return base64_decode($messageid);
 	}
 
 	/**

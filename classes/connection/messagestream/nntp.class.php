@@ -76,7 +76,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			throw new Exception($ret);
 		} else {
 			foreach ($articles AS $article) {
-				$this->messageids[base64_encode($article["Message-ID"])] = $article["Number"];
+				$this->messageids[$article["Message-ID"]] = $article["Number"];
 			}
 		}
 	}

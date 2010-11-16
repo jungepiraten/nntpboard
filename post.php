@@ -11,13 +11,13 @@ $template = $config->getTemplate($session->getAuth());
 $boardid = stripslashes($_REQUEST["boardid"]);
 $reference = null;
 if (!empty($_REQUEST["quote"])) {
-	$reference = stripslashes($_REQUEST["quote"]);
+	$reference = $config->decodeMessageID(stripslashes($_REQUEST["quote"]));
 }
 if (!empty($_REQUEST["reply"])) {
-	$reference = stripslashes($_REQUEST["reply"]);
+	$reference = $config->decodeMessageID(stripslashes($_REQUEST["reply"]));
 }
 if (!empty($_REQUEST["reference"])) {
-	$reference = stripslashes($_REQUEST["reference"]);
+	$reference = $config->decodeMessageID(stripslashes($_REQUEST["reference"]));
 }
 $quote = isset($_REQUEST["quote"]);
 

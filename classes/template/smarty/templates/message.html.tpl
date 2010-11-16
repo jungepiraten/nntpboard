@@ -1,16 +1,16 @@
 <table class="mainmessagetable {if $first}first{/if} {cycle values="odd,even"}">
 <tr class="messagehead">
 <td colspan="2">
- <a id="article{$message.messageid|escape:html}" class="anchor"></a>
- <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|escape:url}">{$message.subject|escape:html}</a>
+ <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
+ <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">von</span>
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  <span class="buttondiv">
-  {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid}" class="reply">Antworten</a>{/if}
-  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;wertung=-1" class="nack">-</a>{/if}
-  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid}&amp;messageid={$message.messageid}" class="cancel">L&ouml;schen</a>{/if}
+  {if ($mayPost)}<a href="post.php?boardid={$board.boardid}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="reply">Antworten</a>{/if}
+  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="nack">-</a>{/if}
+  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="cancel">L&ouml;schen</a>{/if}
  </span>
  </td>
 </tr>
@@ -31,7 +31,7 @@
  <dl class="attachmentbox">
  <dt>Dateianhänge</dt>
  {foreach from=$message.attachments key=partid item=part}
-  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid}&amp;partid={$partid}{/capture}
+  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;partid={$partid}{/capture}
   {if $part.isinline && $part.isimage}
   <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" /></a>
   {else}

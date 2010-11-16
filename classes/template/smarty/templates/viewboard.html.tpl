@@ -45,7 +45,7 @@ Seite {$page+1} von {$pages} &bull;
  <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}" onclick="document.location.href = document.getElementById('thread{$smarty.foreach.counter.iteration}').href;">
   <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden"/></td>
   <td class="title">
-  <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}">{$thread.subject}</a>
+  <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}">{$thread.subject}</a>
   </td>
   <td class="postcount">
   <span class="posts">{$thread.posts}</span>
@@ -56,7 +56,7 @@ Seite {$page+1} von {$pages} &bull;
   </td>
   <td class="lastpost">
   <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
-  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$thread.lastpostmessageid}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
+  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$thread.lastpostmessageid|encodeMessageID}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   </td>
  </tr>
 {foreachelse}
