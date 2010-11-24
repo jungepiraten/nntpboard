@@ -122,16 +122,17 @@ class NNTPMessage {
 			$parentid = array_pop($references);
 		}
 
-		if ($this->isAcknowledge()) {
-			try {
+		try {
+			$message = $connection->getMessage($parentid);
+			while ($message instanceof Acknowledge) {
+				$parentid = $message->getReference();
 				$message = $connection->getMessage($parentid);
-				while ($message instanceof Acknowledge) {
-					$parentid = $message->getReference();
-					$message = $connection->getMessage($parentid);
-				}
-				preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"), $match);
-				return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
-			} catch (NotFoundMessageException $e) {}
+			}
+		} catch (NotFoundMessageException $e) {}
+
+		if ($this->isAcknowledge()) {
+			preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"), $match);
+			return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
 		}
 
 		// Nachrichteninhalt
