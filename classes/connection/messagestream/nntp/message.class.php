@@ -23,10 +23,10 @@ class NNTPMessage {
 		$charset = $message->getCharset();
 		
 		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	base64_decode($message->getMessageID()), $charset));
+		$header->set(	NNTPSingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
 		if ($message->hasParent()) {
-			$header->set(	NNTPSingleHeader::generate("References",	base64_decode($message->getParentID()), $charset));
+			$header->set(	NNTPSingleHeader::generate("References",	$message->getParentID(), $charset));
 		}
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($message->getAuthor())->getPlain(), $charset));
@@ -41,9 +41,9 @@ class NNTPMessage {
 		$charset = $message->getCharset();
 
 		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	base64_decode($ack->getMessageID()), $charset));
+		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("References",	base64_decode($ack->getReference()), $charset));
+		$header->set(	NNTPSingleHeader::generate("References",	$ack->getReference(), $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) . "] " . $message->getSubject(), $charset));
@@ -57,7 +57,7 @@ class NNTPMessage {
 		$charset = $message->getCharset();
 
 		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	base64_decode($cancel->getMessageID()), $charset));
+		$header->set(	NNTPSingleHeader::generate("Message-ID",	$cancel->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($cancel->getAuthor())->getPlain(), $charset));
@@ -101,7 +101,7 @@ class NNTPMessage {
 		$charset = "UTF-8";
 		
 		// Header interpretieren
-		$messageid =	base64_encode($this->getHeader()->get("Message-ID")->getValue($charset));
+		$messageid =	$this->getHeader()->get("Message-ID")->getValue($charset);
 		$subject =	$this->getHeader()->get("Subject")->getValue($charset);
 		$date =		strtotime($this->getHeader()->get("Date")->getValue($charset));
 		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
@@ -119,7 +119,7 @@ class NNTPMessage {
 		$parentid = null;
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
 			$references = explode(" ", $this->getHeader()->get("References")->getValue($charset));
-			$parentid = base64_encode(array_pop($references));
+			$parentid = array_pop($references);
 		}
 
 		if ($this->isAcknowledge()) {

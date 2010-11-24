@@ -39,7 +39,7 @@ function addAttachmentField() {
    <td>
    <input type="hidden" name="charset" value="{$CHARSET}" />
    <input type="hidden" name="boardid" value="{$board.boardid|escape:html}" />
-   <input type="hidden" name="reference" value="{$reference|escape:html}" />
+   <input type="hidden" name="reference" value="{$reference|encodeMessageID|escape:html}" />
   {if isset($address)}
    Benutzer:</td>
    <td><span>{include file=address.html.tpl address=$address}</span></td>

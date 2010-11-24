@@ -6,8 +6,8 @@ $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
-$threadid = isset($_REQUEST["threadid"]) ? stripslashes($_REQUEST["threadid"]) : null;
-$messageid = isset($_REQUEST["messageid"]) ? stripslashes($_REQUEST["messageid"]) : null;
+$threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["threadid"])) : null;
+$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
 
 $board = $config->getBoard($boardid);
 if ($board === null) {

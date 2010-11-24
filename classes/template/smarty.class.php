@@ -17,6 +17,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
+		$this->smarty->register_modifier("encodeMessageID", array($config, "encodeMessageID"));
 		$this->smarty->assign("VERSION", $config->getVersion());
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
@@ -284,9 +285,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	public function viewmessage($board, $thread, $message, $mayPost = false, $mayAcknowledge = false) {
 		$page = floor($thread->getMessagePosition($message) / $this->getConfig()->getMessagesPerPage());
 		$location = "viewthread.php?boardid=" . urlencode($board->getBoardID()) .
-		            "&threadid=" . urlencode($thread->getThreadID()) .
+		            "&threadid=" . urlencode($this->getConfig()->encodeMessageID($thread->getThreadID())) .
 		            "&page=" . intval($page) . "#article" . 
-		            urlencode($message->getMessageID());
+		            urlencode($this->getConfig()->encodeMessageID($message->getMessageID()));
 		header("Location: " . $location);
 		$this->sendHeaders();
 		echo "<a href=\"".htmlentities($location)."\">Weiter</a>";

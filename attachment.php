@@ -5,7 +5,7 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 $session = new Session($config);
 
 $boardid = stripslashes($_REQUEST["boardid"]);
-$messageid = stripslashes($_REQUEST["messageid"]);
+$messageid = $config->decodeMessageID(stripslashes($_REQUEST["messageid"]));
 $partid = stripslashes($_REQUEST["partid"]);
 
 $board = $config->getBoard($boardid);
