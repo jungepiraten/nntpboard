@@ -27,7 +27,7 @@ Seite {$page+1} von {$pages} &bull;
 {/if}
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
-{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
+{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
 </div>
 
@@ -56,7 +56,7 @@ Seite {$page+1} von {$pages} &bull;
   </td>
   <td class="lastpost">
   <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
-  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$thread.lastpostmessageid}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
+  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;messageid={$thread.lastpostmessageid|escape:url}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   </td>
  </tr>
 {foreachelse}
@@ -71,10 +71,10 @@ Seite {$page+1} von {$pages} &bull;
 Seite {$page+1} von {$pages} &bull; 
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
-{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
+{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
 </div>
 {/if}
 
-{if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
+{if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}" class="newthread">Neuer Thread</a>{/if}
 {include file=footer.html.tpl}

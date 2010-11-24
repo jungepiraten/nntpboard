@@ -58,19 +58,19 @@ class JuPiConfig extends DefaultConfig {
 		// Folge hier komplett den "alten" ids
 		$this->addBoard(new Board(13, $parentid, "Landesverbände", "Unterforen der Landesverbände"));
 		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "berlin");
-		$this->addLVBoard(25, 13, "nw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
+		$this->addLVBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
 		$this->addLVBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
 		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
-		$this->addLVBoard(32, 13, "ni", "Niedersachsen", "NDS:Hauptseite", "ni");
+		$this->addLVBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "ni");
 		$this->addLVBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
 		$this->addLVBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
 		$this->addLVBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
 		$this->addLVBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
 		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
-		$this->addLVBoard(53, 13, "rp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
+		$this->addLVBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
 		$this->addLVBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
 		$this->addLVBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
-		$this->addLVBoard(59, 13, "st", "Sachsen Anhalt", "ST:Hauptseite", "st");
+		$this->addLVBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "st");
 		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
 		$this->addLVBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
 	}

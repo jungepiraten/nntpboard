@@ -1,7 +1,7 @@
 <table class="maintable">
 <thead>
 <tr>
- <th colspan=2>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
+ <th colspan=2>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
  <th>Themen</th>
  <th>Beitr&auml;ge</th>
  <th>Letzte Antwort</th>
@@ -13,7 +13,7 @@
  <tr class="boardentry board {cycle values='even,odd'} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('board{$boardid}.{$smarty.foreach.counter.iteration}').href;">
   <td class="icon"><img src="images/flagge{if $board.unread}_unread{/if}.png" /></td>
   <td class="title">
-  <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
+  <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
   <span class="titlebeschr">{$board.desc}</span>
    </td>
    <td class="threadcount">

@@ -14,8 +14,11 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	private $username;
 	private $password;
 
+	// Erste ArtNr und Letzte ArtNr
+	private $firstartnr;
+	private $lastartnr;
 	// MessageID => ArtikelNum
-	private $messageids = array();
+	private $messageids = null;
 	// y (read-write), n (read-only) oder m (moderiert)
 	private $mode = null;
 
@@ -70,30 +73,40 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
-		// Hole eine Uebersicht ueber alle verfuegbaren Posts
-		$articles = $this->nntpclient->getOverview($ret["first"]."-".$ret["last"]);
-		if (PEAR::isError($articles)) {
-			throw new Exception($ret);
-		} else {
-			foreach ($articles AS $article) {
-				$this->messageids[base64_encode($article["Message-ID"])] = $article["Number"];
-			}
-		}
+		$this->firstartnr = $ret["first"];
+		$this->lastartnr = $ret["last"];
 	}
 	
 	public function close() {
 		$this->nntpclient->disconnect();
 	}
 
+	public function getMessageIDArtNrs() {
+		if ($this->messageids == null) {
+			// Hole eine Uebersicht ueber alle verfuegbaren Posts
+			$articles = $this->nntpclient->getOverview($this->firstartnr . "-" . $this->lastartnr);
+			if (PEAR::isError($articles)) {
+				throw new Exception($ret);
+			} else {
+				$this->messageids = array();
+				foreach ($articles AS $article) {
+					$this->messageids[base64_encode($article["Message-ID"])] = $article["Number"];
+				}
+			}			
+		}
+		return $this->messageids;
+	}
+
 
 	public function getMessageIDs() {
-		return array_keys($this->messageids);
+		return array_keys($this->getMessageIDArtNrs());
 	}
 	public function getMessageCount() {
-		return count($this->messageids);
+		return count($this->getMessageIDArtNrs());
 	}
 	public function hasMessage($msgid) {
-		return isset($this->messageids[$msgid]);
+		$messageids = $this->getMessageIDArtNrs();
+		return isset($messageids[$msgid]);
 	}
 	public function getMessage($msgid) {
 		// Frage zuerst den Kurzzeitcache
@@ -101,8 +114,9 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			return $this->messages[$msgid];
 		}
 		// Versuche die Nachricht frisch zu laden
-		if (isset($this->messageids[$msgid])) {
-			$artnr = $this->messageids[$msgid];
+		$messageids = $this->getMessageIDArtNrs();
+		if (isset($messageids[$msgid])) {
+			$artnr = $messageids[$msgid];
 			// Lade die Nachricht und Parse sie
 			$article = $this->nntpclient->getArticle($artnr);
 			if (PEAR::isError($article)) {

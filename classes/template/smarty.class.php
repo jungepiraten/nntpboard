@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . "/../template.class.php");
 
-require_once("/usr/share/php/smarty/libs/Smarty.class.php");
+require_once("Smarty/Smarty.class.php");
 
 /**
  * NOTE: _all_ view* functions quit execution!
