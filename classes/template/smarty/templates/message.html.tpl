@@ -8,9 +8,9 @@
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  <span class="buttondiv">
-  {if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|escape:url}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|escape:url}" class="reply">Antworten</a>{/if}
-  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|escape:url}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|escape:url}&amp;wertung=-1" class="nack">-</a>{/if}
-  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|escape:url}" class="cancel">L&ouml;schen</a>{/if}
+  {if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="reply">Antworten</a>{/if}
+  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="nack">-</a>{/if}
+  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="cancel">L&ouml;schen</a>{/if}
  </span>
  </td>
 </tr>
@@ -31,7 +31,7 @@
  <dl class="attachmentbox">
  <dt>Dateianhänge</dt>
  {foreach from=$message.attachments key=partid item=part}
-  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|escape:url}&amp;partid={$partid|escape:url}{/capture}
+  {capture assign=attachmentlink}attachment.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;partid={$partid|escape:url}{/capture}
   {if $part.isinline && $part.isimage}
   <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" /></a>
   {else}

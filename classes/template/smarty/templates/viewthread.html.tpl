@@ -8,7 +8,7 @@ Seite {$page+1} von {$pages} &bull;
 {/if}
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
-{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
+{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
 </div>
 
@@ -40,7 +40,7 @@ Seite {$page+1} von {$pages} &bull;
 {/if}
 {section name=page start=0 loop=$pages}
 {assign var=p value=$smarty.section.page.index}
-{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
+{if $page!=$p}<a href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
 {/section}
 </div>
 

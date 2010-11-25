@@ -56,7 +56,7 @@ Seite {$page+1} von {$pages} &bull;
   </td>
   <td class="lastpost">
   <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
-  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;messageid={$thread.lastpostmessageid|escape:url}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
+  <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;messageid={$thread.lastpostmessageid|encodeMessageID|escape:url}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   </td>
  </tr>
 {foreachelse}
