@@ -22,7 +22,7 @@ $group = $connection->getGroup();
 $connection->close();
 
 $message = $group->getMessage($messageid);
-if ($message === null) {
+if ($message === false) {
 	$attachment = $session->getAttachment($partid);
 } else {
 	$attachment = $message->getAttachment($partid);
