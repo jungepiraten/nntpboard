@@ -90,7 +90,7 @@ class NNTPSingleHeader {
 
 	public static function generate($name, $value, $charset) {
 		// Nur encoden wenn noetig
-		if (preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $input, $matches)) {
+		if (preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $value, $matches)) {
 			mb_internal_encoding($charset);
 			$value = mb_encode_mimeheader(str_replace(" ", "_", $value), $charset);
 		}

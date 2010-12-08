@@ -75,14 +75,14 @@ abstract class NNTPMimeBody {
 		}
 		// Eventuelle Attachments verpacken wir jetzt
 		foreach ($message->getAttachments() AS $attachment) {
-			$header = new NNTPHeader;
-			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
-			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
-			$header->set($contenttype);
 			$parts[] = NNTPPlainBody::parseObject($attachment);
 		}
 		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
 		if (count($parts) > 1) {
+			$header = new NNTPHeader;
+			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/mixed",	$message->getCharset());
+			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
+			$header->set($contenttype);
 			return new NNTPMixedMimeBody($header, $parts);
 		}
 		// ansonsten nehmen wir einfach dieses eine Attachment

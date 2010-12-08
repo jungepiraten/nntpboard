@@ -86,7 +86,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			// Hole eine Uebersicht ueber alle verfuegbaren Posts
 			$articles = $this->nntpclient->getOverview($this->firstartnr . "-" . $this->lastartnr);
 			if (PEAR::isError($articles)) {
-				throw new Exception($ret);
+				throw new Exception($articles);
 			} else {
 				$this->messageids = array();
 				foreach ($articles AS $article) {
