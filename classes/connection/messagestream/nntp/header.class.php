@@ -92,7 +92,7 @@ class NNTPSingleHeader {
 		// Nur encoden wenn noetig
 		if (preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $value, $matches)) {
 			mb_internal_encoding($charset);
-			$value = mb_encode_mimeheader(str_replace(" ", "_", $value), $charset);
+			$value = mb_encode_mimeheader($value, $charset, "B");
 		}
 		return new NNTPSingleHeader($name, $value);
 	}
@@ -131,7 +131,7 @@ class NNTPSingleHeader {
 
 	public function getExtra($name, $charset = null) {
 		if ($charset != null) {
-			return iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($this->getValue()));
+			return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->getValue())));
 		}
 		return $this->extra[strtolower($name)];
 	}
