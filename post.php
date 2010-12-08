@@ -106,6 +106,8 @@ if (isset($_REQUEST["post"])) {
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);
 		}
+		// Alte Attachments loeschen - werden ja nur fuers Preview gespeichert
+		$session->clearAttachments();
 	} catch (PostingException $e) {
 		$template->viewexception($e);
 	}
