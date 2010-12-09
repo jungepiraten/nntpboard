@@ -80,6 +80,7 @@ abstract class NNTPMimeBody {
 		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
 		if (count($parts) > 1) {
 			$header = new NNTPHeader;
+			$header->set(NNTPSingleHeader::generate("MIME-Version", "1.0", $message->getCharset()));
 			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/mixed",	$message->getCharset());
 			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
