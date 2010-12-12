@@ -16,6 +16,16 @@ function toggleSignature(id) {
 	}
 }
 
+function toggleQuote(id) {
+	if (document.getElementById("quote" + id).style.display == "none") {
+		document.getElementById("quotelink" + id).innerHTML = "Zitat verstecken";
+		document.getElementById("quote" + id).style.display = "block";
+	} else {
+		document.getElementById("quotelink" + id).innerHTML = "Zitat anzeigen";
+		document.getElementById("quote" + id).style.display = "none";
+	}
+}
+
 function addAttachmentField() {
 	var input = document.createElement("input");
 	input.type = "file";

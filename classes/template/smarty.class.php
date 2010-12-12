@@ -172,18 +172,19 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	private function formatMessage($message) {
-		if ($message->hasHTMLBody()) {
-			$text = $message->getHTMLBody($this->getCharset());
-			// Nur "gutes" HTML durchlassen
-			$text = strip_tags($text, "<b><i><u><a><tt><small><big>");
-		} else {
-			$text = $message->getTextBody($this->getCharset());
-			$text = $this->formatText($text);
+		$text = $message->getHTMLBody($this->getCharset());
+		if ($message->hasHTMLBody() and $text == strip_tags($text, "<b><i><u><a><tt><small><big>")) {
+			return $text;
 		}
+		
+		$text = $message->getTextBody($this->getCharset());
+		$text = $this->formatText($text);
 		return $text;
 	}
 
 	private function formatText($text) {
+		$tid = md5($text);
+
 		// Inline-GPG ausschneiden (RFC 2440)
 		$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
 		
@@ -198,6 +199,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$lines = explode("\n", $text);
 		$text = "";
 		$quoted = 0;
+		$quotes = array();
 		for ($i=0; $i<count($lines); $i++) {
 			$line = rtrim($lines[$i]);
 			$quoted_loc = 0;
@@ -209,7 +211,10 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			
 			if (trim($line) != "") {
 				while ($quoted < $quoted_loc) {
-					$text .= "<div class=\"quote\">";
+					$qid = $tid . "-" . $i;
+					$quotes[] = $qid;
+					$text .= "<a href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat verstecken</a>";
+					$text .= "<div class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
 					$quoted++;
 				}
 				while ($quoted > $quoted_loc) {
