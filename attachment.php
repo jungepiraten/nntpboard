@@ -36,7 +36,7 @@ $disposition = $attachment->getDisposition();
 $filename = $attachment->getFilename();
 
 // Fix for images
-if (preg_match("^image/", $attachment->getMimeType()) {
+if (preg_match("^image/", $attachment->getMimeType())) {
 	$disposition = "inline";
 }
 
