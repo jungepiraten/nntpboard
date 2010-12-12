@@ -45,11 +45,15 @@ class Session {
 	}
 
 	public function getAttachments() {
-		return $_SESSION["attachments"];
+		if (isset($_SESSION["attachments"])) {
+			return $_SESSION["attachments"];
+		}
 	}
 
 	public function getAttachment($i) {
-		return $_SESSION["attachments"][$i];
+		if (isset($_SESSION["attachments"][$i])) {
+			return $_SESSION["attachments"][$i];
+		}
 	}
 
 	public function addAttachment(Attachment $a) {

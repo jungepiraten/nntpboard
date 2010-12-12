@@ -38,6 +38,10 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["name"]		= $board->getName();
 		$row["desc"]		= $board->getDesc();
 		// Letzter Post und ungelesenes Forum markieren
+		$row["unread"]		= false;
+		$row["threadcount"]	= 0;
+		$row["messagecount"]	= 0;
+		$row["lastpostdate"]	= 0;
 		if ($board->hasThreads()) {
 			$c = $board->getConnection($this->getAuth());
 			$c->open();

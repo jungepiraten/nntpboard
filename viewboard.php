@@ -40,7 +40,7 @@ if ($connection !== null) {
 
 	$template->viewboard($board, $group, $page, $pages, $threads, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
 } else {
-	$template->viewboard($board, $group);
+	$template->viewboard($board, null);
 }
 
 ?>

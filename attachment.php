@@ -35,6 +35,11 @@ if ($attachment === null) {
 $disposition = $attachment->getDisposition();
 $filename = $attachment->getFilename();
 
+// Fix for images
+if (preg_match("^image/", $attachment->getMimeType()) {
+	$disposition = "inline";
+}
+
 // see RFC 2616 for these Headers
 header("Content-Type: ".$attachment->getMimeType());
 header("Content-Length: ".$attachment->getLength());

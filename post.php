@@ -45,7 +45,7 @@ function generateMessage($config, $session, $reference) {
 		? new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])))
 		: $session->getAuth()->getAddress();
 	$charset = (!empty($_REQUEST["charset"]) ? trim(stripslashes($_REQUEST["charset"])) : $config->getCharSet());
-	$storedattachments = is_array($_REQUEST["storedattachment"]) ? $_REQUEST["storedattachment"] : array();
+	$storedattachments = isset($_REQUEST["storedattachment"]) && is_array($_REQUEST["storedattachment"]) ? $_REQUEST["storedattachment"] : array();
 	$attachment = $_FILES["attachment"];
 	
 	if ($reference !== null) {
