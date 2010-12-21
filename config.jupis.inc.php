@@ -20,6 +20,8 @@ class JuPiConfig extends DefaultConfig {
 		$this->addBoard(new MemCachedNNTPBoard(2, null, "Allgemeines", $this->getNNTP_UCPLinks("misc", "aktive") . "Globale Themen der Jungen Piraten",
 				false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("misc")));
 
+		$this->addOrgaStruktur(300, null);
+
 		$this->addBoard(new Board(400, null, "Gliederungen", "Unterforen der Gebietsgruppen"));
 		$this->addLVStruktur(500, 400);
 		$this->addCrewStruktur(600, 400);
@@ -54,6 +56,16 @@ class JuPiConfig extends DefaultConfig {
 	private function getNNTPGroup($name) {
 		return "pirates.youth.de.{$name}";
 	}
+
+	private function addOrgaStruktur($id, $parentid) {
+		$this->addBoard(new Board($id, $parentid, "Organisation", ""));
+		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
+		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"", null, "ag-oe");
+	}
+	private function addOrgaBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("orga.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("orga.{$kuerzel}")));
+	}
+
 	private function addLVStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
 		$this->addBoard(new Board(13, $parentid, "Landesverbände", "Unterforen der Landesverbände"));
@@ -74,7 +86,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
 		$this->addLVBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
 	}
-
 	private function addLVBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.lv.{$kuerzel}", $mlname, $wiki) . $name, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.lv.{$kuerzel}")));
 	}
@@ -84,7 +95,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addCrewBoard($id+1, $id, "freiburg", "Freiburg",	"BW:Freiburg", "crew-freiburg");
 		$this->addCrewBoard($id+2, $id, "quadrat", "Mannheim",	"BW:Crew_JuPis%B2", null);
 	}
-
 	private function addCrewBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("gliederung.crew.{$kuerzel}", $mlname, $wiki) . $name, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("gliederung.crew.{$kuerzel}")));
 	}
@@ -96,7 +106,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null, "talk-kekse");
 		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Was sonst nicht relevant waere", null, "talk-sonstiges");
 	}
-
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("talk.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("talk.{$kuerzel}")));
 	}
@@ -105,7 +114,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addBoard(new Board($id, $parentid, "Events", ""));
 		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "JuPi-Camp_2011", "pg-jupi-camp");
 	}
-
 	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("event.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("event.{$kuerzel}")));
 	}
