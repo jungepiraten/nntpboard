@@ -128,8 +128,7 @@ class JuPiConfig extends DefaultConfig {
 		if ($host == "junge-piraten.de") {
 			return ucwords(str_replace("."," ",$name));
 		}
-		return $mailto;
-		#return parent::getAddressText($address, $charset);
+		return $name . "@..."; 
 	}
 	public function getAddressLink($address, $charset) {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
@@ -137,7 +136,7 @@ class JuPiConfig extends DefaultConfig {
 		if ($host == "community.junge-piraten.de") {
 			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . ucfirst($name);
 		}
-		return parent::getAddressLink($address, $charset);
+		return "";
 	}
 	public function getAddressImage($address, $charset) {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
