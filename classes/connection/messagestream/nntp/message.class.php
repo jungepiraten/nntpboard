@@ -19,14 +19,19 @@ class NNTPMessage {
 		return new NNTPMessage($header->extractMessageHeader(), $body);
 	}
 
-	public static function parseObject($group, $message) {
+	public static function generateReferences($connection, $message) {
+		// TODO die letzten 5 messageids hier
+		return $message->getParentID();
+	}
+
+	public static function parseObject($connection, $group, $message) {
 		$charset = $message->getCharset();
 		
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
 		if ($message->hasParent()) {
-			$header->set(	NNTPSingleHeader::generate("References",	$message->getParentID(), $charset));
+			$header->set(	NNTPSingleHeader::generate("References",	self::generateReferences($connection, $message), $charset));
 		}
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($message->getAuthor())->getPlain(), $charset));
@@ -37,13 +42,15 @@ class NNTPMessage {
 		return new NNTPMessage($header, NNTPMimeBody::parseObject($message));
 	}
 
-	public static function parseAcknowledgeObject($group, $ack, $message) {
+	public static function parseAcknowledgeObject($connection, $group, $ack, $message) {
 		$charset = $message->getCharset();
+		$references = self::generateReferences($connection, $message);
+		$references .= " " . $message->getMessageID();
 
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("References",	$ack->getReference(), $charset));
+		$header->set(	NNTPSingleHeader::generate("References",	$references, $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) . "] " . $message->getSubject(), $charset));
@@ -53,7 +60,7 @@ class NNTPMessage {
 		return new NNTPMessage($header, NNTPMimeBody::parseAcknowledgeObject($ack, $message));
 	}
 
-	public static function parseCancelObject($group, $cancel, $message) {
+	public static function parseCancelObject($connection, $group, $cancel, $message) {
 		$charset = $message->getCharset();
 
 		$header = new NNTPHeader;

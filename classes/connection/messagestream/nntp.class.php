@@ -138,13 +138,13 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	 * Schreibe eine Nachricht
 	 **/
 	public function postMessage($message) {
-		return $this->post(NNTPMessage::parseObject($this->group, $message));
+		return $this->post(NNTPMessage::parseObject($this, $this->group, $message));
 	}
 	public function postAcknowledge($ack, $message) {
-		return $this->post(NNTPMessage::parseAcknowledgeObject($this->group, $ack, $message));
+		return $this->post(NNTPMessage::parseAcknowledgeObject($this, $this->group, $ack, $message));
 	}
 	public function postCancel($cancel, $message) {
-		return $this->post(NNTPMessage::parseCancelObject($this->group, $cancel, $message));
+		return $this->post(NNTPMessage::parseCancelObject($this, $this->group, $cancel, $message));
 	}
 	private function post($nntpmsg) {
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
