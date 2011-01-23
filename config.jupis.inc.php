@@ -60,7 +60,7 @@ class JuPiConfig extends DefaultConfig {
 	private function addOrgaStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Organisation", ""));
 		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
-		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"", null, "ag-oe");
+		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"Öffentlichkeitsarbeit", "AG_Oe", "ag-oe");
 	}
 	private function addOrgaBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("orga.{$kuerzel}", $mlname, $wiki) . $desc, false, true, false, $this->getNNTPHost(), $this->getNNTPGroup("orga.{$kuerzel}")));
