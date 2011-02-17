@@ -113,7 +113,7 @@ class NNTPSingleHeader {
 	public function getValue($charset = null) {
 		if ($charset != null) {
 			$value = $this->getValue();
-			preg_match_all('$=\\?(.*?)=([bBqQ])=(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
+			preg_match_all('$=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
 			foreach ($parts as $part) {
 				$decoded = $part[0];
 				if (strtolower($part[2]) == "q") {
