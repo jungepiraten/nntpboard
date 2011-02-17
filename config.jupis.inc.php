@@ -121,7 +121,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "JuPi-Camp_2011", "pg-jupi-camp");
 	}
 	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
-		$this->addGenericBoard($id, $parentid, "events.{$kuerzel}", $mlname, $wiki, $name, $desc);
+		$this->addGenericBoard($id, $parentid, "event.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
 
