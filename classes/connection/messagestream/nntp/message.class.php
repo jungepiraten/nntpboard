@@ -125,7 +125,7 @@ class NNTPMessage {
 		// References (per Default als neuer Thread)
 		$parentid = null;
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
-			$references = explode(" ", $this->getHeader()->get("References")->getValue($charset));
+			$references = preg_split("$\\s$", $this->getHeader()->get("References")->getValue($charset));
 			do {
 				$parentid = array_pop($references);
 			} while ($parentid != false && !$connection->hasMessage($parentid));

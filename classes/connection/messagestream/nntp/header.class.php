@@ -112,7 +112,17 @@ class NNTPSingleHeader {
 
 	public function getValue($charset = null) {
 		if ($charset != null) {
-			return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->getValue())));
+			$value = $this->getValue();
+			preg_match_all('$=\\?(.*?)=([bBqQ])=(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
+			foreach ($parts as $part) {
+				$decoded = $part[0];
+				if (strtolower($part[2]) == "q") {
+					$decoded = str_replace("_", " ", $decoded);
+				}
+				$decoded = mb_decode_mimeheader($decoded);
+				$value = str_replace($part[0], $decoded, $value);
+			}
+			return $value;
 		}
 		return $this->value;
 	}

@@ -4,13 +4,16 @@ require_once(dirname(__FILE__) . "/cachednntp.class.php");
 require_once(dirname(__FILE__) . "/../connection/itemcache/mem.class.php");
 
 class MemCachedNNTPBoard extends CachedNNTPBoard {
-	public function __construct($boardid, $parentid, $name, $desc, $host, $group, $anonMayPost, $authMayPost, $isModerated) {
-		parent::__construct($boardid, $parentid, $name, $desc, $host, $group, $anonMayPost, $authMayPost, $isModerated);
+	private $memcache;
+
+	public function __construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated, $memcache, $host, $group) {
+		parent::__construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated, $host, $group);
+		$this->memcache = $memcache;
 	}
 
 	public function getConnection($auth) {
 		return new MemItemCacheConnection(
-		           "localhost", 11211, "nntpboard-" . $this->getBoardID(),
+		           $this->memcache,
 		           parent::getConnection($auth)
 		       );
 	}

@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)."/classes/host.class.php");
+require_once(dirname(__FILE__)."/classes/memcachehost.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/filecachednntp.class.php");
@@ -17,12 +18,13 @@ class TestConfig extends DefaultConfig {
 		$this->addBoard(new Board(null, null, "Testboards", ""));
 
 		$host = new Host("prauscher.homeip.net");
+		$memcache = new MemcacheHost("localhost", 11011, "nntpboard999");
 
 		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
 		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
 				false, true, true, $host, "prauscher.test"));
 		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
-				false, true, false, $host, "prauscher.testing"));
+				false, true, false, $memcache, $host, "prauscher.testing"));
 
 		$this->secretkey = $secretkey;
 	}
