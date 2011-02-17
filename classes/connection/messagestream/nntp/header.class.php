@@ -119,7 +119,7 @@ class NNTPSingleHeader {
 				if (strtolower($part[2]) == "q") {
 					$decoded = str_replace("_", " ", $decoded);
 				}
-				$decoded = mb_decode_mimeheader($decoded);
+				$decoded = iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($decoded));
 				$value = str_replace($part[0], $decoded, $value);
 			}
 			return $value;
