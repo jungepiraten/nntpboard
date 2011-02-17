@@ -52,7 +52,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function getMemcacheHost($boardid) {
-		return new MemCacheHost("storage", 11011, "nntpboard" . $boardid);
+		return new MemCacheHost("storage", 11211, "nntpboard" . $boardid);
 	}
 
 	private function getNNTPGroup($name) {

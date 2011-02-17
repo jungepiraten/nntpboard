@@ -18,7 +18,7 @@ class TestConfig extends DefaultConfig {
 		$this->addBoard(new Board(null, null, "Testboards", ""));
 
 		$host = new Host("prauscher.homeip.net");
-		$memcache = new MemcacheHost("localhost", 11011, "nntpboard999");
+		$memcache = new MemcacheHost("localhost", 11211, "nntpboard999");
 
 		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
 		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",

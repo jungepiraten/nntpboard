@@ -2,7 +2,7 @@
 
 class MemCacheHost {
 	private $host = "localhost";
-	private $port = 11011;
+	private $port = 11211;
 	private $prefix = "";
 	
 	public function __construct($host = null, $port = null, $prefix = "") {
