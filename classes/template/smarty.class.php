@@ -213,7 +213,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				while ($quoted < $quoted_loc) {
 					$qid = $tid . "-" . $i;
 					$quotes[] = $qid;
-					$text .= "<a href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
+					$text .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
 					$text .= "<div class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
 					$quoted++;
 				}
