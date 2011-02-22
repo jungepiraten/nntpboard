@@ -11,7 +11,7 @@ class NNTPHeader {
 			$line = rtrim($plain[$i]);
 			// Multiline-Header
 			while (isset($plain[$i+1]) && preg_match("$^\s$", $plain[$i+1])) {
-				$line .= " ".ltrim($plain[++$i]);
+				$line .= ltrim($plain[++$i]);
 			}
 			if (!empty($line)) {
 				$header->set(NNTPSingleHeader::parsePlain($line));
