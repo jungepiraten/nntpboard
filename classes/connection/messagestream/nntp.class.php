@@ -17,7 +17,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	// Erste ArtNr und Letzte ArtNr
 	private $firstartnr;
 	private $lastartnr;
-	// MessageID => ArtikelNum
+	// MessageIDs
 	private $messageids = null;
 	// y (read-write), n (read-only) oder m (moderiert)
 	private $mode = null;
@@ -81,7 +81,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		$this->nntpclient->disconnect();
 	}
 
-	public function getMessageIDArtNrs() {
+	public function getMessageIDs() {
 		if ($this->messageids == null) {
 			// Hole eine Uebersicht ueber alle verfuegbaren Posts
 			$articles = $this->nntpclient->getOverview($this->firstartnr . "-" . $this->lastartnr);
@@ -90,37 +90,29 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			} else {
 				$this->messageids = array();
 				foreach ($articles AS $article) {
-					$this->messageids[$article["Message-ID"]] = $article["Number"];
+					$this->messageids[] = $article["Message-ID"];
 				}
 			}			
 		}
 		return $this->messageids;
 	}
 
-
-	public function getMessageIDs() {
-		return array_keys($this->getMessageIDArtNrs());
-	}
 	public function getMessageCount() {
-		return count($this->getMessageIDArtNrs());
+		return count($this->getMessageIDs());
 	}
 	public function hasMessage($msgid) {
-		$messageids = $this->getMessageIDArtNrs();
-		return isset($messageids[$msgid]);
+		return in_array($msgid, $this->getMessageIDs());
 	}
 	public function getMessage($msgid) {
 		// Frage zuerst den Kurzzeitcache
 		if (isset($this->messages[$msgid])) {
 			return $this->messages[$msgid];
 		}
-		// Versuche die Nachricht frisch zu laden
-		$messageids = $this->getMessageIDArtNrs();
-		if (isset($messageids[$msgid])) {
-			$artnr = $messageids[$msgid];
+		if ($this->hasMessage($msgid)) {
 			// Lade die Nachricht und Parse sie
-			$article = $this->nntpclient->getArticle($artnr);
+			$article = $this->nntpclient->getArticle($msgid);
 			if (PEAR::isError($article)) {
-				throw new NotFoundMessageException($artnr, $this->group);
+				throw new NotFoundMessageException($msgid, $this->group);
 			}
 			$message = NNTPMessage::parsePlain(implode("\r\n", $article));
 			$message = $message->getObject($this);
