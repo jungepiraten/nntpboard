@@ -1,7 +1,6 @@
 {include file=header.html.tpl title=$board.name}
 
 <p class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</p>
-<p class="markread"><a href="unread.php?markread={$board.boardid}" class="markread">Als gelesen markieren</a></p>
 
 {if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
 {if isset($board.childs)}
@@ -24,6 +23,11 @@
 		<input type="submit" class="newthread" name="" value="Neuer Thread" />
 	</form>
 {/if}
+
+<form action="unread.php" method="get">
+	<input type="hidden" name="markread" value="{$board.boardid}" \>
+	<input type="submit" class="newthread" name="" value="Neuer Thread" />
+</form>
 
 {if isset($threads)}
 <div class="page">
@@ -87,5 +91,10 @@ Seite {$page+1} von {$pages} &bull;
 		<input type="submit" class="newthread" name="" value="Neuer Thread" />
 	</form>
 {/if}
+
+<form action="unread.php" method="get">
+	<input type="hidden" name="markread" value="{$board.boardid}" \>
+	<input type="submit" class="newthread" name="" value="Neuer Thread" />
+</form>
 
 {include file=footer.html.tpl}

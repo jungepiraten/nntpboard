@@ -11,6 +11,7 @@
 		<div class="headerdiv">
 			<div class="buttondiv">
 				<a href="index.php" class="start">Start</a>
+				| <a href="unread.php">Alle als gelesen markieren</a> 
 				| <a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists">Mailinglisten</a>
 				{if $ISANONYMOUS}
 				| <a href="login.php" class="login">Anmelden</a>

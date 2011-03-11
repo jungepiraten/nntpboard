@@ -160,6 +160,7 @@ span.titlebeschr {
 .newthread {
 	float: left;
 	margin-bottom: 10px;
+	margin-left: 10px;
 }
 .mainmessagetable {
 	width:100%;
