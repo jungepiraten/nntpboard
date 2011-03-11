@@ -11,7 +11,7 @@ class NNTPHeader {
 			$line = rtrim($plain[$i]);
 			// Multiline-Header
 			while (isset($plain[$i+1]) && preg_match("$^\s$", $plain[$i+1])) {
-				$line .= ltrim($plain[++$i]);
+				$line .= " " . ltrim($plain[++$i]);
 			}
 			if (!empty($line)) {
 				$header->set(NNTPSingleHeader::parsePlain($line));
@@ -113,9 +113,9 @@ class NNTPSingleHeader {
 	public function getValue($charset = null) {
 		if ($charset != null) {
 			$value = $this->getValue();
-			preg_match_all('$=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
+			preg_match_all('$\\s?=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
 			foreach ($parts as $part) {
-				$decoded = $part[0];
+				$decoded = ltrim($part[0]);
 				if (strtolower($part[2]) == "q") {
 					$decoded = str_replace("_", " ", $decoded);
 				}
