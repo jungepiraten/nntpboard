@@ -26,6 +26,8 @@ a:focus
 	clear:both;
 	padding:10px;
 	background-color:#FFAC4C;
+	border-radius:5px;
+	border-radius:5px;
 	-moz-border-radius:5px;
 	-khtml-border-radius:5px;
 }
@@ -66,6 +68,7 @@ a:focus
 	width:100%;
 	border-spacing:0px;
 	border:5px solid #FFAC4C;
+	border-radius:5px;
 	-moz-border-radius:5px;
 	-khtml-border-radius:5px;
 	border-top:3px solid #FFAC4C;
@@ -161,6 +164,7 @@ span.titlebeschr {
 	width:100%;
 	border-spacing:0px;
 	border:5px solid #FFAC4C;
+	border-radius:5px;
 	-moz-border-radius:5px;
 	-khtml-border-radius:5px;
 	margin-top:20px;
