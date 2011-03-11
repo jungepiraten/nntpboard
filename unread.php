@@ -21,8 +21,9 @@ if (isset($_REQUEST["markread"])) {
 	recurseMarkRead($board, $session->getAuth());
 }
 
-if (isset($_SERVER["HTTP_REFERRER"])) {
-	header("Location: " . $_SERVER["HTTP_REFERRER"]);
+if (isset($_SERVER["HTTP_REFERER"])) {
+	header("Location: " . $_SERVER["HTTP_REFERER"]);
+} else {
+	header("Location: /");
 }
-
 ?>
