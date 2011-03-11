@@ -81,5 +81,11 @@ Seite {$page+1} von {$pages} &bull;
 </div>
 {/if}
 
-{if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}" class="newthread">Neuer Thread</a>{/if}
+{if ($mayPost)}
+	<form action="post.php" method="get">
+		<input type="hidden" name="boardid" value="{$board.boardid}" \>
+		<input type="submit" class="newthread" name="" value="Neuer Thread" />
+	</form>
+{/if}
+
 {include file=footer.html.tpl}

@@ -158,7 +158,8 @@ span.titlebeschr {
 	color:#55524E;
 }
 .newthread {
-	font-size:14px;
+	float: left;
+	margin-bottom: 10px;
 }
 .mainmessagetable {
 	width:100%;
