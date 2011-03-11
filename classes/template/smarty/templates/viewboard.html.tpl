@@ -18,7 +18,11 @@
 {$childboards}
 {/if}
 
-{if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="newthread">Neuer Thread</a>{/if}
+{if ($mayPost)}
+	<form action="post.php?boardid={$board.boardid}" method="get">
+		<input type="submit" class="newthread" name="" value="Neuer Thread" />
+	</form>
+{/if}
 
 {if isset($threads)}
 <div class="page">
