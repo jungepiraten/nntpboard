@@ -26,7 +26,7 @@
 
 <form action="unread.php" method="get">
 	<input type="hidden" name="markread" value="{$board.boardid}" \>
-	<input type="submit" class="newthread" name="" value="Neuer Thread" />
+	<input type="submit" class="newthread" name="" value="Forum als gelesen markieren" />
 </form>
 
 {if isset($threads)}
@@ -94,7 +94,7 @@ Seite {$page+1} von {$pages} &bull;
 
 <form action="unread.php" method="get">
 	<input type="hidden" name="markread" value="{$board.boardid}" \>
-	<input type="submit" class="newthread" name="" value="Neuer Thread" />
+	<input type="submit" class="newthread" name="" value="Forum als gelesen markieren" />
 </form>
 
 {include file=footer.html.tpl}
