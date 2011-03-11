@@ -131,6 +131,12 @@ class NNTPMessage {
 			} while ($parentid != false && !$connection->hasMessage($parentid));
 		}
 
+		// Fiese Fixes gegen dumme Clients, die kein References setzen
+		if ($parentid == null && strtolower(substr($subject,0,3)) == "re:") {
+			$topicsubject = ltrim(substr($subject,3));
+			// TODO Themen nach Subject suchen und MessageID raussuchen
+		}
+
 		try {
 			$message = $connection->getMessage($parentid);
 			while ($message instanceof Acknowledge) {
