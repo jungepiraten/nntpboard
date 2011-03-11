@@ -114,6 +114,9 @@ tr.boardentry:hover td {
 .boardentry td.lastpost {
 	padding-left:5px;
 }
+.icon img {
+	border:0px;
+}
 
 span.title {
 	font-size:16px;
@@ -157,7 +160,12 @@ span.titlebeschr {
 	border:1px solid #FFAC4C;
 	color:#55524E;
 }
-.newthread {
+input.newthread {
+	float: left;
+	margin-bottom: 10px;
+	margin-left: 5px;
+}
+input.markread {
 	float: left;
 	margin-bottom: 10px;
 	margin-left: 5px;
