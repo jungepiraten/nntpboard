@@ -19,7 +19,8 @@
 {/if}
 
 {if ($mayPost)}
-	<form action="post.php?boardid={$board.boardid}" method="get">
+	<form action="post.php" method="get">
+		<input type="hidden" name="boardid" value="{$board.boardid}" \>
 		<input type="submit" class="newthread" name="" value="Neuer Thread" />
 	</form>
 {/if}
