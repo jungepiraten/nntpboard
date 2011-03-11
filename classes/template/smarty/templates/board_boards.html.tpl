@@ -11,7 +11,7 @@
 {foreach from=$boards item=board name=counter}
 {if $zeigekategorien || $board.hasthreads}
  <tr class="boardentry board {cycle values='even,odd'} {if $smarty.foreach.counter.first}first{/if}" onClick="document.location.href = document.getElementById('board{$boardid}.{$smarty.foreach.counter.iteration}').href;">
-  <td class="icon"><img src="images/flagge{if $board.unread}_unread{/if}.png" /></td>
+  <td class="icon">{if $board.unread}<a href="unread.php?markread={$boardid|escape:url}">{/if}<img src="images/flagge{if $board.unread}_unread{/if}.png" />{if $board.unread}</a>{/if}</td>
   <td class="title">
   <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
   <span class="titlebeschr">{$board.desc}</span>
