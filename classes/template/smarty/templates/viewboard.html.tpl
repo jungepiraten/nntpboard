@@ -3,6 +3,12 @@
 <p class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</p>
 
 {if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
+
+<form action="unread.php" class="markread" method="get">
+	<input type="hidden" name="markread" value="{$board.boardid}" \>
+	<input type="submit" class="markread" name="" value="Forum als gelesen markieren" />
+</form>
+
 {if isset($board.childs)}
 {assign var=restforen value=0}
 {capture assign=childboards}
@@ -23,11 +29,6 @@
 		<input type="submit" class="newthread" name="" value="Neuer Thread" />
 	</form>
 {/if}
-
-<form action="unread.php" class="markread" method="get">
-	<input type="hidden" name="markread" value="{$board.boardid}" \>
-	<input type="submit" class="markread" name="" value="Forum als gelesen markieren" />
-</form>
 
 {if isset($threads)}
 <div class="page">
