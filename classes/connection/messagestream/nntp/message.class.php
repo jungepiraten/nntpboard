@@ -93,7 +93,7 @@ class NNTPMessage {
 	}
 
 	public function isAcknowledge() {
-		return preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"));
+		return preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain","UTF-8"));
 	}
 
 	public function getPlain() {
@@ -125,7 +125,7 @@ class NNTPMessage {
 		// References (per Default als neuer Thread)
 		$parentid = null;
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
-			$references = preg_split("$\\s$", $this->getHeader()->get("References")->getValue($charset));
+			$references = preg_split('$\\s$', $this->getHeader()->get("References")->getValue($charset));
 			do {
 				$parentid = array_pop($references);
 			} while ($parentid != false && !$connection->hasMessage($parentid));
@@ -146,7 +146,7 @@ class NNTPMessage {
 		} catch (NotFoundMessageException $e) {}
 
 		if ($this->isAcknowledge()) {
-			preg_match("~^[+-][0-9]{1,4}~", $this->body->getBodyPart("text/plain","UTF-8"), $match);
+			preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain","UTF-8"), $match);
 			return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
 		}
 
