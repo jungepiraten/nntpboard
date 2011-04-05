@@ -21,7 +21,13 @@ class NNTPSignedMimeBody extends NNTPMimeBody {
 	}
 
 	public function getAttachmentParts() {
-		return array();
+		$attachments = array();
+		foreach ($this->getParts() as $part) {
+			if ($part instanceof NNTPMimeBody) {
+				$attachments = array_merge($attachments, $part->getAttachmentParts());
+			}
+		}
+		return $attachments;
 	}
 }
 
