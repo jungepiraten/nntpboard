@@ -52,8 +52,6 @@ class JuPisAuth extends JuPisAnonAuth {
 
 	public static function authenticate($user, $pass) {
 		$auth = new JuPisAuth($user, $pass);
-		// TODO eigentlich brauchen wir ja schon auth - aber zum testen ists einfacher so
-		return $auth;
 		// fetchUserDetails() wirft eine AuthException, wenn es Probleme gab
 		$auth->fetchUserDetails();
 		return $auth;
