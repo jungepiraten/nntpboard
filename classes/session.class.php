@@ -8,16 +8,18 @@ class Session {
 		session_start();
 	}
 	
-	public function login($auth, $permanent = false) {
+	public function login($auth) {
 		if (isset($_SESSION["auth"])) {
 			$auth->transferRead($_SESSION["auth"]);
 		}
 		$_SESSION["auth"] = $auth;
-		if ($permanent == true) {
-			$array = array("username" => $auth->getUsername(), "password" => $auth->getPassword());
-			$string = $this->config->encryptString(serialize($array));
-			setcookie("nntpboard_auth", $string, time() + 360*24*60*60);
-		}
+	}
+
+	public function permanentLogin($auth) {
+		$this->login($auth);
+		$array = array("username" => $auth->getUsername(), "password" => $auth->getPassword());
+		$string = $this->config->encryptString(serialize($array));
+		setcookie("nntpboard_auth", $string, time() + 360*24*60*60);
 	}
 
 	public function logout() {

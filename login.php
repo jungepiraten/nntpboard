@@ -12,7 +12,11 @@ if (isset($_REQUEST["login"])) {
 
 	try {
 		$auth = $config->getAuth($user, $pass);
-		$session->login($auth, $permanent);
+		if ($permanent) {
+			$session->permanentLogin($auth);
+		} else {
+			$session->login($auth);
+		}
 		$template->viewloginsuccess($auth);
 	} catch (AuthException $e) {
 		$template->viewloginfailed();
