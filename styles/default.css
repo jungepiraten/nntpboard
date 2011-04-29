@@ -204,7 +204,7 @@ input.markread {
 	float:right;
 	padding-right:5px;
 }
-.message .authorpic {
+.message td.author, .message .authorpic {
 	width:100px;
 }
 .info {

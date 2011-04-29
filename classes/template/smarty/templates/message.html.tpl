@@ -3,8 +3,6 @@
 <td colspan="2">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
- <span class="info">von</span>
- <span class="author">{include file=address.html.tpl address=$message.author}</span>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  <span class="buttondiv">
@@ -15,8 +13,9 @@
  </td>
 </tr>
 <tr class="message">
-<td class="authorpic">
- <img src="{$message.author.image}" width="70px" />
+<td class="author">
+ <span class="author">{include file=address.html.tpl address=$message.author}</span>
+ <img src="{$message.author.image}" class="authorpic" width="70px" />
 </td>
 <td class="message">
  <p class="body">{$message.body}</p>
