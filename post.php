@@ -10,6 +10,7 @@ $template = $config->getTemplate($session->getAuth());
 
 $boardid = stripslashes($_REQUEST["boardid"]);
 $reference = null;
+$referencemessages = null;
 if (!empty($_REQUEST["quote"])) {
 	$reference = $config->decodeMessageID(stripslashes($_REQUEST["quote"]));
 }
@@ -34,6 +35,11 @@ if ($connection === null) {
 if ($reference !== null) {
 	$connection->open();
 	$group = $connection->getGroup();
+	$referencemessages = array();
+	foreach (array_slice(array_reverse($group->getThread($reference)->getMessageIDs()),0,5) as $messageid) {
+		$referencemessages[] = $group->getMessage($messageid);
+	}
+	$group->getThread($reference);
 	$reference = $group->getMessage($reference);
 	$connection->close();
 }
@@ -151,6 +157,6 @@ function return_bytes($val) {
 
 $maxuploadsize = display_filesize(return_bytes(ini_get("upload_max_filesize")));
 
-$template->viewpostform($board, $maxuploadsize, $reference, $quote, $preview, $session->getAttachments());
+$template->viewpostform($board, $maxuploadsize, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
 
 ?>

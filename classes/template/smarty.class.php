@@ -323,7 +323,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 
-	public function viewpostform($board, $maxuploadsize, $reference = null, $quote = false, $preview = null, $attachmentobjects = null) {
+	public function viewpostform($board, $maxuploadsize, $referencemessages = null, $reference = null, $quote = false, $preview = null, $attachmentobjects = null) {
 		$subject = "";
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
@@ -337,6 +337,13 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				}
 				$this->smarty->assign("body", $body);
 			}
+		}
+		if ($referencemessages !== null) {
+			$messages = array();
+			foreach ($referencemessages as $message) {
+				$messages[] = $this->parseMessage($message);
+			}
+			$this->smarty->assign("referencemessages", $messages);
 		}
 
 		$attachments = array();
