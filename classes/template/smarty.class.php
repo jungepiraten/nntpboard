@@ -212,7 +212,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			
 			if (trim($line) != "") {
 				while ($quoted < $quoted_loc) {
-					$qid = $tid . "-" . $i;
+					$qid = $tid . "-" . count($quotestack) . "-" . $i;
 					array_unshift($quotestack, $qid);
 					$quotes[$qid] = "";
 					$quoted++;
