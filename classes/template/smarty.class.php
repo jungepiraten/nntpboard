@@ -201,42 +201,43 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$quoted = 0;
 		$quotestack = array();
 		$quotes = array();
-		for ($i=0; $i<count($lines); $i++) {
-			$line = rtrim($lines[$i]);
+		for ($i=0; $i<count($lines) + 1; $i++) {
 			$quoted_loc = 0;
-			// Wir haben vorher schon htmlentities rausgeparst ...
-			while (substr($line,0,4) == "&gt;") {
-				$line = ltrim(substr($line,4));
-				$quoted_loc++;
+			$line = "";
+			if ($i < count($lines)) {
+				$line = rtrim($lines[$i]);
+				// Wir haben vorher schon htmlentities rausgeparst ...
+				while (substr($line,0,4) == "&gt;") {
+					$line = ltrim(substr($line,4));
+					$quoted_loc++;
+				}
 			}
-			
-			if (trim($line) != "") {
-				while ($quoted < $quoted_loc) {
-					$qid = $tid . "-" . count($quotestack) . "-" . $i;
-					array_unshift($quotestack, $qid);
-					$quotes[$qid] = "";
-					$quoted++;
+
+			while ($quoted < $quoted_loc) {
+				$qid = $tid . "-" . count($quotestack) . "-" . $i;
+				array_unshift($quotestack, $qid);
+				$quotes[$qid] = "";
+				$quoted++;
+			}
+			while ($quoted > $quoted_loc) {
+				$qid = array_shift($quotestack);
+				$quotetext = $quotes[$qid];
+				$q = "";
+				if (count(explode("\n", $quotetext)) <= 4) {
+					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat verstecken</a>";
+					$q .= "<div class=\"quote\" id=\"quote{$qid}\">";
+				} else {
+					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
+					$q .= "<div class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
 				}
-				while ($quoted > $quoted_loc) {
-					$qid = array_shift($quotestack);
-					$quotetext = $quotes[$qid];
-					$q = "";
-					if (count(explode("\n", $quotetext)) <= 4) {
-						$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat verstecken</a>";
-						$q .= "<div class=\"quote\" id=\"quote{$qid}\">";
-					} else {
-						$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
-						$q .= "<div class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
-					}
-					$q .= $quotetext;
-					$q .= "</div>";
-					if (count($quotestack) > 0) {
-						$quotes[reset($quotestack)] .= $q;
-					} else {
-						$text .= $q;
-					}
-					$quoted--;
+				$q .= $quotetext;
+				$q .= "</div>";
+				if (count($quotestack) > 0) {
+					$quotes[reset($quotestack)] .= $q;
+				} else {
+					$text .= $q;
 				}
+				$quoted--;
 			}
 			if (count($quotestack) > 0) {
 				$quotes[reset($quotestack)] .= $line . "\r\n";
@@ -244,10 +245,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$text .= $line . "\r\n";
 			}
 		}
-		while ($quoted > 0) {
-			$text .= "</div>";
-			$quoted--;
-		}
+
 		// Formatierung
 		$text = preg_replace('%(\s|^)(\*[^\s]+\*)(\s|$)%', '$1<b>$2</b>$3', $text);
 		$text = preg_replace('%(\s|^)(/[^\s]+/)(\s|$)%', '$1<i>$2</i>$3', $text);
