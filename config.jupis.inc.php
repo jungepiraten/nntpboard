@@ -75,7 +75,7 @@ class JuPiConfig extends DefaultConfig {
 	private function addLVStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
 		$this->addBoard(new Board(13, $parentid, "Landesverbände", "Unterforen der Landesverbände"));
-		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "berlin");
+		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
 		$this->addLVBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
 		$this->addLVBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
 		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
