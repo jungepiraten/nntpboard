@@ -34,6 +34,7 @@ class TestConfig extends DefaultConfig {
 	}
 
 	public function getAuth($user, $pass) {
+		return new JuPisAuth($user, $pass);
 		return JuPisAuth::authenticate($user, $pass);
 	}
 

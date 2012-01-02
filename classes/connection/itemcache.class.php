@@ -5,6 +5,9 @@ require_once(dirname(__FILE__) . "/../group/dynamic.class.php");
 
 abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	private $group;
+	/* Anhand von $grouphash != $oldgrouphash koennen wir feststellen, ob wir
+	 * komplex speichern muessen oder einfach fertig sind */
+	private $oldgrouphash;
 	private $grouphash;
 	private $lastthread;
 
@@ -32,6 +35,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	
 	public function open() {
 		$this->grouphash = $this->loadGroupHash();
+		$this->oldgrouphash = $this->grouphash;
 		$this->lastthread = $this->loadLastThread();
 		// Fallback, falls wir ungueltige Daten bekommen
 		if (!($this->lastthread instanceof Thread)) {
@@ -40,20 +44,22 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	
 	public function close() {
-		$this->saveGroupHash($this->grouphash);
-		$this->saveLastThread($this->lastthread);
-		if ($this->group !== null) {
-			$this->saveMessageIDs($this->group->getMessageIDs());
-			$this->saveMessageThreads($this->group->getMessageThreads());
-			$this->saveThreadsLastPost($this->group->getThreadsLastPost());
-			foreach ($this->group->getNewMessagesIDs() as $messageid) {
-				$this->saveMessage($messageid, $this->group->getMessage($messageid));
-			}
-			foreach ($this->group->getNewThreadIDs() as $threadid) {
-				$this->saveThread($threadid, $this->group->getThread($threadid));
-			}
-			foreach ($this->group->getAcknowledgeIDs() as $messageid) {
-				$this->saveAcknowledges($messageid, $this->group->getAcknowledgeMessageIDs($messageid));
+		if ($this->hasChanged()) {
+			$this->saveGroupHash($this->grouphash);
+			$this->saveLastThread($this->lastthread);
+			if ($this->group !== null) {
+				$this->saveMessageIDs($this->group->getMessageIDs());
+				$this->saveMessageThreads($this->group->getMessageThreads());
+				$this->saveThreadsLastPost($this->group->getThreadsLastPost());
+				foreach ($this->group->getNewMessagesIDs() as $messageid) {
+					$this->saveMessage($messageid, $this->group->getMessage($messageid));
+				}
+				foreach ($this->group->getNewThreadIDs() as $threadid) {
+					$this->saveThread($threadid, $this->group->getThread($threadid));
+				}
+				foreach ($this->group->getAcknowledgeIDs() as $messageid) {
+					$this->saveAcknowledges($messageid, $this->group->getAcknowledgeMessageIDs($messageid));
+				}
 			}
 		}
 	}
@@ -74,6 +80,9 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	public function setGroupHash($hash) {
 		$this->grouphash = $hash;
+	}
+	protected function hasChanged() {
+		return $this->grouphash != $this->oldgrouphash;
 	}
 
 	public function getLastThread() {

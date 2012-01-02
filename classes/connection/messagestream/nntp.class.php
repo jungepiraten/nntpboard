@@ -151,6 +151,8 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			// Ein unerwarteter Fehler - wie spannend *g*
 			throw new PostingException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
 		}
+		// Beim naechsten Zugriff sollten wir neue MessageIDs holen
+		$this->messageids = null;
 		// Gebe "m" zurueck, falls die Gruppe moderiert ist
 		return $this->mode;
 	}
