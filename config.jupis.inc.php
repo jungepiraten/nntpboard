@@ -84,7 +84,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addLVBoard(100,35, "by.mfr", "Mittelfranken", "BY:Mittelfranken", "by-mfr");
 		$this->addLVBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
 		$this->addLVBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
-		$this->addLVBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hh");
+		$this->addLVBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
 		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
 		$this->addLVBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
 		$this->addLVBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
