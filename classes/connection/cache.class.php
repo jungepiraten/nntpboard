@@ -43,6 +43,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
 		if ($resp != "m") {
 			$this->getGroup()->addMessage($message);
+			$this->updateGroupHash();
 		}
 		$this->uplink->close();
 		return $resp;
@@ -55,6 +56,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
 		if ($resp != "m") {
 			$this->getGroup()->addMessage($ack);
+			$this->updateGroupHash();
 		}
 		$this->uplink->close();
 		return $resp;
@@ -67,6 +69,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
 		if ($resp != "m") {
 			$this->getGroup()->removeMessage($cancel->getReference());
+			$this->updateGroupHash();
 		}
 		$this->uplink->close();
 		return $resp;
@@ -119,6 +122,10 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		$grouphash = $this->uplink->getGroupHash();
 		$this->setGroupHash($grouphash);
 		$cachegroup->setGroupHash($grouphash);
+	}
+
+	public function updateGroupHash() {
+		$this->setGroupHash($this->uplink->getGroupHash());
 	}
 
 	abstract protected function setGroupHash($hash);
