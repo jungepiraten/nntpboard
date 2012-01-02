@@ -67,18 +67,24 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		}
 		$this->mode = $ret[$this->group]["posting"];
 		
+		$this->refreshCache();
+	}
+	
+	public function close() {
+		$this->nntpclient->disconnect();
+	}
+
+	// Interne Caches leeren, damit wir merken, dass sich etwas geaendert hat
+	protected function refreshCache() {
 		// Waehle die passende Gruppe aus
-		// Hole Zuordnung ArtNr <=> MessageID
 		$ret = $this->nntpclient->selectGroup($this->group, true);
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
 		$this->firstartnr = $ret["first"];
 		$this->lastartnr = $ret["last"];
-	}
-	
-	public function close() {
-		$this->nntpclient->disconnect();
+		
+		$this->messageids = null;
 	}
 
 	public function getMessageIDs() {
@@ -151,8 +157,8 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			// Ein unerwarteter Fehler - wie spannend *g*
 			throw new PostingException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
 		}
-		// Beim naechsten Zugriff sollten wir neue MessageIDs holen
-		$this->messageids = null;
+		// u.a. um zu bemerken, dass wir einen neuen GroupCache haben
+		$this->refreshCache();
 		// Gebe "m" zurueck, falls die Gruppe moderiert ist
 		return $this->mode;
 	}
