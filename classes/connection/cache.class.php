@@ -92,7 +92,9 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$cachegroup->removeMessage($messageid);
 		}
 
-		$cachegroup->setGroupHash($group->getGroupHash());
+		$grouphash = $group->getGroupHash();
+		$this->setGroupHash($grouphash);
+		$cachegroup->setGroupHash($grouphash);
 	}
 
 	public function updateGroup() {
@@ -114,7 +116,9 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$cachegroup->removeMessage($messageid);
 		}
 
-		$cachegroup->setGroupHash($this->uplink->getGroupHash());
+		$grouphash = $this->uplink->getGroupHash();
+		$this->setGroupHash($grouphash);
+		$cachegroup->setGroupHash($grouphash);
 	}
 
 	abstract protected function setGroupHash($hash);
@@ -124,17 +128,15 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 **/
 	public function updateCache() {
 		$this->uplink->open();
-		// Gruppenhashes vergleichen
-		if (false && $this->uplink->getGroupHash() == $this->getGroupHash()) {
-			$this->uplink->close();
-			return;
-		}
-		/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,
-		 * muessen wir nicht erst die komplette Gruppe laden */
-		if ($this->uplink instanceof MessageStream) {
-			$this->updateGroup();
-		} else {
-			$this->setGroup($this->uplink->getGroup());
+		// Gruppenhashes vergleichen (Schnellste Moeglichkeit)
+		if ($this->uplink->getGroupHash() != $this->getGroupHash()) {
+			/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,
+			 * muessen wir nicht erst die komplette Gruppe laden */
+			if ($this->uplink instanceof MessageStream) {
+				$this->updateGroup();
+			} else {
+				$this->setGroup($this->uplink->getGroup());
+			}
 		}
 		$this->uplink->close();
 	}
