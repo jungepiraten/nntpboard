@@ -20,7 +20,8 @@ function parseFacEs($text, $host, &$cache) {
 		}
 	}
 	foreach ($cache[$host] as $id => $thumb) {
-		$text = preg_replace('#(http://|https://|)' . $host . "/" . preg_quote($id) . '#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', $text);
+		$text = preg_replace('#(&lt;|<|)(http://|https://|)' . $host . "/" . preg_quote($id) . '(&gt;|>|)#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', 
+$text);
 	}
 	return $text;
 }
