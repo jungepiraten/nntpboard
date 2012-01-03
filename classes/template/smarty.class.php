@@ -4,12 +4,36 @@ require_once(dirname(__FILE__) . "/../template.class.php");
 
 require_once("Smarty/Smarty.class.php");
 
+function parseFacEs($text, $host, &$cache) {
+	if (!isset($cache[$host])) {
+		$cache[$host] = array();
+	}
+	preg_match_all('#' . preg_quote($host) . '/([0-9]+)#', $text, $matches, PREG_SET_ORDER);
+	foreach ($matches as $match) {
+		if (!isset($cache[$host][$match[1]])) {
+			$item = array_pop(json_decode(file_get_contents("http://" . $host . "/api/id/" . $match[1]))->items);
+			if (!empty($item->face_thumbnail)) {
+				$cache[$host][$match[1]] = $item->face_thumbnail;
+			} else {
+				$cache[$host][$match[1]] = $item->face_url;
+			}
+		}
+	}
+	foreach ($cache[$host] as $id => $thumb) {
+		$text = preg_replace('#(http://|https://|)' . $host . "/" . preg_quote($id) . '#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', $text);
+	}
+	return $text;
+}
+
 /**
  * NOTE: _all_ view* functions quit execution!
  */
 
 class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private $smarty;
+
+	// Used for ragefac.es, ponyfac.es, lauerfac.es
+	private $apiCache;
 	
 	public function __construct($config, $charset, $auth) {
 		parent::__construct($config, $charset, $auth);
@@ -250,6 +274,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = preg_replace('%(\s|^)(\*[^\s]+\*)(\s|$)%', '$1<b>$2</b>$3', $text);
 		$text = preg_replace('%(\s|^)(/[^\s]+/)(\s|$)%', '$1<i>$2</i>$3', $text);
 		$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
+
+		// ragefac.es
+		$text = parseFacEs($text, "ragefac.es", $this->apiCache);
+		$text = parseFacEs($text, "ponyfac.es", $this->apiCache);
+		$text = parseFacEs($text, "lauerfac.es", $this->apiCache);
 
 		// Links
 		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '$1<a href="$2">$2</a>$3', $text);
