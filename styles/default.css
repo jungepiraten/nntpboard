@@ -197,6 +197,7 @@ input.markread {
 .message td {
 	padding:5px;
 	padding-bottom:10px;
+	vertical-align:top;
 	border-style:none solid solid solid;
 	border-width:1px;
 }
