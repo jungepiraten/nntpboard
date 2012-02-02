@@ -30,6 +30,9 @@ class JuPiConfig extends DefaultConfig {
 		
 		$this->addGenericBoard(666, null, "test", "test", null, "Test", "Testforum. Spamgefahr!");
 
+		$this->addBoard(new Board(899, null, "Young Pirates International", ""));
+		$this->addInternationalBoard(900, 899, "ypi", "ypi", null, "Misc", "Miscellanganeous");
+
 		$this->secretkey = $secretkey;
 	}
 
@@ -56,11 +59,14 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function getNNTPGroup($name) {
-		return "pirates.youth.de.{$name}";
+		return "pirates.youth.{$name}";
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks($group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup($group)));
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks($group, "de." . $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup($group)));
+	}
+	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks($group, "int." . $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup($group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {
