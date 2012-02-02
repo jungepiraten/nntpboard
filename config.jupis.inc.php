@@ -63,10 +63,10 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup($group)));
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
 	}
 	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup($group)));
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {
