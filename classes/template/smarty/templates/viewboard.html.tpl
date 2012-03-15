@@ -2,12 +2,7 @@
 
 <p class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</p>
 
-{if !empty($board.desc)}<p class="desc">{$board.desc}</p>{/if}
-
-<form action="unread.php" class="markread" method="get">
-	<input type="hidden" name="markread" value="{$board.boardid}" \>
-	<input type="submit" class="markread" name="" value="Forum als gelesen markieren" />
-</form>
+{if !empty($board.desc)}<p class="well">{$board.desc}</p>{/if}
 
 {if isset($board.childs)}
 {assign var=restforen value=0}
@@ -23,25 +18,35 @@
 {$childboards}
 {/if}
 
-{if ($mayPost)}
-	<form action="post.php" class="newthread" method="get">
-		<input type="hidden" name="boardid" value="{$board.boardid}" \>
-		<input type="submit" class="newthread" name="" value="Neuer Thread" />
-	</form>
-{/if}
+<div class="btn-toolbar">
+	<div class="btn-group">
+		<a href="/unread.php?markread={$board.boardid}" class="btn">Forum als gelesen markieren</a>
+	</div>
 
-{if isset($threads)}
-<div class="page">
-{if $pages > 1}
-Seite {$page+1} von {$pages} &bull; 
-{/if}
-{section name=page start=0 loop=$pages}
-{assign var=p value=$smarty.section.page.index}
-{if $page!=$p}<a href="viewboard.php?boardid={$board.boardid|escape:url}&amp;page={$p}" class="pagenumber">{else}<span class="selected-page">{/if}{$p+1}{if $page!=$p}</a>{else}</span>{/if}
-{/section}
+
+
+
+	{if isset($threads)}
+	{if $pages > 1}
+	<div class="pagination pagination-centered">
+		<ul>
+			{section name=page start=0 loop=$pages}
+				{assign var=p value=$smarty.section.page.index}
+				{if $p<=$page - 3 && $p>=6}
+					<li {if $page==$p}class="active"{/if}><a href="viewboard.php?boardid={$board.boardid|escape:url}&amp;page={$p}">{$p+1}</a></li>
+				{/if}
+			{/section}
+		</ul>
+	</div>
+	{/if}
+
+	<div class="btn-group">
+	{if ($mayPost)}<a class="btn btn-primary">Neuer Thread</a>{/if}
+	</div>
+
 </div>
 
-<table class="maintable">
+<table class="table table-striped">
 <thead>
 <tr>
  <th class="title" colspan="2">Thema</th>
@@ -87,15 +92,15 @@ Seite {$page+1} von {$pages} &bull;
 {/if}
 
 {if ($mayPost)}
-	<form action="post.php" class="newthread" method="get">
+	<form action="post.php" method="get">
 		<input type="hidden" name="boardid" value="{$board.boardid}" \>
-		<input type="submit" class="newthread" name="" value="Neuer Thread" />
+		<input type="submit" class="btn btn-primary" name="" value="Neuer Thread" />
 	</form>
 {/if}
 
-<form action="unread.php" class="markread" method="get">
+<form action="unread.php" method="get">
 	<input type="hidden" name="markread" value="{$board.boardid}" \>
-	<input type="submit" class="markread" name="" value="Forum als gelesen markieren" />
+	<input type="submit" class="btn" name="" value="Forum als gelesen markieren" />
 </form>
 
 {include file=footer.html.tpl}

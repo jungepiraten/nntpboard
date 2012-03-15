@@ -2,48 +2,80 @@
 <html dir="ltr">
 	<head>
 		<meta name="Content-Type" content="text/html; charset={$CHARSET}" />
-		<link rel="stylesheet" href="styles/default.css" type="text/css" />
+		<link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 		<link rel="icon" type="image/png" href="images/favicon.png" />
-		<title>Junge Piraten &bull; {$title|escape:html}</title>
+
+		<style type="text/css">
 		{literal}
-		<script type="text/javascript">
-		<!--
-		function showLoginBar() {
-			document.getElementById('login').style.display = "block";
-			document.getElementById('login').getElementsByTagName('input')[0].focus();
-		}
-		//-->
-		</script>
+			body {
+				padding-top: 60px;
+				padding-bottom: 40px;
+			}
 		{/literal}
+		</style>
+
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+		<title>Junge Piraten &bull; {$title|escape:html}</title>
+
 	</head>
 <body>
-	<div class="seite">
-		<div class="headerdiv">
-			<div class="buttondiv">
-				<a href="index.php" class="start">Start</a>
-				| <a href="unread.php">Alle als gelesen markieren</a> 
-				| <a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists">Mailinglisten</a>
-				{if $ISANONYMOUS}
-				| <a href="login.php" class="login" onClick="showLoginBar(); return false;">Anmelden</a>
-				| <a class="register" href="https://ucp.junge-piraten.de/index.php?module=register">Registrieren</a>
-				{else}
-				| <a href="https://ucp.junge-piraten.de/" class="editprofile">{$ADDRESS}</a>
-				| <a class="logout" href="logout.php">Abmelden</a>
-				{/if}
-			</div>
-			<a href="index.php"><img src="images/logo.png" class="logo" alt="Zur Forenübersicht"/></a>
-		</div>
-		<form class="headerLogin" style="display:none;" id="login" action="login.php" method="post">
-			<fieldset>
-				<input type="hidden" name="redirect" value="{$smarty.server.REQUEST_ADDRESS}" />
-				<label for="username" class="username">Benutzername:</label>
-				<input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|stripslashes|escape:html}{/if}" />
-				<label for="password" class="password">Passwort:</label>
-				<input type="password" class="password" name="password" id="password"/>
-				<input type="checkbox" class="permanent" name="permanent" id="permanent"/> <label for="permanent">Dauerhaft anmelden?</label>
 
-				<input type="submit" class="submit" name="login" value="Login" />
-			</fieldset>
-		</form>
-		<a href="http://piratenpad.de/jupis-nntpboard-vorschlaege">Bitte hilf mit, NNTPBoard zu verbessern!</a>
-		<h1 class="mainname">{$title|escape:html}</h1>
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<a class="brand" href="/">
+					NNTPBoard
+				</a>
+				<ul class="nav">
+					<li class="active"><a href="/">Forenübersicht</a></li>
+					<li><a href="https://ucp.junge-piraten.de/index.php?module=lists">Mailinglisten</a></li>
+				</ul>
+
+				<form class="navbar-form pull-right">
+					<input type="text" class="span2" placeholder="Loginname" />
+					<input type="password" class="span2" placeholder="Passwort" />
+					<button type="submit" class="btn btn-primary">Anmelden</button>
+				</form>
+
+
+				<ul class="nav pull-right">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li class="active"><a href="/">Forum</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<div class="well sidebar-nav">
+					<ul class="nav nav-list">
+						<li class="nav-header">Navigation</li>
+						<li class="active"><a href="/">Forenübersicht</a></li>
+						{if $ISANONYMOUS}
+							<li><a href="/login.php">Anmelden</a></li>
+							<li><a href="https://ucp.junge-piraten.de/index.php?module=register">Registrieren</a></li>
+						{else}
+							<li><a href="/logout.php">Abmelden</a></li>							
+						{/if}
+						<li><a href="/unread.php">Alle als gelesen markieren</a></li>
+						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists">Mailinglisten</a></li>
+					</ul>
+				</div>
+			</div>
+
+
+        <div class="span9">
+
+
+		<h1>{$title|escape:html}</h1>
