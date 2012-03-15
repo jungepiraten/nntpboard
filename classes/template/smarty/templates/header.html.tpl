@@ -35,12 +35,16 @@
 					<li><a href="https://ucp.junge-piraten.de/index.php?module=lists">Mailinglisten</a></li>
 				</ul>
 
-				<form class="navbar-form pull-right">
-					<input type="text" class="span2" placeholder="Loginname" />
-					<input type="password" class="span2" placeholder="Passwort" />
-					<button type="submit" class="btn btn-primary">Anmelden</button>
-				</form>
-
+				{if $ISANONYMOUS}
+					<form class="navbar-form pull-right form-inline" action="/login.php" method="POST">
+						<input type="hidden" name="redirect" value="/" />
+						<input type="text" name="username" class="span2" placeholder="Loginname" />
+						<input type="password" name="password" class="span2" placeholder="Passwort" />
+						<button type="submit" class="btn btn-primary">Anmelden</button>
+					</form>
+				{else}
+					<a href="/logout.php" class="btn btn-danger pull-right">Abmelden</a>
+				{/if}
 
 				<ul class="nav pull-right">
 					<li class="dropdown">
