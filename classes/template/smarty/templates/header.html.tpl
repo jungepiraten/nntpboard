@@ -86,6 +86,6 @@
 
         <div class="span9">
 
-
-		<h1>{$title|escape:html}</h1>
+		<h1 style="margin-bottom: 20px;">{$title|escape:html}</h1>
+		<div class="alert alert-info"><a class="close">&times;</a> Das NNTPBoard ist das Forum der Jungen Piraten. Alles, was hier gepostet wird, kommt auch automatisch auf die entsprechenden Mailinglisten und ist im entsprechenden NNTP-Thread verfügbar (Und umgedreht). Achte daher bitte darauf, deinen Text so zu formulieren, wie du es bei einer normalen E-Mail auch tun würdest.</div>
 

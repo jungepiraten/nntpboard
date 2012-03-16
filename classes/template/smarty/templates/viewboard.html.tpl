@@ -1,6 +1,6 @@
 {include file=header.html.tpl title=$board.name}
 
-<p class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</p>
+<ul class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</ul>
 
 {if !empty($board.desc)}<p class="well">{$board.desc}</p>{/if}
 

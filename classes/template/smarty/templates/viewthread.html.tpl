@@ -1,6 +1,8 @@
 {include file=header.html.tpl title=$thread.subject}
 
-{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}
+<ul class="breadcrumb">
+	{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}
+</ul>
 
 <div class="page">
 {if $pages > 1}
