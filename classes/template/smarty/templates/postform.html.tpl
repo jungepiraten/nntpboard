@@ -33,8 +33,6 @@ function addAttachmentField() {
 	input.type = "file";
 	input.name = "attachment[]";
 	document.getElementById('attachments').appendChild(input);
-	var newline = document.createElement("br");
-	document.getElementById('attachments').appendChild(newline);
 }
 
 //-->
@@ -53,43 +51,50 @@ function addAttachmentField() {
 	<fieldset>
 
 		<div class="control-group">
-<!--
-			{if isset($address)}
-				<span>{include file=address.html.tpl address=$address}</span>
+ 			{if isset($address)}
+				<label class="control-label" for="user">Benutzer</label>
+				<p class="controls">
+					<input type="text" name="user" id="user" value="{$address.text|escape:html}" readonly />
+				</p>
 			{else}
-				<label for="user">Benutzer:</label></td>
-				<td><input type="text" name="user" id="user" size="30" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" /></td>
-				<td><label for="email" style="float:right">E-Mail:</label></td>
-				<td style="width:180px"><input type="text" name="email" id="email" size ="30" style="float:right" value="{if isset($smarty.request.email)}{$smarty.request.email|stripslashes|escape:html}{else}{$email|escape:html}{/if}" /></td>
-			{/if}-->
+				<label class="control-label" for="user">Benutzer</label>
+				<p class="controls">
+					<input type="text" name="user" id="user" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" />
+				</p>
+
+				<label class="control-label" for="email">E-Mail</label>
+				<p class="controls">
+					<input type="text" name="email" id="email" value="{if isset($smarty.request.email)}{$smarty.request.email|stripslashes|escape:html}{else}{$email|escape:html}{/if}" />
+				</p>
+			{/if}
 
 			<label class="control-label" for="subject">Betreff</label>
-			<div class="controls">
+			<p class="controls">
 				<input type="text" class="span7" name="subject" id="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|stripslashes|escape:html}{else}{$subject|escape:html}{/if}" />
-				<p class="help-block">Bitte gebe hier den Betreff an, unter dem deine Nachricht erscheinen soll. In 90% der Fälle brauchst du dieses Feld nicht bearbeiten.</p>
-			</div>
+			</p>
 
-			<label class="control-label" for="body">Text:</label>
-			<div class="controls">
+			<label class="control-label" for="body">Text</label>
+			<p class="controls">
 				<textarea name="body" id="body" class="span7" cols="80" rows="20">{if isset($smarty.request.body)}{$smarty.request.body|stripslashes|escape:html}{else}{$body|escape:html}{/if}</textarea>
+			</p>
+
+			<label class="control-label" for="attachments">Anh&auml;nge:<br /> (Max. {$maxuploadsize})</label>
+			<div class="controls">
+				{foreach from=$attachments key=partid item=attachment}
+					<input type="checkbox" name="storedattachment[]" value="{$partid}" checked="checked" />
+					<strong><a href="attachment.php?boardid={$board.boardid|escape:url}&amp;partid={$partid|escape:html}">{$attachment.filename}</a></strong><br />
+				{/foreach}
+
+				<p id="attachments">
+					<input type="file" name="attachment[]" />
+				</p>
+				<p><a href="#attachments" onclick="addAttachmentField()">Weitere Datei anhängen</a></p>
 			</div>
-
-<label for="attachments">Anh&auml;nge:<br /> (Max. {$maxuploadsize})</label></td>
-
-    <div id="attachments">
-     {foreach from=$attachments key=partid item=attachment}
-      <input type="checkbox" name="storedattachment[]" value="{$partid}" checked="checked" />
-      <strong><a href="attachment.php?boardid={$board.boardid|escape:url}&amp;partid={$partid|escape:html}">{$attachment.filename}</a></strong><br />
-     {/foreach}
-     <input type="file" name="attachment[]" /><br />
-    </div>
-
-    <a href="#attachments" onclick="addAttachmentField()">Weiteres</a>
 
 
 			<div class="form-actions">
-				<input type="submit" class="btn btn-primary" name="post" value="Schreiben" />
-				<input type="submit" class="btn" name="preview" value="Vorschau" />
+				<button type="submit" class="btn btn-primary" name="post" /><i class="icon-edit icon-white"></i> Schreiben</button>
+				<button type="submit" class="btn" name="preview"><i class="icon-check"></i> Vorschau</button>
 			</div>
 		</div>
 	</fieldset>

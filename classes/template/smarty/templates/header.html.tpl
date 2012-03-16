@@ -33,11 +33,24 @@
 				<ul class="nav">
 					<li class="active"><a href="/">Forenübersicht</a></li>
 					<li><a href="https://ucp.junge-piraten.de/index.php?module=lists">Mailinglisten</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="https://www.junge-piraten.de/">Homepage</a></li>
+							<li><a href="https://www.junge-piraten.de/mitmachen/">Mitmachen</a></li>
+							<li class="active"><a href="/">Forum</a></li>
+							<li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
+							<li><a href="http://jupis.piratenpad.de/">Piratenpad</a></li>
+							<li><a href="https://ucp.junge-piraten.de/">UCP</a></li>
+							<li><a href="https://www.junge-piraten.de/presse">Presse</a></li>
+						</ul>
+					</li>
 				</ul>
 
 				{if $ISANONYMOUS}
 					<form class="navbar-form pull-right form-inline" action="/login.php" method="POST">
 						<input type="hidden" name="redirect" value="/" />
+						<input type="hidden" name="login" value="1" />
 						<input type="text" name="username" class="span2" placeholder="Loginname" />
 						<input type="password" name="password" class="span2" placeholder="Passwort" />
 						<button type="submit" class="btn btn-primary">Anmelden</button>
@@ -45,15 +58,6 @@
 				{else}
 					<a href="/logout.php" class="btn btn-danger pull-right"><i class="icon-off icon-white"></i> Abmelden</a>
 				{/if}
-
-				<ul class="nav pull-right">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li class="active"><a href="/">Forum</a></li>
-						</ul>
-					</li>
-				</ul>
 			</div>
 		</div>
 	</div>
@@ -74,11 +78,19 @@
 						{/if}
 						<li><a href="/unread.php"><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
 						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
-
+{php}
+function isSubBoard($destBoard, $curBoard) {
+	if (!isset($destBoard["parent"])) {
+		return false;
+	} else if ($curBoard["boardid"] == $destBoard["parent"]["boardid"] || $curBoard["boardid"] == $destBoard["boardid"]) {
+		return true;
+	} else {
+		return isSubBoard($destBoard["parent"], $curBoard);
+	}
+}
+{/php}
 						<li class="nav-header">Foren</li>
-						{foreach from=$ROOTBOARD.childs item=board name=counter}
-							<li><a href="#"><i class="icon-list-alt"></i> {$board.name|escape:html}</a></li>
-						{/foreach}
+						{include file="header_forennavigation.html.tpl" curboard=$ROOTBOARD}
 					</ul>
 				</div>
 			</div>
@@ -87,5 +99,4 @@
         <div class="span9">
 
 		<h1 style="margin-bottom: 20px;">{$title|escape:html}</h1>
-		<div class="alert alert-info"><a class="close">&times;</a> Das NNTPBoard ist das Forum der Jungen Piraten. Alles, was hier gepostet wird, kommt auch automatisch auf die entsprechenden Mailinglisten und ist im entsprechenden NNTP-Thread verfügbar (Und umgedreht). Achte daher bitte darauf, deinen Text so zu formulieren, wie du es bei einer normalen E-Mail auch tun würdest.</div>
 
