@@ -67,7 +67,7 @@ abstract class DefaultConfig {
 	 **/
 	public function getVersion() {
 		// TODO es ist nicht umbedingt schoen, die Versionsnummer hier festzulegen ;)
-		return "1.0RC2";
+		return "2.0";
 	}
 	public function generateMessageID() {
 		return "<" . uniqid("", true) . "@" . $this->getMessageIDHost() . ">";
