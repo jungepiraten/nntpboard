@@ -5,17 +5,24 @@
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
- <span class="buttondiv">
-  {if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="quote">Zitieren</a> &middot; <a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="reply">Antworten</a>{/if}
-  {if ($mayAcknowledge)} &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="ack">+</a> &middot; <a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="nack">-</a>{/if}
-  {if ($message.mayCancel)} &middot; <a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="cancel">L&ouml;schen</a>{/if}
+ <div class="btn-group pull-right">
+  {if ($message.mayCancel)}<a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-danger btn-mini"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
+  {if ($mayAcknowledge)}<a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-ok"></i> Zustimmen</a><a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="btn btn-mini"><i class="icon-remove"></i> Ablehnen</a>{/if}
+
+  {if ($mayPost)}
+	<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-file"></i> Zitieren</a>
+	<a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="btn btn-inverse btn-mini"><i class="icon-share-alt icon-white"></i> Antworten</a>
+  {/if}
+
+  </div>
+
  </span>
  </td>
 </tr>
 <tr class="message">
-<td class="author">
- <span class="author">{include file=address.html.tpl address=$message.author}</span>
- <img src="{$message.author.image}" class="authorpic" width="70px" />
+<td class="author span2">
+ <p><img src="{$message.author.image}" class="authorpic" /></p>
+ <p>{include file=address.html.tpl address=$message.author}</p>
 </td>
 <td class="message">
  <p class="body">{$message.body}</p>
