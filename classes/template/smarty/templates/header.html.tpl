@@ -43,7 +43,7 @@
 						<button type="submit" class="btn btn-primary">Anmelden</button>
 					</form>
 				{else}
-					<a href="/logout.php" class="btn btn-danger pull-right">Abmelden</a>
+					<a href="/logout.php" class="btn btn-danger pull-right"><i class="icon-off icon-white"></i> Abmelden</a>
 				{/if}
 
 				<ul class="nav pull-right">
@@ -62,13 +62,13 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span3">
-				<div class="well sidebar-nav">
+				<div class="well sidebar-nav" style="padding: 8px 0;">
 					<ul class="nav nav-list">
 						<li class="nav-header">Navigation</li>
 						<li><a href="/"><i class="icon-home"></i> Forenübersicht</a></li>
 						{if $ISANONYMOUS}
-							<li><a href="/login.php">Anmelden</a></li>
-							<li><a href="https://ucp.junge-piraten.de/index.php?module=register">Registrieren</a></li>
+							<li><a href="/login.php"><i class="icon-user"></i> Anmelden</a></li>
+							<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>
 						{else}
 							<li><a href="/logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 						{/if}
