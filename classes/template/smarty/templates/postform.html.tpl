@@ -93,8 +93,8 @@ function addAttachmentField() {
 
 
 			<div class="form-actions">
-				<button type="submit" class="btn btn-primary" name="post" /><i class="icon-edit icon-white"></i> Schreiben</button>
-				<button type="submit" class="btn" name="preview"><i class="icon-check"></i> Vorschau</button>
+				<button type="submit" class="btn btn-primary" name="post" value="1"><i class="icon-edit icon-white"></i> Schreiben</button>
+				<button type="submit" class="btn" name="preview" value="1"><i class="icon-check"></i> Vorschau</button>
 			</div>
 		</div>
 	</fieldset>
