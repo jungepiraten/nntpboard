@@ -65,15 +65,20 @@
 				<div class="well sidebar-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header">Navigation</li>
-						<li class="active"><a href="/">Forenübersicht</a></li>
+						<li><a href="/"><i class="icon-home"></i> Forenübersicht</a></li>
 						{if $ISANONYMOUS}
 							<li><a href="/login.php">Anmelden</a></li>
 							<li><a href="https://ucp.junge-piraten.de/index.php?module=register">Registrieren</a></li>
 						{else}
-							<li><a href="/logout.php">Abmelden</a></li>							
+							<li><a href="/logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 						{/if}
-						<li><a href="/unread.php">Alle als gelesen markieren</a></li>
-						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists">Mailinglisten</a></li>
+						<li><a href="/unread.php"><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
+						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
+
+						<li class="nav-header">Foren</li>
+						{foreach from=$ROOTBOARD.childs item=board name=counter}
+							<li><a href="#"><i class="icon-list-alt"></i> {$board.name|escape:html}</a></li>
+						{/foreach}
 					</ul>
 				</div>
 			</div>
@@ -83,3 +88,4 @@
 
 
 		<h1>{$title|escape:html}</h1>
+

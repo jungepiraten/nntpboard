@@ -20,8 +20,7 @@ function parseFacEs($text, $host, &$cache) {
 		}
 	}
 	foreach ($cache[$host] as $id => $thumb) {
-		$text = preg_replace('#(&lt;|<|)(http://|https://|)' . $host . "/" . preg_quote($id) . '(&gt;|>|)#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', 
-$text);
+		$text = preg_replace('#(&lt;|<|)(http://|https://|)' . $host . "/" . preg_quote($id) . '(&gt;|>|)#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', $text);
 	}
 	return $text;
 }
@@ -43,6 +42,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
 		$this->smarty->register_modifier("encodeMessageID", array($config, "encodeMessageID"));
+		$this->smarty->assign("ROOTBOARD", $this->parseBoard($config->getBoard()));
 		$this->smarty->assign("VERSION", $config->getVersion());
 		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
@@ -248,15 +248,15 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$qid = array_shift($quotestack);
 				$quotetext = $quotes[$qid];
 				$q = "";
-				if (count(explode("\n", $quotetext)) <= 4) {
+				if (count(explode("\n", $quotetext)) <= 7) {
 					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat verstecken</a>";
-					$q .= "<div class=\"quote\" id=\"quote{$qid}\">";
+					$q .= "<blockquote class=\"quote\" id=\"quote{$qid}\">";
 				} else {
 					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
-					$q .= "<div class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
+					$q .= "<blockquote class=\"quote\" id=\"quote{$qid}\" style=\"display:none;\">";
 				}
 				$q .= $quotetext;
-				$q .= "</div>";
+				$q .= "</blockquote>";
 				if (count($quotestack) > 0) {
 					$quotes[reset($quotestack)] .= $q;
 				} else {

@@ -13,7 +13,7 @@
  </td>
 </tr>
 <tr class="message">
-<td class="author">
+<td class="author span2">
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
  <img src="{$message.author.image}" class="authorpic" width="70px" />
 </td>
