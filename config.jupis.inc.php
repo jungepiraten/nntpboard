@@ -14,6 +14,7 @@ require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
 class JuPiConfig extends DefaultConfig {
 	private $secretkey;
+	private $memcachelink;
 	private $ldappass;
 	private $mailusers = array();
 	
@@ -146,15 +147,15 @@ class JuPiConfig extends DefaultConfig {
 			return ucfirst($name);
 		}
 		if (!isset($this->mailusers[$mailto])) {
-			if ($this->link == null) {
-				$this->link = new Memcache;
-				$this->link->pconnect("storage", 11211);
+			if ($this->memcachelink == null) {
+				$this->memcachelink = new Memcache;
+				$this->memcachelink->pconnect("storage", 11211);
 			}
-			$this->mailusers[$mailto] = $this->link->get("nntpboard-communityuser-" . $mailto);
+			$this->mailusers[$mailto] = $this->memcachelink->get("nntpboard-communityuser-" . $mailto);
 
 			if (!isset($this->mailusers[$mailto])) {
-				$link = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
-				$search = $link->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
+				$ldaplink = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
+				$search = $ldaplink->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
 				if ($search->count() != 1) {
 					$this->mailusers[$mailto] = null;
 				} else {
@@ -162,7 +163,7 @@ class JuPiConfig extends DefaultConfig {
 				}
 			}
 
-			$this->link->set("nntpboard-communityuser-" . $mailto, $this->mailusers[$mailto]);
+			$this->memcachelink->set("nntpboard-communityuser-" . $mailto, $this->mailusers[$mailto]);
 		}
 		return $this->mailusers[$mailto];
 	}
