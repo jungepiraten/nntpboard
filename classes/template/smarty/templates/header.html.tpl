@@ -76,7 +76,7 @@
 						{else}
 							<li><a href="/logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 						{/if}
-						<li><a href="/unread.php"><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
+						<li><a href="/unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
 						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
 {php}
 function isSubBoard($destBoard, $curBoard) {
