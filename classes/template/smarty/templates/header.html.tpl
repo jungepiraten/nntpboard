@@ -27,18 +27,18 @@
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
-				<a class="brand" href="/">
+				<a class="brand" href="index.php">
 					NNTPBoard
 				</a>
 				<ul class="nav">
-					<li class="active"><a href="/">Forenübersicht</a></li>
+					<li class="active"><a href="index.php">Forenübersicht</a></li>
 					<li><a href="https://ucp.junge-piraten.de/index.php?module=lists">Mailinglisten</a></li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
 						<ul class="dropdown-menu">
 							<li><a href="https://www.junge-piraten.de/">Homepage</a></li>
 							<li><a href="https://www.junge-piraten.de/mitmachen/">Mitmachen</a></li>
-							<li class="active"><a href="/">Forum</a></li>
+							<li class="active"><a href="index.php">Forum</a></li>
 							<li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
 							<li><a href="http://jupis.piratenpad.de/">Piratenpad</a></li>
 							<li><a href="https://ucp.junge-piraten.de/">UCP</a></li>
@@ -48,15 +48,14 @@
 				</ul>
 
 				{if $ISANONYMOUS}
-					<form class="navbar-form pull-right form-inline" action="/login.php" method="POST">
-						<input type="hidden" name="redirect" value="/" />
+					<form class="navbar-form pull-right form-inline" action="login.php" method="POST">
 						<input type="hidden" name="login" value="1" />
 						<input type="text" name="username" class="span2" placeholder="Loginname" />
 						<input type="password" name="password" class="span2" placeholder="Passwort" />
 						<button type="submit" class="btn btn-primary">Anmelden</button>
 					</form>
 				{else}
-					<a href="/logout.php" class="btn btn-danger pull-right"><i class="icon-off icon-white"></i> Abmelden</a>
+					<a href="logout.php" class="btn btn-danger pull-right"><i class="icon-off icon-white"></i> Abmelden</a>
 				{/if}
 			</div>
 		</div>
@@ -69,15 +68,15 @@
 				<div class="well sidebar-nav" style="padding: 8px 0;">
 					<ul class="nav nav-list">
 						<li class="nav-header">Navigation</li>
-						<li><a href="/"><i class="icon-home"></i> Forenübersicht</a></li>
+						<li><a href="index.php"><i class="icon-home"></i> Forenübersicht</a></li>
 						{if $ISANONYMOUS}
-							<li><a href="/login.php"><i class="icon-user"></i> Anmelden</a></li>
+							<li><a href="login.php"><i class="icon-user"></i> Anmelden</a></li>
 							<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>
 						{else}
-							<li><a href="/logout.php"><i class="icon-off"></i> Abmelden</a></li>							
+							<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 						{/if}
-						<li><a href="/unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
-						<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
+						<li><a href="unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
+						<li><a href="//ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
 {php}
 function isSubBoard($destBoard, $curBoard) {
 	if (!isset($destBoard["parent"])) {

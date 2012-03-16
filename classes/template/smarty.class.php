@@ -435,7 +435,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 	
 	public function viewloginform() {
-		$this->smarty->assign("referer", isset($_REQUEST["referer"]) ? $_REQUEST["referer"] : $_SERVER["HTTP_REFERER"]);
+		$this->smarty->assign("referer", isset($_REQUEST["referer"]) ? $_REQUEST["referer"] : (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : "index.php"));
 		$this->sendHeaders();
 		$this->smarty->display("loginform.html.tpl");
 		exit;
