@@ -1,4 +1,12 @@
 {foreach from=$curboard.childs item=board_item name=counter}
-	<li><a href="viewboard.php?boardid={$board_item.boardid|escape:url}"><i class="icon-list-alt"></i> {$board_item.name|escape:html}</a></li>
-	{if isset($board) && isSubBoard($board, $board_item)}<ul class="nav nav-list">{include file="header_forennavigation.html.tpl" curboard=$board_item}</ul>{/if}
+	<li class="{if isset($board) && $board_item.boardid == $board.boardid}active{/if}">
+		<a href="viewboard.php?boardid={$board_item.boardid|escape:url}" {if count($board_item.childs) > 0}onClick="$('#board-childnav{$board_item.boardid}').fadeToggle(200);return false;"{/if}>
+			<i class="icon-list-alt"></i> {$board_item.name|escape:html}
+		</a>
+		{if count($board_item.childs) > 0}
+			<ul id="board-childnav{$board_item.boardid}" {if !isset($board) || !isSubBoard($board, $board_item)}style="display:none;"{/if} class="nav nav-list">
+				{include file="header_forennavigation.html.tpl" curboard=$board_item}
+			</ul>
+		{/if}
+	</li>
 {/foreach}

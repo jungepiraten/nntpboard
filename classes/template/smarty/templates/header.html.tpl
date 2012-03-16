@@ -21,7 +21,6 @@
 		<![endif]-->
 
 		<title>Junge Piraten &bull; {$title|escape:html}</title>
-
 	</head>
 <body>
 
@@ -89,6 +88,7 @@ function isSubBoard($destBoard, $curBoard) {
 	}
 }
 {/php}
+
 						<li class="nav-header">Foren</li>
 						{include file="header_forennavigation.html.tpl" curboard=$ROOTBOARD}
 					</ul>
