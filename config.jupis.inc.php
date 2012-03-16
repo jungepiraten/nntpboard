@@ -146,20 +146,20 @@ class JuPiConfig extends DefaultConfig {
 			return ucfirst($name);
 		}
 		if (!isset($this->mailusers[$mailto])) {
-			$link = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
-			$search = $link->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
-			if ($search->count() != 1) {
-				$this->mailusers[$mailto] = null;
-			} else {
-				$this->mailusers[$mailto] = ucfirst($search->shiftEntry()->uid());
-			}
+#			$link = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
+#			$search = $link->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
+#			if ($search->count() != 1) {
+#				$this->mailusers[$mailto] = null;
+#			} else {
+#				$this->mailusers[$mailto] = ucfirst($search->shiftEntry()->uid());
+#			}
 		}
 		return $this->mailusers[$mailto];
 	}
 	public function getAddressText($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
 		if ($communityuser != null) {
-			return $this->getCommunityUser();
+			return $communityuser;
 		}
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
@@ -171,14 +171,14 @@ class JuPiConfig extends DefaultConfig {
 	public function getAddressLink($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
 		if ($communityuser != null) {
-			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . ucfirst($name);
+			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . $communityuser;
 		}
 		return "";
 	}
 	public function getAddressImage($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
 		if ($communityuser != null) {
-			return "jupisavatar.php?name=" . urlencode(ucfirst($name));
+			return "jupisavatar.php?name=" . urlencode($communityuser);
 		}
 		return parent::getAddressImage($address, $charset);
 	}
