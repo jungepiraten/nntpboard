@@ -5,6 +5,7 @@
 		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 		<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 		<link rel="icon" type="image/png" href="images/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
 		{literal}
@@ -65,7 +66,7 @@
 
 	<div class="container-fluid">
 		<div class="row-fluid">
-			<div class="span3">
+			<div class="span3 hidden-phone">
 				<div class="well sidebar-nav" style="padding: 8px 0;">
 					<ul class="nav nav-list">
 						<li class="nav-header">Navigation</li>

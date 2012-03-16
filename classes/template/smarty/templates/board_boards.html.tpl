@@ -2,8 +2,8 @@
 <thead>
 <tr>
  <th colspan=2>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
- <th>Themen</th>
- <th>Beitr&auml;ge</th>
+ <th class="hidden-phone">Themen</th>
+ <th class="hidden-phone">Beitr&auml;ge</th>
  <th>Letzte Antwort</th>
 </tr>
 </thead>
@@ -16,16 +16,16 @@
   <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
 	  <span>{$board.desc}</span>
    </td>
-   <td class="span2">
+   <td class="span1 hidden-phone">
   {if isset($board.threadcount)}
-  <span>{$board.threadcount|escape:html}</span>
+  {$board.threadcount|escape:html}
   {else}
   <span> - </span>
   {/if}
   </td>
-   <td class="span2">
+   <td class="hidden-phone span1">
   {if isset($board.messagecount)}
-  <span>{$board.messagecount|escape:html}</span>
+  {$board.messagecount|escape:html}
   {else}
   <span> - </span>
   {/if}

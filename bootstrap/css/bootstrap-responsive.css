@@ -58,6 +58,16 @@
 .hidden-desktop {
   display: none;
 }
+td.visible-desktop, th.visible-desktop {
+  display: table-cell;
+}
+td.hidden-phone, th.hidden-phone {
+  display: table-cell;
+}
+td.hidden-tablet, th.hidden-tablet {
+  display: table-cell;
+}
+
 @media (max-width: 767px) {
   .visible-phone {
     display: block;
@@ -70,6 +80,12 @@
   }
   .visible-desktop {
     display: none;
+  }
+  td.visible-phone, th.visible-phone {
+    display: table-cell;
+  }
+  td.hidden-desktop, th.hidden-desktop {
+    display: table-cell;
   }
 }
 @media (min-width: 768px) and (max-width: 979px) {
@@ -84,6 +100,12 @@
   }
   .visible-desktop {
     display: none;
+  }
+  td.visible-tablet, th.visible-tablet {
+    display: table-cell;
+  }
+  td.hidden-desktop, th.hidden-desktop {
+    display: table-cell;
   }
 }
 @media (max-width: 480px) {
