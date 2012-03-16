@@ -1,8 +1,10 @@
 			</div>
 		</div>
 
+		<hr />
+
 		<footer>
-			<p class="version">NNTPBoard/{$VERSION} – <a href="index.php">Foren-&Uuml;bersicht</a> &middot; NNTPBoard - Erstellt f&uuml;r die <a href="//www.junge-piraten.de/">Jungen Piraten</a>.</p>
+			<p class="version">NNTPBoard/{$VERSION} &middot; Erstellt f&uuml;r die <a href="//www.junge-piraten.de/">Jungen Piraten</a>.</p>
 		</footer>
 {literal}
 <!-- Piwik -->
@@ -18,19 +20,5 @@ piwikTracker.enableLinkTracking();
 </script><noscript><p><img src="http://stats.junge-piraten.de/piwik.php?idsite=3" style="border:0" alt="" /></p></noscript>
 <!-- End Piwik Tracking Code -->
 {/literal}
-
-	<script src="/bootstrap/js/jquery.js"></script>
-	<script src="/bootstrap/js/bootstrap-transition.js"></script>
-	<script src="/bootstrap/js/bootstrap-alert.js"></script>
-	<script src="/bootstrap/js/bootstrap-modal.js"></script>
-	<script src="/bootstrap/js/bootstrap-dropdown.js"></script>
-	<script src="/bootstrap/js/bootstrap-scrollspy.js"></script>
-	<script src="/bootstrap/js/bootstrap-tab.js"></script>
-	<script src="/bootstrap/js/bootstrap-tooltip.js"></script>
-	<script src="/bootstrap/js/bootstrap-popover.js"></script>
-	<script src="/bootstrap/js/bootstrap-button.js"></script>
-	<script src="/bootstrap/js/bootstrap-collapse.js"></script>
-	<script src="/bootstrap/js/bootstrap-carousel.js"></script>
-	<script src="/bootstrap/js/bootstrap-typeahead.js"></script>
 </body>
 </html>

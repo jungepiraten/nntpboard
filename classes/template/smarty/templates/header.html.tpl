@@ -2,8 +2,8 @@
 <html dir="ltr">
 	<head>
 		<meta name="Content-Type" content="text/html; charset={$CHARSET}" />
-		<link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
-		<link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 		<link rel="icon" type="image/png" href="images/favicon.png" />
 
 		<style type="text/css">

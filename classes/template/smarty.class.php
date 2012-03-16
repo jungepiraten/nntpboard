@@ -20,8 +20,7 @@ function parseFacEs($text, $host, &$cache) {
 		}
 	}
 	foreach ($cache[$host] as $id => $thumb) {
-		$text = preg_replace('#(&lt;|<|)(http://|https://|)' . $host . "/" . preg_quote($id) . '(&gt;|>|)#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', 
-$text);
+		$text = preg_replace('#(&lt;|<|)(http://|https://|)' . $host . "/" . preg_quote($id) . '(&gt;|>|)#', '<a href="http://' . $host . "/" . $id . '"><img src="' . $thumb . '" width=100 /></a>', $text);
 	}
 	return $text;
 }
@@ -218,7 +217,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		
 		// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
 		$text = iconv("UTF-8", $this->getCharset(),
-		htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
+			htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
 
 		// Zitate sind eine fiese sache ...
 		$lines = explode("\n", $text);
@@ -282,7 +281,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = parseFacEs($text, "lauerfac.es", $this->apiCache);
 
 		// Links
-		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '$1<a href="$2">$2</a>$3', $text);
+		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '<a href="$2">$2</a>', $text);
 
 		// Zeilenumbrueche
 		$text = nl2br(trim($text));

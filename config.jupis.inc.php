@@ -1,5 +1,8 @@
 <?php
 
+// http://pear.php.net/package/Net_LDAP2
+require_once("Net/LDAP2.php");
+
 require_once(dirname(__FILE__)."/classes/host.class.php");
 require_once(dirname(__FILE__)."/classes/memcachehost.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
@@ -11,8 +14,10 @@ require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
 class JuPiConfig extends DefaultConfig {
 	private $secretkey;
+	private $ldappass;
+	private $mailusers = array();
 	
-	public function __construct($secretkey) {
+	public function __construct($secretkey, $ldappass) {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
 
@@ -34,6 +39,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellanganeous");
 
 		$this->secretkey = $secretkey;
+		$this->ldappass = $ldappass;
 	}
 
 	private function getNNTP_UCPLinks($name = null, $mlname = null, $wiki = null) {
@@ -133,30 +139,45 @@ class JuPiConfig extends DefaultConfig {
 		$this->addGenericBoard($id, $parentid, "event.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
-
-	public function getAddressText($address, $charset) {
+	private function getCommunityUser($address, $charset) {
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
 			return ucfirst($name);
 		}
+		if (!isset($this->mailusers[$mailto])) {
+			$link = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
+			$search = $link->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
+			if ($search->count() != 1) {
+				$this->mailusers[$mailto] = null;
+			} else {
+				$this->mailusers[$mailto] = ucfirst($search->shiftEntry()->uid());
+			}
+		}
+		return $this->mailusers[$mailto];
+	}
+	public function getAddressText($address, $charset) {
+		$communityuser = $this->getCommunityUser($address, $charset);
+		if ($communityuser != null) {
+			return $this->getCommunityUser();
+		}
+		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
+		list($name, $host) = explode("@", $mailto);
 		if ($host == "junge-piraten.de") {
 			return ucwords(str_replace("."," ",$name));
 		}
 		return ($address->hasName() ? $address->getName() . " " : "") . "<" . $name . "@...>";
 	}
 	public function getAddressLink($address, $charset) {
-		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
-		list($name, $host) = explode("@", $mailto);
-		if ($host == "community.junge-piraten.de") {
+		$communityuser = $this->getCommunityUser($address, $charset);
+		if ($communityuser != null) {
 			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . ucfirst($name);
 		}
 		return "";
 	}
 	public function getAddressImage($address, $charset) {
-		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
-		list($name, $host) = explode("@", $mailto);
-		if ($host == "community.junge-piraten.de") {
+		$communityuser = $this->getCommunityUser($address, $charset);
+		if ($communityuser != null) {
 			return "jupisavatar.php?name=" . urlencode(ucfirst($name));
 		}
 		return parent::getAddressImage($address, $charset);
