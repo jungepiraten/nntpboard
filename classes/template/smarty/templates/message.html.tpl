@@ -6,7 +6,7 @@
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
 {if !isset($hidecontrols)}
  <div class="btn-group pull-right">
-  {if ($message.mayCancel)}<a href="javascript:deletePost('{$board.boardid|escape:url}','{$message.messageid|encodeMessageID|escape:url}');" class="btn btn-danger btn-mini deletePost"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
+  {if ($message.mayCancel)}<a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-danger btn-mini deletePost"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
   {if ($mayAcknowledge)}<a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-ok"></i> Zustimmen</a><a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="btn btn-mini"><i class="icon-remove"></i> Ablehnen</a>{/if}
 
   {if ($mayPost)}

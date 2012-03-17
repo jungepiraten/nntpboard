@@ -61,11 +61,11 @@ function toggleQuote(id) {
 </div>
 <script type="text/javascript">
 {literal}
-	function deletePost(boardid, messageid) {
-		event.stopImmediatePropagation();
-		$("#delModal").children(".modal-footer").children("#delButton").attr("href", "cancel.php?boardid=" + boardid + "&amp;messageid=" + messageid);
-		$("#delModal").modal();
-	}
+$(".deletePost").click(function deletePost() {
+	event.stopImmediatePropagation();
+	$("#delModal").children(".modal-footer").children("#delButton").attr("href", $(this).attr("href"));
+	$("#delModal").modal();
+});
 {/literal}
 </script>
 
