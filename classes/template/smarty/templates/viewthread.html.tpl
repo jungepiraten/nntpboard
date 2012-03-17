@@ -67,7 +67,7 @@ function toggleQuote(id) {
 		event.stopImmediatePropagation(linkString);
 		$("#delModal").children(".modal-footer").children("#delButton").attr("href", linkString);
 		$("#delModal").modal();
-	});
+	};
 {/literal}
 </script>
 
