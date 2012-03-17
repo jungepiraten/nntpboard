@@ -15,7 +15,7 @@
 				padding-top: 60px;
 				padding-bottom: 40px;
 			}
-	
+
 			.no-padding {
 				padding:0px;
 			}
