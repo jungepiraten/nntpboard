@@ -278,3 +278,12 @@ div.quote div.quote div.quote div.quote div.quote div.quote {
 	border-color:#c0c;
 	background-color:#fcf;
 }
+
+.no-padding {
+	padding:0px;
+}
+
+.no-top-bottom-margin {
+	margin-top:0px;
+	margin-bottom:0px;
+}

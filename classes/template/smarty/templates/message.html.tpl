@@ -1,4 +1,3 @@
-<table class="table table-striped">
 <tr class="messagehead">
 <td colspan="2">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
@@ -58,4 +57,3 @@
  </dl>
  {/if}
 </td></tr>
-</table>

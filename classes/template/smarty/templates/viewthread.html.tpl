@@ -36,11 +36,11 @@ function toggleQuote(id) {
 {capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={/capture}
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 {/if}
-
+<table class="table table-striped table-bordered">
 {foreach from=$messages item=message name=counter}
 {include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
 {/foreach}
-
+</table>
 {if $pages > 1}
 {capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={/capture}
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
