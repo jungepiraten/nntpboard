@@ -2,8 +2,10 @@
 <html dir="ltr">
 	<head>
 		<meta name="Content-Type" content="text/html; charset={$CHARSET}" />
-		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-		<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
+		<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
+		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<link rel="icon" type="image/png" href="images/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 

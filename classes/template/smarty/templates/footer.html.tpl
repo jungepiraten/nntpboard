@@ -20,8 +20,5 @@ piwikTracker.enableLinkTracking();
 </script><noscript><p><img src="http://stats.junge-piraten.de/piwik.php?idsite=3" style="border:0" alt="" /></p></noscript>
 <!-- End Piwik Tracking Code -->
 {/literal}
-
-	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
-	<script src="bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>
