@@ -41,7 +41,7 @@ function addAttachmentField() {
 
 {if isset($preview)}
 <table class="table table-striped table-bordered">
-{include file=message.html.tpl message=$preview first=1 id="post"}
+{include file=message.html.tpl message=$preview first=1 id="post" hidecontrols=1}
 </table>
 {/if}
 
@@ -105,7 +105,7 @@ function addAttachmentField() {
 {if isset($referencemessages)}
 <table class="table table-striped table-bordered">
  {foreach from=$referencemessages item=message name=counter}
-  {include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
+  {include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration hidecontrols=1}
  {/foreach}
 </table>
 {/if}
