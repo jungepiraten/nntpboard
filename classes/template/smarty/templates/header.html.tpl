@@ -13,7 +13,7 @@
 				padding-top: 60px;
 				padding-bottom: 40px;
 			}
-	
+
 			.no-padding {
 				padding:0px;
 			}
@@ -80,9 +80,7 @@
 						<li><a href="index.php"><i class="icon-home"></i> Forenübersicht</a></li>
 						{if $ISANONYMOUS}
 							<li><a href="login.php"><i class="icon-user"></i> Anmelden</a></li>
-							<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>
-						{else}
-							<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>							
+							<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>						
 						{/if}
 						<li><a href="unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
 						<li><a href="//ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
