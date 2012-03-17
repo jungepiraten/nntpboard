@@ -28,6 +28,8 @@ function toggleQuote(id) {
 	}
 }
 
+
+
 //-->
 </script>
 {/literal}
@@ -45,5 +47,30 @@ function toggleQuote(id) {
 {capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={/capture}
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 {/if}
+
+<div class="modal fade" id="delModal">
+	  <div class="modal-header">
+	    <a class="close" data-dismiss="modal">×</a>
+	    <h3>Achtung:</h3>
+	  </div>
+	  <div class="modal-body">
+	    <p>Soll der Eintrag wirklich gelöscht werden?</p>
+	  </div>
+	  <div class="modal-footer">
+	    <a class="btn btn-danger" id="delButton">Löschen</a>
+	    <a class="btn" data-dismiss="modal">Abbrechen</a>
+	  </div>
+</div>
+<script type="text/javascript">
+{literal}
+	$(".deletePost").click(function() {
+		event.stopImmediatePropagation();
+		var linkString = $(this).parent().children("a.delLink").attr("href")
+		$("#delModal").children(".modal-footer").children("#delButton").attr("href", linkString);
+		$("#delModal").modal();
+	});
+{/literal}
+</script>
+
 
 {include file=footer.html.tpl}
