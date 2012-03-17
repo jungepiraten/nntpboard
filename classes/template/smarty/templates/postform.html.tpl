@@ -103,9 +103,11 @@ function addAttachmentField() {
 </form>
 
 {if isset($referencemessages)}
+<table class="table table-striped table-bordered">
  {foreach from=$referencemessages item=message name=counter}
   {include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
  {/foreach}
+</table>
 {/if}
 
 <br />
