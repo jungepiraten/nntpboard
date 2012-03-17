@@ -38,11 +38,10 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="brand" href="index.php">
-						Junge Piraten
+						NNTPBoard
 					</a>
 					<ul class="nav">
-						<li><a href="https://ucp.junge-piraten.de/index.php">Account</a></li>
-						<li class="active"><a href="index.php">Forum</a></li>
+						<li class="active"><a href="index.php">Forenübersicht</a></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
 							<ul class="dropdown-menu">
