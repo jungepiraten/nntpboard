@@ -65,6 +65,7 @@ $(".deletePost").click(function deletePost() {
 	event.stopImmediatePropagation();
 	$("#delModal").children(".modal-footer").children("#delButton").attr("href", $(this).attr("href"));
 	$("#delModal").modal();
+	return false;
 });
 {/literal}
 </script>
