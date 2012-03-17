@@ -19,7 +19,7 @@
 {/if}
 
 {if isset($threads)}
-<div class="container-fluid nopadding">
+<div class="container-fluid no-padding">
 <div class="row-fluid">
 	<div class="span6">
 		{if $pages > 1}

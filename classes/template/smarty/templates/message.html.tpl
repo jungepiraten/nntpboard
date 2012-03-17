@@ -21,7 +21,7 @@
 </tr>
 <tr class="message">
 <td class="author span2">
- {if isset($message.author.image}<p><img src="{$message.author.image}" class="thumbnail" /></p>{/if}
+ {if isset($message.author.image)}<p><img src="{$message.author.image}" class="thumbnail" /></p>{/if}
  <p>{include file=address.html.tpl address=$message.author}</p>
 </td>
 <td class="message">
