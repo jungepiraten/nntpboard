@@ -61,7 +61,7 @@ function toggleQuote(id) {
 </div>
 <script type="text/javascript">
 {literal}
-$(".deletePost").click(function deletePost() {
+$(".deletePost").click(function() {
 	event.stopImmediatePropagation();
 	$("#delModal").children(".modal-footer").children("#delButton").attr("href", $(this).attr("href"));
 	$("#delModal").modal();
