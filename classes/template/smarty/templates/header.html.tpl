@@ -13,6 +13,15 @@
 				padding-top: 60px;
 				padding-bottom: 40px;
 			}
+	
+			.no-padding {
+				padding:0px;
+			}
+
+			.no-top-bottom-margin {
+				margin-top:0px;
+				margin-bottom:0px;
+			}
 		{/literal}
 		</style>
 
