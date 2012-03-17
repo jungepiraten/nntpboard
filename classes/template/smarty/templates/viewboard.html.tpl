@@ -19,7 +19,7 @@
 {/if}
 
 {if isset($threads)}
-<div class="container-fluid">
+<div class="container-fluid nopadding">
 <div class="row-fluid">
 	<div class="span6">
 		{if $pages > 1}
@@ -30,14 +30,14 @@
 	</div>
 
 	<div class="btn-toolbar span6">
-		<div class="btn-group pull-right">
+		<div class="btn-group pull-right no-top-bottom-margin">
 			<a href="unread.php?markread={$board.boardid}" class="btn"><i class="icon-flag"></i> Forum als gelesen markieren</a>
 			{if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Neuer Thread</a>{/if}
 		</div>
 	</div>
 </div>
 
-<table class="row-fluid table table-striped">
+<table class="row-fluid table table-striped table-bordered">
 <thead>
 <tr>
  <th class="title" colspan="2">Thema</th>

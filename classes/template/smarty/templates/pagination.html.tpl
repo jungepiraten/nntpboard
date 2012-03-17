@@ -1,4 +1,4 @@
-<div class="pagination pagination-left">
+<div class="pagination pagination-left no-top-bottom-margin">
 	<ul>
 		{if $page > 3}
 			{section name=pages loop=$pagecount start=0 max=2}
