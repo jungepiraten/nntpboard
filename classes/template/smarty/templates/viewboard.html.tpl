@@ -48,7 +48,7 @@
 </thead>
 <tbody>
 {foreach from=$threads item=thread name=counter}
- <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}" onclick="document.location.href = document.getElementById('thread{$smarty.foreach.counter.iteration}').href;">
+ <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}">
   <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden"/></td>
   <td class="title">
   <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}">{$thread.subject}</a>
@@ -91,5 +91,14 @@
 </div>
 </div>
 {/if}
+
+<script type="text/javascript">
+$(function() {
+    $('tr.boardentry').click(function(e) {
+        if (e.which !== 1) return;
+        document.location.href = $(this).find('td.title a.subject').attr('href');
+    });
+});
+</script>
 
 {include file=footer.html.tpl}
