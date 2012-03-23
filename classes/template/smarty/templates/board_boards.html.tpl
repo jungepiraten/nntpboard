@@ -10,7 +10,7 @@
 <tbody>
 {foreach from=$boards item=board name=counter}
 {if $zeigekategorien || $board.hasthreads}
- <tr onClick="document.location.href = document.getElementById('board{$boardid}.{$smarty.foreach.counter.iteration}').href;">
+ <tr class="clickable">
   <td class="span1" style="width: 30px;">{if $board.unread}<a href="unread.php?markread={$boardid|escape:url}">{/if}<img src="images/flagge{if $board.unread}_unread{/if}.png" />{if $board.unread}</a>{/if}</td>
   <td>
   <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
@@ -44,3 +44,11 @@
 {/foreach}
 </tbody>
 </table>
+<script type="text/javascript">
+$(function() {
+    $('tr.clickable').click(function(e) {
+        if (e.which !== 1) return;
+        document.location.href = $(this).find('a.name').attr('href');
+    });
+});
+</script>
