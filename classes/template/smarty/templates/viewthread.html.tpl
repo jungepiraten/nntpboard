@@ -59,16 +59,16 @@ function toggleQuote(id) {
 	    <a class="btn" data-dismiss="modal">Abbrechen</a>
 	  </div>
 </div>
-<script type="text/javascript">
+
 {literal}
+<script type="text/javascript">
 $(".deletePost").click(function() {
 	event.stopImmediatePropagation();
 	$("#delModal").children(".modal-footer").children("#delButton").attr("href", $(this).attr("href"));
 	$("#delModal").modal();
 	return false;
 });
-{/literal}
 </script>
-
+{/literal}
 
 {include file=footer.html.tpl}

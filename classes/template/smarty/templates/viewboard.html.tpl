@@ -92,6 +92,7 @@
 </div>
 {/if}
 
+{literal}
 <script type="text/javascript">
 $(function() {
     $('tr.boardentry').click(function(e) {
@@ -100,5 +101,6 @@ $(function() {
     });
 });
 </script>
+{/literal}
 
 {include file=footer.html.tpl}

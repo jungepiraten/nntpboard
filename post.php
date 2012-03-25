@@ -62,7 +62,7 @@ function generateMessage($config, $session, $reference) {
 
 	$textbody = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
 
-	$message = new Message($messageid, time(), $autor, $subject, $charset, $parentid,  $textbody);
+	$message = new Message($messageid, time(), $autor, $subject, $charset, $parentid, $textbody);
 	// Speichere alte Attachments und 
 	$as = array();
 	foreach ($storedattachments as $partid) {

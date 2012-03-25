@@ -44,6 +44,8 @@
 {/foreach}
 </tbody>
 </table>
+
+{literal}
 <script type="text/javascript">
 $(function() {
     $('tr.clickable').click(function(e) {
@@ -52,3 +54,4 @@ $(function() {
     });
 });
 </script>
+{/literal}
