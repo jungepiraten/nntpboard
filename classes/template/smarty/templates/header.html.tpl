@@ -9,8 +9,8 @@
 		<link rel="icon" type="image/png" href="images/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<style type="text/css">
 		{literal}
+		<style type="text/css">
 			body {
 				padding-top: 60px;
 				padding-bottom: 40px;
@@ -24,8 +24,18 @@
 				margin-top:0px;
 				margin-bottom:0px;
 			}
-		{/literal}
 		</style>
+		<script type="text/javascript">
+		$(function() {
+			$("a.btn").click(function (event) {
+				$(this).attr("disabled","disabled");
+			});
+			$("form").submit(function (event) {
+				$(this).find(".btn").attr("disabled","disabled");
+			});
+		});
+		</script>
+		{/literal}
 
 		<!--[if lt IE 9]>
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
