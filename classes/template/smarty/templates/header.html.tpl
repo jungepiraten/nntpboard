@@ -31,9 +31,10 @@
 				$(this).attr("disabled","disabled");
 			});
 			$("form").submit(function (event) {
-				$(this).find(".btn").addClass("disabled").click(function(ev) {
-					ev.stopImmediatePropagation();
-				});
+				if ($(this).hasClass("disabled")) {
+					return false;
+				}
+				$(this).addClass("disabled").find(".btn").addClass("disabled");
 			});
 		});
 		</script>
