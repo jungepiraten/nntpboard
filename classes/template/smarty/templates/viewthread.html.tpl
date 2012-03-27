@@ -33,7 +33,7 @@ function toggleQuote(id) {
 {/literal}
 
 {if $pages > 1}
-{capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={/capture}
+{capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={/capture}
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 {/if}
 <table class="table table-striped table-bordered">
@@ -42,7 +42,7 @@ function toggleQuote(id) {
 {/foreach}
 </table>
 {if $pages > 1}
-{capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid}&amp;page={/capture}
+{capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={/capture}
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 {/if}
 

@@ -31,7 +31,9 @@
 				$(this).attr("disabled","disabled");
 			});
 			$("form").submit(function (event) {
-				$(this).find(".btn").attr("disabled","disabled");
+				$(this).find(".btn").addClass("disabled").click(function(ev) {
+					ev.stopImmediatePropagation();
+				});
 			});
 		});
 		</script>
