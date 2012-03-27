@@ -56,7 +56,7 @@ if (!is_resource($img)) {
 $origw = ImageSx($img);
 $origh = ImageSy($img);
 if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
-	if ($origw > $origh) {
+	if ($origw * THUMBHEIGHT > $origh * THUMBWIDTH) {
 		$thumbw = THUMBWIDTH;
 		$thumbh = $origh * (THUMBWIDTH / $origw);
 	} else {
