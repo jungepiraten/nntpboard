@@ -90,6 +90,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addBoard(new Board(13, $parentid, "Landesverbände", "Unterforen der Landesverbände"));
 		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
 		$this->addLVBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
+		$this->addLVBoard(100,35, "nrw.do", "Dortmund", "NRW:Dortmund", "nrw-do");
 		$this->addLVBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
 		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
 		$this->addLVBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "ni");
