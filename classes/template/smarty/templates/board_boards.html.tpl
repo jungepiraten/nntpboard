@@ -48,7 +48,7 @@
 {literal}
 <script type="text/javascript">
 $(function() {
-    $('tr.clickable').click(function(e) {
+    $('tr.clickable').css("cursor","pointer").click(function(e) {
         if (e.which !== 1) return;
         document.location.href = $(this).find('a.name').attr('href');
     });

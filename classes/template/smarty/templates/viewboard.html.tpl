@@ -95,7 +95,7 @@
 {literal}
 <script type="text/javascript">
 $(function() {
-    $('tr.boardentry').click(function(e) {
+    $('tr.boardentry').css("cursor", "pointer").click(function(e) {
         if (e.which !== 1) return;
         document.location.href = $(this).find('td.title a.subject').attr('href');
     });
