@@ -2,7 +2,7 @@
 
 define("CACHEPERIOD", 24 * 60 * 60);
 define("THUMBWIDTH", 100);
-define("THUMBHEIGHT", 100);
+define("THUMBHEIGHT", 140);
 
 $name = stripslashes($_REQUEST["name"]);
 $cachename = "avatarcache/" . md5($name);
