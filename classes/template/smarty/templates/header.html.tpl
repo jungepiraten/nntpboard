@@ -28,7 +28,10 @@
 		<script type="text/javascript">
 		$(function() {
 			$("a.btn").click(function (event) {
-				$(this).attr("disabled","disabled");
+				if ($(this).hasClass("disabled")) {
+					return false;
+				}
+				$(this).addClass("disabled");
 			});
 			$("form").submit(function (event) {
 				if ($(this).hasClass("disabled")) {
