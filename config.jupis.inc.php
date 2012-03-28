@@ -164,7 +164,7 @@ class JuPiConfig extends DefaultConfig {
 				}
 			}
 
-			$this->memcachelink->set("nntpboard-communityuser-" . $mailto, $this->mailusers[$mailto]);
+			$this->memcachelink->set("nntpboard-communityuser-" . $mailto, $this->mailusers[$mailto], 0, 24*60*60);
 		}
 		return $this->mailusers[$mailto];
 	}
