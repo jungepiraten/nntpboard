@@ -27,9 +27,7 @@ class JuPiConfig extends DefaultConfig {
 
 		$this->addOrgaStruktur(300, null);
 
-		$this->addBoard(new Board(400, null, "Regionale Gliederungen", "Unterforen der Gebietsgruppen"));
-		$this->addLVStruktur(500, 400);
-		$this->addCrewStruktur(600, 400);
+		$this->addRegionStruktur(500, null);
 
 		$this->addTalkStruktur(700, null);
 		$this->addEventStruktur(800, null);
@@ -85,39 +83,32 @@ class JuPiConfig extends DefaultConfig {
 		$this->addGenericBoard($id, $parentid, "orga.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
-	private function addLVStruktur($id, $parentid) {
+	private function addRegionStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
-		$this->addBoard(new Board(13, $parentid, "Bundesländer", "Unterforen der Bundesländer"));
-		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
-		$this->addLVBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
-		$this->addLVBoard(110,25, "nrw.do", "Dortmund", "NRW:Dortmund", "nrw-do");
-		$this->addLVBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
-		$this->addLVBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
-		$this->addLVBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "ni");
-		$this->addLVBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
-		$this->addLVBoard(100,35, "by.mfr", "Mittelfranken", "BY:Mittelfranken", "by-mfr");
-		$this->addLVBoard(101,35, "by.muc", "München", "BY:Muenchen", "by-muc");
-		$this->addLVBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
-		$this->addLVBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
-		$this->addLVBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
-		$this->addLVBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
-		$this->addLVBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
-		$this->addLVBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
-		$this->addLVBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
-		$this->addLVBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "st");
-		$this->addLVBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
-		$this->addLVBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
+		$this->addBoard(new Board(13, $parentid, "Regionale Gliederungen", "Unterforen der Gebietsgruppen"));
+		$this->addRegionBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
+		$this->addRegionBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
+		$this->addRegionBoard(110,25, "nrw.do", "Dortmund", "NRW:Dortmund", "nrw-do");
+		$this->addRegionBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
+		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
+		$this->addRegionBoard(601,28, "freiburg", "Freiburg", "BW:Freiburg", "crew-freiburg");
+		$this->addRegionBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "ni");
+		$this->addRegionBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
+		$this->addRegionBoard(100,35, "by.mfr", "Mittelfranken", "BY:Mittelfranken", "by-mfr");
+		$this->addRegionBoard(101,35, "by.muc", "München", "BY:Muenchen", "by-muc");
+		$this->addRegionBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
+		$this->addRegionBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
+		$this->addRegionBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
+		$this->addRegionBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
+		$this->addRegionBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
+		$this->addRegionBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
+		$this->addRegionBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
+		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "st");
+		$this->addRegionBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
+		$this->addRegionBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
 	}
-	private function addLVBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
+	private function addRegionBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "gliederung.lv.{$kuerzel}", $mlname, $wiki, $name, $desc);
-	}
-
-	private function addCrewStruktur($id, $parentid) {
-		$this->addBoard(new Board($id, $parentid, "Crews", "Unterforen der Crews"));
-		$this->addCrewBoard($id+1, $id, "freiburg", "Freiburg",	"BW:Freiburg", "crew-freiburg");
-	}
-	private function addCrewBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
-		$this->addGenericBoard($id, $parentid, "gliederung.crew.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
 	private function addTalkStruktur($id, $parentid) {
