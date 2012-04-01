@@ -14,7 +14,7 @@
 {/if}
 {/foreach}
 {/capture}
-{if $restforen == 1}{include file=board_boards.html.tpl name="Foren" boards=$board.childs}{/if}
+{if $restforen == 1}{include file=board_boards.html.tpl name="Foren" boards=$board.childs zeigekategorien=!isset($threads)}{/if}
 {$childboards}
 {/if}
 
