@@ -24,6 +24,10 @@
 				margin-top:0px;
 				margin-bottom:0px;
 			}
+
+			input, textarea {
+				background-color:white;
+			}
 		</style>
 		<script type="text/javascript">
 		$(function() {
