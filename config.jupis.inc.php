@@ -115,7 +115,6 @@ class JuPiConfig extends DefaultConfig {
 	private function addCrewStruktur($id, $parentid) {
 		$this->addBoard(new Board($id, $parentid, "Crews", "Unterforen der Crews"));
 		$this->addCrewBoard($id+1, $id, "freiburg", "Freiburg",	"BW:Freiburg", "crew-freiburg");
-		$this->addCrewBoard($id+2, $id, "quadrat", "Mannheim",	"BW:Crew_JuPis%B2", null);
 	}
 	private function addCrewBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "gliederung.crew.{$kuerzel}", $mlname, $wiki, $name, $desc);
