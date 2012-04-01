@@ -27,7 +27,7 @@ class JuPiConfig extends DefaultConfig {
 
 		$this->addOrgaStruktur(300, null);
 
-		$this->addBoard(new Board(400, null, "Gliederungen", "Unterforen der Gebietsgruppen"));
+		$this->addBoard(new Board(400, null, "Regionale Gliederungen", "Unterforen der Gebietsgruppen"));
 		$this->addLVStruktur(500, 400);
 		$this->addCrewStruktur(600, 400);
 
@@ -87,7 +87,7 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addLVStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
-		$this->addBoard(new Board(13, $parentid, "Landesgruppen", "Unterforen der Landesgruppen (Crews, Landesverbände o.ä.)"));
+		$this->addBoard(new Board(13, $parentid, "Bundesländer", "Unterforen der Bundesländer"));
 		$this->addLVBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
 		$this->addLVBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
 		$this->addLVBoard(110,25, "nrw.do", "Dortmund", "NRW:Dortmund", "nrw-do");
