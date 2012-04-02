@@ -92,7 +92,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addRegionBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
 		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
 		$this->addRegionBoard(601,28, "bw.freiburg", "Freiburg", "BW:Freiburg", "crew-freiburg");
-		$this->addRegionBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "ni");
+		$this->addRegionBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "nds");
 		$this->addRegionBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
 		$this->addRegionBoard(100,35, "by.mfr", "Mittelfranken", "BY:Mittelfranken", "by-mfr");
 		$this->addRegionBoard(101,35, "by.muc", "München", "BY:Muenchen", "by-muc");
@@ -103,7 +103,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addRegionBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
 		$this->addRegionBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
 		$this->addRegionBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
-		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "st");
+		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "lsa");
 		$this->addRegionBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
 		$this->addRegionBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
 	}
