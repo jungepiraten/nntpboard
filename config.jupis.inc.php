@@ -144,7 +144,7 @@ class JuPiConfig extends DefaultConfig {
 			}
 			$this->mailusers[$mailto] = $this->memcachelink->get("nntpboard-communityuser-" . $mailto);
 
-			if (!isset($this->mailusers[$mailto])) {
+			if ($this->mailusers[$mailto] === false) {
 				$ldaplink = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
 				$search = $ldaplink->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
 				if ($search->count() != 1) {
