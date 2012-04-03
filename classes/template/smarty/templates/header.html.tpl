@@ -2,11 +2,11 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset={$CHARSET}" />
-		<link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
-		<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
-		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
-		<script src="bootstrap/js/bootstrap.min.js"></script>
-		<link rel="icon" type="image/png" href="images/favicon.png" />
+		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap.css" rel="stylesheet" />
+		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
+		<script src="https://static.junge-piraten.de/jquery.min.js"></script>
+		<script src="https://static.junge-piraten.de/bootstrap/js/bootstrap.min.js"></script>
+		<link rel="icon" type="image/png" href="https://static.junge-piraten.de/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		{literal}
@@ -48,7 +48,7 @@
 		{/literal}
 
 		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+			<script src="https://static.junge-piraten.de/ie-html5.js"></script>
 		<![endif]-->
 
 		<title>Junge Piraten &bull; {$title|escape:html}</title>
@@ -103,7 +103,7 @@
 								<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 							{/if}
 							<li><a href="unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
-							<li><a href="//ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
+							<li><a href="https://ucp.junge-piraten.de/index.php?module=lists" class="lists"><i class="icon-envelope"></i> Mailinglisten</a></li>
 {php}
 function isSubBoard($destBoard, $curBoard) {
 	if (!isset($destBoard["parent"])) {
