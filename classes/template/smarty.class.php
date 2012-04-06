@@ -220,16 +220,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = iconv("UTF-8", $this->getCharset(),
 			htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
 
-		// Bei nicht-angemeldeten Benutzern versuchen, Mailadressen zu filtern
-		if ($this->getAuth() == null || $this->getAuth()->isAnonymous()) {
-			preg_match_all('/([^ ]{3,}@[^ ]{3,})/', $text, $matches);
-			foreach ($matches[1] as $mail) {
-				$address = new Address("", $mail);
-				$html = '<a href="' . $this->getConfig()->getAddressLink($address, $this->getCharset()) . '">' . $this->getConfig()->getAddressText($address, $this->getCharset()) . '</a>';
-				$text = str_replace($mail, $html, $text);
-			}
-		}
-		
 		// Zitate sind eine fiese sache ...
 		$lines = explode("\n", $text);
 		$text = "";
@@ -294,6 +284,16 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		// Links
 		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '<a href="$2">$2</a>', $text);
 
+		// Bei nicht-angemeldeten Benutzern versuchen, Mailadressen zu filtern
+		if ($this->getAuth() == null || $this->getAuth()->isAnonymous()) {
+			preg_match_all('/([^ ]{3,}@[^ ]{3,})/', $text, $matches);
+			foreach ($matches[1] as $mail) {
+				$address = new Address("", $mail);
+				$html = '<a href="' . $this->getConfig()->getAddressLink($address, $this->getCharset()) . '">' . $this->getConfig()->getAddressText($address, $this->getCharset()) . '</a>';
+				$text = str_replace($mail, $html, $text);
+			}
+		}
+		
 		// Zeilenumbrueche
 		$text = nl2br(trim($text));
 		return $text;
