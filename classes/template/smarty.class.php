@@ -282,14 +282,21 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = parseFacEs($text, "lauerfac.es", $this->apiCache);
 
 		// Links
-		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:.*)(&gt;)%U', '<a href="$2">$2</a>', $text);
+		$text = preg_replace('%(&lt;)([a-zA-Z]{3,6}:[^ ]*)(&gt;)%U', '<a href="$2">$2</a>', $text);
 
 		// Bei nicht-angemeldeten Benutzern versuchen, Mailadressen zu filtern
 		if ($this->getAuth() == null || $this->getAuth()->isAnonymous()) {
-			preg_match_all('/([^ ]{3,}@[^ ]{3,})/', $text, $matches);
-			foreach ($matches[1] as $mail) {
+			preg_match_all('/(&lt;)?([^\\s]{3,}@[^\\s:]{3,})(&gt;)?/', $text, $matches);
+			foreach ($matches[0] as $mail) {
+				if (substr($mail, 0, 4) == "&lt;") {
+					$mail = substr($mail, 4);
+				}
+				if (substr($mail, -4) == "&gt;") {
+					$mail = substr($mail, 0, strlen($mail) - 4);
+				}
 				$address = new Address("", $mail);
-				$html = '<a href="' . $this->getConfig()->getAddressLink($address, $this->getCharset()) . '">' . $this->getConfig()->getAddressText($address, $this->getCharset()) . '</a>';
+				$html = '<a href="' . htmlentities($this->getConfig()->getAddressLink($address, $this->getCharset())) . '">' . htmlentities($this->getConfig()->getAddressText($address, $this->getCharset())) . '</a>';
+				$text = str_replace("&lt;" . $mail . "&gt;", $html, $text);
 				$text = str_replace($mail, $html, $text);
 			}
 		}
