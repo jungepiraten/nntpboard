@@ -212,7 +212,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 
 		// Inline-GPG ausschneiden (RFC 2440)
 		$text = preg_replace('$-----BEGIN PGP SIGNED MESSAGE-----(.*)\r?\n\r?\n(.*)-----BEGIN PGP SIGNATURE-----(.*)-----END PGP SIGNATURE-----$Us', '$2', $text);
-		
+
 		// Erkenne auch nicht ausgezeichnete Links
 		$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
 		
@@ -220,6 +220,16 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = iconv("UTF-8", $this->getCharset(),
 			htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
 
+		// Bei nicht-angemeldeten Benutzern versuchen, Mailadressen zu filtern
+		if ($this->getAuth() == null || $this->getAuth()->isAnonymous()) {
+			preg_match_all('/([^ ]{3,}@[^ ]{3,})/', $text, $matches);
+			foreach ($matches[1] as $mail) {
+				$address = new Address("", $mail);
+				$html = '<a href="' . $this->getConfig()->getAddressLink($address, $this->getCharset()) . '">' . $this->getConfig()->getAddressText($address, $this->getCharset()) . '</a>';
+				$text = str_replace($mail, $html, $text);
+			}
+		}
+		
 		// Zitate sind eine fiese sache ...
 		$lines = explode("\n", $text);
 		$text = "";
