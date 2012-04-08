@@ -107,7 +107,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addRegionBoard(57, 13, "sn", "Sachsen", "", "SN:Hauptseite", "sn");
 		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "", "LSA:Hauptseite", "lsa");
 		$this->addRegionBoard(61, 13, "sh", "Schleswig-Holstein", "", "SH:Hauptseite", "sh");
-		$this->addRegionBoard(63, 13, "th", "Thüringen", "Allgemeine Themen der <a href="http://thueringen.junge-piraten.de/">Jungen Piraten Thüringen</a>", "TH:Hauptseite", "th");
+		$this->addRegionBoard(63, 13, "th", "Thüringen", "Allgemeine Themen der <a href=\"http://thueringen.junge-piraten.de/\">Jungen Piraten Thüringen</a>", "TH:Hauptseite", "th");
 	}
 	private function addRegionBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "region.{$kuerzel}", $mlname, $wiki, $name, $desc);
