@@ -88,28 +88,28 @@ class JuPiConfig extends DefaultConfig {
 	private function addRegionStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
 		$this->addBoard(new Board(13, $parentid, "Regionale Gliederungen", "Unterforen der Gebietsgruppen"));
-		$this->addRegionBoard(14, 13, "be", "Berlin", "BE:Hauptseite", "be");
-		$this->addRegionBoard(25, 13, "nrw", "Nordrhein-Westfalen", "NRW:Hauptseite", "nrw");
-		$this->addRegionBoard(110,25, "nrw.do", "Dortmund", "NRW:Dortmund", "nrw-do");
-		$this->addRegionBoard(26, 13, "he", "Hessen", "HE:Hauptseite", "he");
-		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "BW:Hauptseite", "bw");
-		$this->addRegionBoard(601,28, "bw.freiburg", "Freiburg", "BW:Freiburg", "crew-freiburg");
-		$this->addRegionBoard(32, 13, "nds", "Niedersachsen", "NDS:Hauptseite", "nds");
-		$this->addRegionBoard(35, 13, "by", "Bayern", "BY:Hauptseite", "by");
-		$this->addRegionBoard(100,35, "by.mfr", "Mittelfranken", "BY:Mittelfranken", "by-mfr");
-		$this->addRegionBoard(101,35, "by.muc", "München", "BY:Muenchen", "by-muc");
-		$this->addRegionBoard(45, 13, "bb", "Brandenburg", "BB:Hauptseite", "bb");
-		$this->addRegionBoard(47, 13, "hb", "Bremen", "HB:Hauptseite", "hb");
-		$this->addRegionBoard(49, 13, "hh", "Hamburg", "HH:Hauptseite", "hamburg");
-		$this->addRegionBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "MV:Hauptseite", "mv");
-		$this->addRegionBoard(53, 13, "rlp", "Rheinland-Pfalz", "RLP:Hauptseite", "rlp");
-		$this->addRegionBoard(55, 13, "sl", "Saarland", "SL:Hauptseite", "sl");
-		$this->addRegionBoard(57, 13, "sn", "Sachsen", "SN:Hauptseite", "sn");
-		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "LSA:Hauptseite", "lsa");
-		$this->addRegionBoard(61, 13, "sh", "Schleswig-Holstein", "SH:Hauptseite", "sh");
-		$this->addRegionBoard(63, 13, "th", "Thüringen", "TH:Hauptseite", "th");
+		$this->addRegionBoard(14, 13, "be", "Berlin", "", "BE:Hauptseite", "be");
+		$this->addRegionBoard(25, 13, "nrw", "Nordrhein-Westfalen", "", "NRW:Hauptseite", "nrw");
+		$this->addRegionBoard(110,25, "nrw.do", "Dortmund", "", "NRW:Dortmund", "nrw-do");
+		$this->addRegionBoard(26, 13, "he", "Hessen", "", "HE:Hauptseite", "he");
+		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "", "BW:Hauptseite", "bw");
+		$this->addRegionBoard(601,28, "bw.freiburg", "Freiburg", "", "BW:Freiburg", "crew-freiburg");
+		$this->addRegionBoard(32, 13, "nds", "Niedersachsen", "", "NDS:Hauptseite", "nds");
+		$this->addRegionBoard(35, 13, "by", "Bayern", "", "BY:Hauptseite", "by");
+		$this->addRegionBoard(100,35, "by.mfr", "Mittelfranken", "", "BY:Mittelfranken", "by-mfr");
+		$this->addRegionBoard(101,35, "by.muc", "München", "", "BY:Muenchen", "by-muc");
+		$this->addRegionBoard(45, 13, "bb", "Brandenburg", "", "BB:Hauptseite", "bb");
+		$this->addRegionBoard(47, 13, "hb", "Bremen", "", "HB:Hauptseite", "hb");
+		$this->addRegionBoard(49, 13, "hh", "Hamburg", "", "HH:Hauptseite", "hamburg");
+		$this->addRegionBoard(51, 13, "mv", "Mecklenburg-Vorpommern", "", "MV:Hauptseite", "mv");
+		$this->addRegionBoard(53, 13, "rlp", "Rheinland-Pfalz", "", "RLP:Hauptseite", "rlp");
+		$this->addRegionBoard(55, 13, "sl", "Saarland", "", "SL:Hauptseite", "sl");
+		$this->addRegionBoard(57, 13, "sn", "Sachsen", "", "SN:Hauptseite", "sn");
+		$this->addRegionBoard(59, 13, "lsa", "Sachsen Anhalt", "", "LSA:Hauptseite", "lsa");
+		$this->addRegionBoard(61, 13, "sh", "Schleswig-Holstein", "", "SH:Hauptseite", "sh");
+		$this->addRegionBoard(63, 13, "th", "Thüringen", "Allgemeine Themen der <a href="http://thueringen.junge-piraten.de/">Jungen Piraten Thüringen</a>", "TH:Hauptseite", "th");
 	}
-	private function addRegionBoard($id, $parentid, $kuerzel, $name, $wiki, $mlname) {
+	private function addRegionBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "region.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
