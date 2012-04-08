@@ -33,10 +33,11 @@ class JuPiConfig extends DefaultConfig {
 		$this->addTalkStruktur(700, null);
 		$this->addEventStruktur(800, null);
 		
-		$this->addGenericBoard(666, null, "test", "test", null, "Test", "Testforum. Spamgefahr!");
-
 		$this->addBoard(new Board(899, null, "Young Pirates International", ""));
 		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellanganeous");
+
+		$this->addBoard(new Board(665, null, "Test", ""));
+		$this->addGenericBoard(666, 665, "test", "test", null, "Test", "Testforum. Spamgefahr!");
 
 		$this->secretkey = $secretkey;
 		$this->ldappass = $ldappass;
