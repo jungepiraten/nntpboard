@@ -66,6 +66,7 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li><a href="https://www.junge-piraten.de/">Homepage</a></li>
+								<li><a href="https://www.junge-piraten.de/community/">Mitmachen</a></li>
 								<li class="active"><a href="index.php">Forum</a></li>
 								<li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
 								<li><a href="http://jupis.piratenpad.de/">Piratenpad</a></li>
