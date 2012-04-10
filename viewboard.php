@@ -35,7 +35,10 @@ if ($connection !== null) {
 	 * von Neu => Alt. */
 	$threadids = array_slice(array_reverse($group->getThreadIDs()), $page * $config->getThreadsPerPage(), $config->getThreadsPerPage());
 	foreach ($threadids AS $threadid) {
-		$threads[] = $group->getThread($threadid);
+		$thread = $group->getThread($threadid);
+		if ($thread != NULL) {
+			$threads[] = $thread;
+		}
 	}
 
 	$template->viewboard($board, $group, $page, $pages, $threads, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
