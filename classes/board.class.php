@@ -92,6 +92,11 @@ class Board {
 		return false;
 	}
 
+	// in KBytes
+	public function getMaxAttachmentSize() {
+		return 512;
+	}
+
 	public function getConnection($auth) {
 		return null;
 	}

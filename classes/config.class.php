@@ -74,9 +74,10 @@ abstract class DefaultConfig {
 	}
 	abstract protected function getMessageIDHost();
 	abstract public function getTemplate($auth);
-	public function isAttachmentAllowed($attachment) {
+	public function isAttachmentAllowed($board, $message, $attachment) {
+		// TODO Gesamtnachrichtengroesse pruefen
 		// Per Default erlauben wir alle Attachments < 512 KB
-		return $attachment->getLength() < 512 * 1024;
+		return $attachment->getLength() < $board->getMaxAttachmentSize() * 1024;
 	}
 
 	/**

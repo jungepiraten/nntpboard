@@ -80,7 +80,7 @@ function addAttachmentField() {
 				<textarea name="body" id="body" class="span7" cols="80" rows="20">{if isset($smarty.request.body)}{$smarty.request.body|stripslashes|escape:html}{else}{$body|escape:html}{/if}</textarea>
 			</p>
 
-			<label class="control-label" for="attachments">Anh&auml;nge:<br /> (Max. {$maxuploadsize})</label>
+			<label class="control-label" for="attachments">Anh&auml;nge:<br /> (Max. {$board.maxattachmentsize|calculateFileSize})</label>
 			<div class="controls">
 				{foreach from=$attachments key=partid item=attachment}
 					<input type="checkbox" name="storedattachment[]" value="{$partid}" checked="checked" />

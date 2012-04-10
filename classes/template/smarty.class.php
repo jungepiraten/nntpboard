@@ -42,6 +42,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
 		$this->smarty->register_modifier("encodeMessageID", array($config, "encodeMessageID"));
+		$this->smarty->register_modifier("calculateFileSize", array($this, "calculateFileSize"));
 		$this->smarty->assign("ROOTBOARD", $this->parseBoard($config->getBoard()));
 		$this->smarty->assign("VERSION", $config->getVersion());
 		$this->smarty->assign("CHARSET", $this->getCharset());
@@ -49,6 +50,19 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress());
 	}
 
+	public function calculateFileSize($filesize) {
+		// See http://www.php.net/file-upload for details
+		if(is_numeric($filesize)) {
+			$decr = 1024; $step = 0;
+			$prefix = array('KB','MB','GB','TB','PB');
+			while(($filesize / $decr) > 0.9) {
+				$filesize = $filesize / $decr;
+				$step++;
+			}
+			return round($filesize,2).' '.$prefix[$step];
+		}
+		return 'NaN';
+	}
 
 	private function sendHeaders() {
 		header("Content-Type: text/html; Charset={$this->getCharset()}");
@@ -60,8 +74,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($board->hasParent() && $parseParent == true) {
 			$row["parent"]	= $this->parseBoard($board->getParent());
 		}
-		$row["name"]		= $board->getName();
-		$row["desc"]		= $board->getDesc();
+		$row["name"]			= $board->getName();
+		$row["desc"]			= $board->getDesc();
+		$row["maxattachmentsize"]	= $board->getMaxAttachmentSize();
 		// Letzter Post und ungelesenes Forum markieren
 		$row["unread"]		= false;
 		$row["threadcount"]	= 0;
@@ -370,7 +385,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		exit;
 	}
 
-	public function viewpostform($board, $maxuploadsize, $referencemessages = null, $reference = null, $quote = false, $preview = null, $attachmentobjects = null) {
+	public function viewpostform($board, $referencemessages = null, $reference = null, $quote = false, $preview = null, $attachmentobjects = null) {
 		$subject = "";
 		if ($reference !== null) {
 			$subject = $reference->getSubject();
@@ -403,7 +418,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("address", $this->parseAddress($this->getAuth()->getAddress()));
 		
 		$this->smarty->assign("board", $this->parseBoard($board));
-		$this->smarty->assign("maxuploadsize", $maxuploadsize);
 		$this->smarty->assign("attachments", $attachments);
 		$this->smarty->assign("preview", $this->parseMessage($preview));
 		$this->sendHeaders();

@@ -82,7 +82,7 @@ function generateMessage($config, $session, $reference) {
 			}
 			$a = new Attachment("attachment", $attachment["type"][$i], file_get_contents($attachment["tmp_name"][$i]), basename($attachment["name"][$i]));
 			// TODO Attachment-Whitelist
-			if (!$config->isAttachmentAllowed($a)) {
+			if (!$config->isAttachmentAllowed($m, $a)) {
 				continue;
 			}
 			$message->addAttachment($a);
@@ -119,44 +119,6 @@ if (isset($_REQUEST["post"])) {
 	}
 }
 
-// See http://www.php.net/file-upload for details
-function display_filesize($filesize){
-   
-    if(is_numeric($filesize)){
-    $decr = 1024; $step = 0;
-    $prefix = array('Byte','KB','MB','GB','TB','PB');
-       
-    while(($filesize / $decr) > 0.9){
-        $filesize = $filesize / $decr;
-        $step++;
-    }
-    return round($filesize,2).' '.$prefix[$step];
-    } else {
-
-    return 'NaN';
-    }
-   
-}
-
-// See http://www.php.net/ini_get for details
-function return_bytes($val) {
-    $val = trim($val);
-    $last = strtolower($val[strlen($val)-1]);
-    switch($last) {
-        // The 'G' modifier is available since PHP 5.1.0
-        case 'g':
-            $val *= 1024;
-        case 'm':
-            $val *= 1024;
-        case 'k':
-            $val *= 1024;
-    }
-
-    return $val;
-}
-
-$maxuploadsize = display_filesize(return_bytes(ini_get("upload_max_filesize")));
-
-$template->viewpostform($board, $maxuploadsize, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
+$template->viewpostform($board, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
 
 ?>
