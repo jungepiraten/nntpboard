@@ -44,7 +44,7 @@ if ($reference !== null) {
 	$connection->close();
 }
 
-function generateMessage($config, $session, $reference) {
+function generateMessage($config, $session, $board, $reference) {
 	$messageid = $config->generateMessageID();
 	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
 	$autor = $session->getAuth()->isAnonymous()
@@ -82,7 +82,7 @@ function generateMessage($config, $session, $reference) {
 			}
 			$a = new Attachment("attachment", $attachment["type"][$i], file_get_contents($attachment["tmp_name"][$i]), basename($attachment["name"][$i]));
 			// TODO Attachment-Whitelist
-			if (!$config->isAttachmentAllowed($m, $a)) {
+			if (!$config->isAttachmentAllowed($board, $m, $a)) {
 				continue;
 			}
 			$message->addAttachment($a);
@@ -99,7 +99,7 @@ if (isset($_REQUEST["preview"])) {
 
 if (isset($_REQUEST["post"])) {
 	// TODO Sperre gegen F5
-	$message = generateMessage($config, $session, $reference);
+	$message = generateMessage($config, $session, $board, $reference);
 
 	try {
 		$connection->open();
