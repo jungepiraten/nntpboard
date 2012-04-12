@@ -27,13 +27,13 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-$connection = $board->getConnection($session->getAuth());
+$connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
 }
 
 if ($reference !== null) {
-	$connection->open();
+	$connection->open($session->getAuth());
 	$group = $connection->getGroup();
 	$referencemessages = array();
 	foreach (array_slice(array_reverse($group->getThread($reference)->getMessageIDs()),0,5) as $messageid) {
@@ -102,7 +102,7 @@ if (isset($_REQUEST["post"])) {
 	$message = generateMessage($config, $session, $board, $reference);
 
 	try {
-		$connection->open();
+		$connection->open($session->getAuth());
 		$resp = $connection->postMessage($message);
 		$group = $connection->getGroup();
 		$thread = $group->getThread($message->getMessageID());

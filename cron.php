@@ -12,8 +12,7 @@ $config->markCronRunning();
  *  - Nachrichten in den Cache herunterladen
  **/
 foreach ($config->getBoardIDs() as $boardid) {
-	// Benutze keine Authentifikation
-	$cache = $config->getBoard($boardid)->getConnection(NULL);
+	$cache = $config->getBoard($boardid)->getConnection();
 	
 	// Nur bei CacheConnections macht das wirklich Sinn ...
 	if (!($cache instanceof AbstractCacheConnection)) {
@@ -21,7 +20,8 @@ foreach ($config->getBoardIDs() as $boardid) {
 	}
 
 	try {
-		$cache->open();
+		// Benutze keine Authentifikation
+		$cache->open(NULL);
 
 		// Versuche neue Nachrichten zu ergattern
 		$cache->updateCache();

@@ -17,8 +17,8 @@ class NNTPBoard extends Board {
 		return true;
 	}
 
-	public function getConnection($auth) {
-		return new NNTPConnection($this->host, $this->group, $auth);
+	public function getConnection() {
+		return new NNTPConnection($this->host, $this->group);
 	}
 }
 

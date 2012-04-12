@@ -11,10 +11,10 @@ class MemCachedNNTPBoard extends CachedNNTPBoard {
 		$this->memcache = $memcache;
 	}
 
-	public function getConnection($auth) {
+	public function getConnection() {
 		return new MemItemCacheConnection(
 		           $this->memcache,
-		           parent::getConnection($auth)
+		           parent::getConnection()
 		       );
 	}
 }

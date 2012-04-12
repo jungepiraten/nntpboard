@@ -8,7 +8,10 @@ $template = $config->getTemplate($session->getAuth());
 
 function recurseMarkRead($board, $auth) {
 	if ($board->hasThreads()) {
-		$auth->markReadGroup($board->getConnection($auth)->getGroup());
+		$connection = $board->getConnection();
+		$connection->open($auth);
+		$auth->markReadGroup($connection->getGroup());
+		$connection->close();
 	}
 	foreach ($board->getSubBoardIDs() as $boardid) {
 		recurseMarkRead($board->getSubBoard($boardid), $auth);

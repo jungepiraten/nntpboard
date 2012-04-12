@@ -19,12 +19,14 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	abstract protected function loadLastThread();
 	abstract protected function saveLastThread($thread);
 	
-	public function open() {
+	public function open($auth) {
+		parent::open($auth);
 		$this->grouphash = $this->loadGroupHash();
 		$this->lastpostsubject = $this->loadLastThread();
 	}
 
 	public function close() {
+		parent::close();
 		if ($this->group !== null) {
 			$this->saveGroup($this->group);
 			$this->saveGroupHash($this->group->getGroupHash());

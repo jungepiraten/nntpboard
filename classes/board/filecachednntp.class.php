@@ -8,10 +8,10 @@ class FileCachedNNTPBoard extends CachedNNTPBoard {
 		parent::__construct($boardid, $parentid, $name, $desc, $host, $group, $anonMayPost, $authMayPost, $isModerated);
 	}
 
-	public function getConnection($auth) {
+	public function getConnection() {
 		return new FileItemCacheConnection(
 		           dirname(__FILE__) . "/../../cache/".$this->getBoardID()."/",
-		           parent::getConnection($auth)
+		           parent::getConnection()
 		       );
 	}
 }

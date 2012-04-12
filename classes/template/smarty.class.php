@@ -83,8 +83,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["messagecount"]	= 0;
 		$row["lastpostdate"]	= 0;
 		if ($board->hasThreads()) {
-			$c = $board->getConnection($this->getAuth());
-			$c->open();
+			$c = $board->getConnection();
+			$c->open($this->getAuth());
 			$group = $c->getGroup();
 			$c->close();
 			$row["hasthreads"]		= true;

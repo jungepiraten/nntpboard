@@ -13,11 +13,10 @@ if ($board === null) {
 	die("Board nicht gefunden!");
 }
 
-$connection = $board->getConnection($session->getAuth());
 if ($connection === null) {
 	die("Board enthaelt keine Group!");
 }
-$connection->open();
+$connection->open($session->getAuth());
 $group = $connection->getGroup();
 $connection->close();
 

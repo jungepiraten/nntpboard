@@ -11,8 +11,6 @@ require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
 class NNTPConnection extends AbstractMessageStreamConnection {
 	private $host;
 	private $group;
-	private $username;
-	private $password;
 
 	// Erste ArtNr und Letzte ArtNr
 	private $firstartnr;
@@ -30,11 +28,6 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		$this->host = $host;
 		$this->group = $group;
 
-		if (isset($auth)) {
-			$this->username = $auth->getNNTPUsername();
-			$this->password = $auth->getNNTPPassword();
-		}
-
 		// Verbindung initialisieren
 		$this->nntpclient = new Net_NNTP_Client;
 	}
@@ -43,7 +36,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		return __CLASS__ . ":" . $this->group . "@" . $this->host;
 	}
 	
-	public function open() {
+	public function open($auth) {
 		// Verbindung oeffnen
 		$ret = $this->nntpclient->connect($this->host->getHost(), false, $this->host->getPort());
 		if (PEAR::isError($ret)) {
@@ -53,8 +46,8 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		$this->nntpclient->cmdModeReader();
 		
 		// ggf. Authentifieren
-		if (isset($this->username)) {
-			$ret = $this->nntpclient->authenticate($this->username, $this->password);
+		if (isset($auth)) {
+			$ret = $this->nntpclient->authenticate($auth->getNNTPUsername(), $auth->getNNTPPassword());
 			if (PEAR::isError($ret)) {
 				throw new Exception($ret);
 			}

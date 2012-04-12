@@ -1,7 +1,7 @@
 <?php
 
 interface Connection {
-	public function open();
+	public function open($auth);
 	public function close();
 
 	// Meist sehr Kostenintensiv, da alle Posts geladen werden müssen

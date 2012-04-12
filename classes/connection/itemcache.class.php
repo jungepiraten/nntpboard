@@ -33,7 +33,8 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	abstract protected function loadLastThread();
 	abstract protected function saveLastThread($thread);
 	
-	public function open() {
+	public function open($auth) {
+		parent::open($auth);
 		$this->grouphash = $this->loadGroupHash();
 		$this->oldgrouphash = $this->grouphash;
 		$this->lastthread = $this->loadLastThread();
@@ -44,6 +45,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	
 	public function close() {
+		parent::close();
 		if ($this->hasChanged()) {
 			$this->saveGroupHash($this->grouphash);
 			$this->saveLastThread($this->lastthread);

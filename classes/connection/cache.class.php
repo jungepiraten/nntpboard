@@ -20,12 +20,21 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 **/
 	private $uplink;
 
+	private $auth;
+
 	private $cacheSentPosts;
 	
 	public function __construct($uplink, $cacheSentPosts = true) {
 		parent::__construct();
 		$this->uplink = $uplink;
 		$this->cacheSentPosts = $cacheSentPosts;
+	}
+
+	public function open($auth) {
+		$this->auth = $auth;
+	}
+
+	public function close() {
 	}
 
 	public function getGroupID() {
@@ -74,19 +83,15 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 
 	public function postMessage($message) {
 		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("message", $message);
+			$this->addMessageQueue("message", array($message));
 			$this->handleMessage($message);
 			return "y";
 		}
-		$this->uplink->open();
-		// Die Berechtigungen prueft der Uplink selbst
-		$resp = $this->uplink->postMessage($message);
+		$resp = $this->postCacheMessage($this->auth, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
-		if ($resp != "m") {
+		if ($resp == "y") {
 			$this->handleMessage($message);
 		}
-		$this->uplink->close();
 		return $resp;
 	}
 	public function postAcknowledge($ack, $message) {
@@ -95,15 +100,11 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$this->handleMessage($ack);
 			return "y";
 		}
-		$this->uplink->open();
-		// Die Berechtigungen prueft der Uplink selbst
-		$resp = $this->uplink->postAcknowledge($ack, $message);
+		$resp = $this->postCacheAcknowledge($this->auth, $ack, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
-		if ($resp != "m") {
-			$this->handleMessage($ack);
+		if ($resp == "y") {
+			$this->handleMessage($cancel);
 		}
-		$this->uplink->close();
 		return $resp;
 	}
 	public function postCancel($cancel, $message) {
@@ -112,14 +113,32 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$this->handleMessage($cancel);
 			return "y";
 		}
-		$this->uplink->open();
-		// Die Berechtigungen prueft der Uplink selbst
-		$resp = $this->uplink->postCancel($cancel, $message);
+		$resp = $this->postCacheCancel($this->auth, $cancel, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		// Falls der Uplink moderiert ist, warten wir lieber, bis dieser die Nachricht rausrueckt
-		if ($resp != "m") {
+		if ($resp == "y") {
 			$this->handleMessage($cancel);
 		}
+		return $resp;
+	}
+
+	private function postCacheMessage($auth, $message) {
+		// Die Berechtigungen prueft der Uplink selbst
+		$this->uplink->open($auth);
+		$resp = $this->postMessage($message);
+		$this->uplink->close();
+		return $resp;
+	}
+	private function postCacheAcknowledge($auth, $ack, $message) {
+		// Die Berechtigungen prueft der Uplink selbst
+		$this->uplink->open($auth);
+		$resp = $this->postAcknowledge($ack, $message);
+		$this->uplink->close();
+		return $resp;
+	}
+	private function postCacheCancel($auth, $cancel, $message) {
+		// Die Berechtigungen prueft der Uplink selbst
+		$this->uplink->open($auth);
+		$resp = $this->postCancel($cancel, $message);
 		$this->uplink->close();
 		return $resp;
 	}
@@ -159,11 +178,6 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	public function updateGroup() {
 		$cachegroup = $this->getGroup();
 
-		// Bei passendem Prefix pushen wir erstmal unsere Nachrichten
-		if ($this->hasLocalMessages()) {
-			$this->postMessageCache();
-		}
-
 		$uplinkmessageids = $this->uplink->getMessageIDs();
 		$cachemessageids  = $cachegroup->getMessageIDs();
 
@@ -185,19 +199,20 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		$cachegroup->setGroupHash($grouphash);
 	}
 
-	private function postMessageCache() {
+	private function postCache() {
 		foreach ($this->getMessageQueue("message") as $msgid => $message) {
-			$this->uplink->postMessage($message);
+			list($auth, $message) = $msg;
+			$this->postCacheMessage($auth, $message);
 			$this->delMessageQueue("message", $msgid);
 		}
 		foreach ($this->getMessageQueue("acknowledge") as $msgid => $msg) {
-			list($ack, $message) = $msg;
-			$this->uplink->postAcknowledge($ack, $message);
+			list($auth, $ack, $message) = $msg;
+			$this->postCacheAcknowledge($auth, $ack, $message);
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
 		foreach ($this->getMessageQueue("cancel") as $msgid => $message) {
-			list($cancel, $message) = $msg;
-			$this->uplink->postCancel($cancel, $message);
+			list($auth, $cancel, $message) = $msg;
+			$this->postCacheCancel($auth, $cancel, $message);
 			$this->delMessageQueue("cancel", $msgid);
 		}
 	}
@@ -206,7 +221,11 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 * Hole neue Daten vom Uplink / Cache-Update
 	 **/
 	public function updateCache() {
-		$this->uplink->open();
+		if ($this->hasLocalMessages()) {
+			$this->postCache();
+		}
+
+		$this->uplink->open($this->auth);
 		// Gruppenhashes vergleichen (Schnellste Moeglichkeit)
 		if ($this->uplink->getGroupHash() != $this->getGroupHash()) {
 			/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,

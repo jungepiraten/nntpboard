@@ -14,14 +14,14 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
-$connection = $board->getConnection($session->getAuth());
+$connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
 }
 
 /* Thread laden */
 // Sobald die Verbindung geoeffnet ist, beginnen wir einen Kritischen Abschnitt!
-$connection->open();
+$connection->open($session->getAuth());
 $group = $connection->getGroup();
 $connection->close();
 if ($threadid === null && $messageid !== null) {

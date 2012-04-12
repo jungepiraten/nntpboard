@@ -97,7 +97,7 @@ class Board {
 		return 512;
 	}
 
-	public function getConnection($auth) {
+	public function getConnection() {
 		return null;
 	}
 }
