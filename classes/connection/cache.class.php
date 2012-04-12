@@ -124,21 +124,21 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	private function postCacheMessage($auth, $message) {
 		// Die Berechtigungen prueft der Uplink selbst
 		$this->uplink->open($auth);
-		$resp = $this->postMessage($message);
+		$resp = $this->uplink->postMessage($message);
 		$this->uplink->close();
 		return $resp;
 	}
 	private function postCacheAcknowledge($auth, $ack, $message) {
 		// Die Berechtigungen prueft der Uplink selbst
 		$this->uplink->open($auth);
-		$resp = $this->postAcknowledge($ack, $message);
+		$resp = $this->uplink->postAcknowledge($ack, $message);
 		$this->uplink->close();
 		return $resp;
 	}
 	private function postCacheCancel($auth, $cancel, $message) {
 		// Die Berechtigungen prueft der Uplink selbst
 		$this->uplink->open($auth);
-		$resp = $this->postCancel($cancel, $message);
+		$resp = $this->uplink->postCancel($cancel, $message);
 		$this->uplink->close();
 		return $resp;
 	}
