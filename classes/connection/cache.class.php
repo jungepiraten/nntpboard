@@ -200,7 +200,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	}
 
 	private function postCache() {
-		foreach ($this->getMessageQueue("message") as $msgid => $message) {
+		foreach ($this->getMessageQueue("message") as $msgid => $msg) {
 			list($auth, $message) = $msg;
 			$this->postCacheMessage($auth, $message);
 			$this->delMessageQueue("message", $msgid);
@@ -210,7 +210,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$this->postCacheAcknowledge($auth, $ack, $message);
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
-		foreach ($this->getMessageQueue("cancel") as $msgid => $message) {
+		foreach ($this->getMessageQueue("cancel") as $msgid => $msg) {
 			list($auth, $cancel, $message) = $msg;
 			$this->postCacheCancel($auth, $cancel, $message);
 			$this->delMessageQueue("cancel", $msgid);
