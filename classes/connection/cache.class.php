@@ -83,7 +83,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 
 	public function postMessage($message) {
 		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("message", array($message));
+			$this->addMessageQueue("message", array($this->auth, $message));
 			$this->handleMessage($message);
 			return "y";
 		}
@@ -96,7 +96,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	}
 	public function postAcknowledge($ack, $message) {
 		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("acknowledge", array($ack, $message));
+			$this->addMessageQueue("acknowledge", array($this->auth, $ack, $message));
 			$this->handleMessage($ack);
 			return "y";
 		}
@@ -109,7 +109,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	}
 	public function postCancel($cancel, $message) {
 		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("cancel", array($cancel, $message));
+			$this->addMessageQueue("cancel", array($this->auth, $cancel, $message));
 			$this->handleMessage($cancel);
 			return "y";
 		}
