@@ -27,6 +27,9 @@ class FileGroupCacheConnection extends AbstractGroupCacheConnection {
 	private function getGroupFilename() {
 		return $this->dir . "/index.dat";
 	}
+	private function getMessageQueueFilename() {
+		return $this->dir . "/messagequeue.dat";
+	}
 	private function getMetaFilename() {
 		return $this->dir . "/meta.dat";
 	}
@@ -50,6 +53,24 @@ class FileGroupCacheConnection extends AbstractGroupCacheConnection {
 		file_put_contents($filename, serialize($group));
 	}
 
+	protected function loadMessageQueue() {
+		if ($this->messagequeue == null) {
+			$filename = $this->getMessageQueueFilename();
+			if (!file_exists($filename)) {
+				$this->messagequeue = array();
+				return;
+			}
+			$this->messagequeue = unserialize(file_get_contents($filename));
+		}
+	}
+	protected function saveMessageQueue() {
+		if ($this->messagequeue != null) {
+			$filename = $this->getMessageQueueFilename();
+			mkdir_parents(dirname($filename));
+			file_put_contents($filename, serialize($this->messagequeue));
+		}
+	}
+
 	protected function loadMeta() {
 		if ($this->meta == null) {
 			$filename = $this->getMetaFilename();
@@ -66,6 +87,16 @@ class FileGroupCacheConnection extends AbstractGroupCacheConnection {
 			mkdir_parents(dirname($filename));
 			file_put_contents($filename, serialize($this->meta));
 		}
+	}
+
+	protected function getMessageQueue($queueid) {
+		$this->loadMessageQueue();
+		return $this->messagequeue[$queueid];
+	}
+	protected function setMessageQueue($queueid, $queue) {
+		$this->loadMessageQueue();
+		$this->messagequeue[$queueid] = $queue;
+		$this->saveMessageQueue();
 	}
 
 	protected function loadGroupHash() {

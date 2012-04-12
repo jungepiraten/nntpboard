@@ -65,6 +65,18 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 	}
 
+	protected function setMessageQueue($queueid, $queue) {
+		$this->loadIndex();
+		$this->index['messagequeue'][$queueid] = $queue;
+		$this->saveIndex();
+	}
+	protected function getMessageQueue($queueid) {
+		$this->loadIndex();
+		if (isset($this->index['messagequeue'][$queueid])) {
+			return $this->index['messagequeue'][$queueid];
+		}
+		return array();
+	} 
 	public function loadMessageIDs() {
 		$this->loadIndex();
 		if (isset($this->index['messageids'])) {

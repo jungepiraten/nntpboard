@@ -82,7 +82,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 		$this->grouphash = $hash;
 	}
 	protected function hasChanged() {
-		return $this->grouphash != $this->oldgrouphash;
+		return $this->grouphash !== $this->oldgrouphash;
 	}
 
 	public function getLastThread() {

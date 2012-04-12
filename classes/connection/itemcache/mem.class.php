@@ -20,6 +20,19 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->link;
 	}
 
+	protected function getMessageQueue($queueid) {
+		$link = $this->getLink();
+		$queue = $link->get($this->memcache->getKeyName("messagequeue-" . $queueid));
+		if ($queue != null) {
+			return $queue;
+		}
+		return array();
+	}
+	protected function setMessageQueue($queueid, $queue) {
+		$link = $this->getLink();
+		$link->set($this->memcache->getKeyName("messagequeue-" . $queueid), $queue);
+	}
+
 	public function loadMessageIDs() {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("messageid"));

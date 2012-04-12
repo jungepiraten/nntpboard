@@ -43,6 +43,23 @@ class MemGroupCacheConnection extends AbstractGroupCacheConnection {
 	/**
 	 * 
 	 **/
+	protected function getMessageQueue($queueid) {
+		$link = $this->getLink();
+		$queue = $link->get($this->prefix . "_messagequeue-" . $queueid);
+		if ($queue != null) {
+			return $queue;
+		}
+		return array();
+	}
+
+	protected function setMessageQueue($queueid, $queue) {
+		$link = $this->getLink();
+		$link->set($this->prefix . "_messagequeue-" . $queueid, $queue);
+	}
+
+	/**
+	 * 
+	 **/
 	protected function loadGroupHash() {
 		$link = $this->getLink();
 		return $link->get($this->prefix . "_hash");
