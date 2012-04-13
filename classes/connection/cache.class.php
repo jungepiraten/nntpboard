@@ -9,6 +9,8 @@ require_once(dirname(__FILE__)."/../group/static.class.php");
 require_once(dirname(__FILE__)."/../address.class.php");
 require_once(dirname(__FILE__)."/../thread.class.php");
 require_once(dirname(__FILE__)."/../message.class.php");
+require_once(dirname(__FILE__)."/../acknowledge.class.php");
+require_once(dirname(__FILE__)."/../cancel.class.php");
 require_once(dirname(__FILE__)."/../exceptions/group.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/thread.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/message.exception.php");
