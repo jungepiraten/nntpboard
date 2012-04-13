@@ -13,6 +13,7 @@ if ($board === null) {
 	die("Board nicht gefunden!");
 }
 
+$connection = $board->getConnection();
 if ($connection === null) {
 	die("Board enthaelt keine Group!");
 }
