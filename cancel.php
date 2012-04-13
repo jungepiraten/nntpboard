@@ -44,7 +44,7 @@ $autor = $session->getAuth()->isAnonymous()
 	: $session->getAuth()->getAddress();
 $cancel = new Cancel($cancelid, $messageid, time(), $autor, $wertung);
 
-$connection->open();
+$connection->open($session->getAuth());
 $resp = $connection->postCancel($cancel, $message);
 $connection->close();
 if ($resp == "m") {
