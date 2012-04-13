@@ -214,7 +214,6 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
 		foreach ($this->getMessageQueue("cancel") as $msgid => $msg) {
-var_dump($msg);
 			list($auth, $cancel, $message) = $msg;
 			$this->postCacheCancel($auth, $cancel, $message);
 			$this->delMessageQueue("cancel", $msgid);
