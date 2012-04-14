@@ -50,11 +50,11 @@ class NNTPMessage {
 		$header = new NNTPHeader;
 		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "") . abs(intval($ack->getWertung())), $charset));
+		$header->set(	NNTPSingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())), $charset));
 		$header->set(	NNTPSingleHeader::generate("References",	$references, $charset));
 		$header->set(	NNTPSingleHeader::generate("From",
 				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "") . abs(intval($ack->getWertung())) . "] " . $message->getSubject(), $charset));
+		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject(), $charset));
 		$header->set(	NNTPSingleHeader::generate("Date",
 				date("r", $ack->getDate()), $charset));
 
