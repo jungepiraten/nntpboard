@@ -69,7 +69,6 @@
 								<li><a href="https://www.junge-piraten.de/community/">Mitmachen</a></li>
 								<li class="active"><a href="index.php">Forum</a></li>
 								<li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
-								<li><a href="http://jupis.piratenpad.de/">Piratenpad</a></li>
 								<li><a href="https://ucp.junge-piraten.de/">UCP</a></li>
 								<li><a href="https://pad.junge-piraten.de/">Pads</a></li>
 								<li><a href="https://www.junge-piraten.de/presse">Presse</a></li>
