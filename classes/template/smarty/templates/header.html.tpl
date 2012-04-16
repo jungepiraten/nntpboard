@@ -62,7 +62,7 @@
 					</a>
 					<ul class="nav">
 						<li class="active"><a href="index.php">Forenübersicht</a></li>
-						<li class="dropdown">
+						<li class="dropdown hidden-phone">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li><a href="https://www.junge-piraten.de/">Homepage</a></li>
