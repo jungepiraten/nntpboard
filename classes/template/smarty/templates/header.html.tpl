@@ -2,6 +2,7 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset={$CHARSET}" />
+		<link href="https://static.junge-piraten.de/bootstrap-jupis.css" rel="stylesheet" />
 		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap.css" rel="stylesheet" />
 		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
 		<script src="https://static.junge-piraten.de/jquery.min.js"></script>
