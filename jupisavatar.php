@@ -43,11 +43,11 @@ if ($image === null) {
 	$image = "images/genericperson.png";
 }
 
-if (substr($image, -5) == ".jpeg" || substr($image, -4) == ".jpg") {
+if (strtolower(substr($image, -5)) == ".jpeg" || strtolower(substr($image, -4)) == ".jpg") {
 	$img = ImageCreateFromJPEG($image);
-} else if (substr($image, -4) == ".gif") {
+} else if (strtolower(substr($image, -4)) == ".gif") {
 	$img = ImageCreateFromGIF($image);
-} else if (substr($image, -4) == ".png") {
+} else if (strtolower(substr($image, -4)) == ".png") {
 	$img = ImageCreateFromPNG($image);
 }
 if (!is_resource($img)) {
