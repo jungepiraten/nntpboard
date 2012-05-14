@@ -60,7 +60,10 @@ function generateMessage($config, $session, $board, $reference) {
 		$parentid = null;
 	}
 
-	$textbody = (!empty($_REQUEST["body"]) ? stripslashes($_REQUEST["body"]) : null);
+	if (empty($_REQUEST["body"])) {
+		throw new Exception("Body empty");
+	}
+	$textbody = stripslashes($_REQUEST["body"]);
 
 	$message = new Message($messageid, time(), $autor, $subject, $charset, $parentid, $textbody);
 	// Speichere alte Attachments und 
@@ -98,10 +101,10 @@ if (isset($_REQUEST["preview"])) {
 }
 
 if (isset($_REQUEST["post"])) {
-	// TODO Sperre gegen F5
-	$message = generateMessage($config, $session, $board, $reference);
-
 	try {
+		// TODO Sperre gegen F5
+		$message = generateMessage($config, $session, $board, $reference);
+
 		$connection->open($session->getAuth());
 		$resp = $connection->postMessage($message);
 		$group = $connection->getGroup();
@@ -115,6 +118,8 @@ if (isset($_REQUEST["post"])) {
 		// Alte Attachments loeschen - werden ja nur fuers Preview gespeichert
 		$session->clearAttachments();
 	} catch (PostingException $e) {
+		$template->viewexception($e);
+	} catch (Exception $e) {
 		$template->viewexception($e);
 	}
 }
