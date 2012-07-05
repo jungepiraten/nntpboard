@@ -170,11 +170,7 @@ class JuPiConfig extends DefaultConfig {
 			return $communityuser;
 		}
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
-		list($name, $host) = explode("@", $mailto);
-		if ($host == "junge-piraten.de") {
-			return ucwords(str_replace("."," ",$name));
-		}
-		return ($address->hasName() ? $address->getName() . " " : "") . "<" . $name . "@...>";
+		return substr($mailto, 0, 3) . "...";
 	}
 	public function getAddressLink($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
