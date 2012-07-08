@@ -169,8 +169,21 @@ class JuPiConfig extends DefaultConfig {
 		if ($communityuser != null) {
 			return $communityuser;
 		}
+
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
-		return substr($mailto, 0, 3) . "...";
+		list($name, $host) = explode("@", $mailto);
+		global $session;
+		if ($session->getAuth()->isAnonymous()) {
+			if ($host == "junge-piraten.de" && in_array(strtolower($name), array("vorstand", "presse", "kontakt"))) {
+				return ucwords(str_replace("."," ",$name));
+			}
+			return substr($mailto, 0, 3) . "...";
+		} else {
+			if ($host == "junge-piraten.de") {
+				return ucwords(str_replace("."," ",$name));
+			}
+			return ($address->hasName() ? $address->getName() . " " : "") . "<" . $name . "@...>";
+		}
 	}
 	public function getAddressLink($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
