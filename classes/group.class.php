@@ -44,7 +44,7 @@ abstract class AbstractGroup implements Group {
 	public function hasMessage($messageid) {
 		return in_array($messageid, $this->getMessageIDs());
 	}
-	
+
 	public function getThreadCount() {
 		return count($this->getThreadIDs());
 	}
@@ -93,7 +93,7 @@ abstract class AbstractGroup implements Group {
 					$parent->addChild($message);
 				}
 			}
-		
+
 			// Zum Thread hinzufuegen
 			if ($message->hasParent() && $this->hasThread($message->getParentID())) {
 				$thread = $this->getThread($message->getParentID());
@@ -130,7 +130,7 @@ abstract class AbstractGroup implements Group {
 					$this->getMessage($childid)->setParent($parent);
 				}
 			}
-		
+
 			// Threading
 			if ($this->hasThread($messageid)) {
 				$thread = $this->getThread($messageid);

@@ -25,7 +25,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	private $auth;
 
 	private $cacheSentPosts;
-	
+
 	public function __construct($uplink, $cacheSentPosts = true) {
 		parent::__construct();
 		$this->uplink = $uplink;
@@ -159,7 +159,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 
 		$uplinkmessageids = $group->getMessageIDs();
 		$cachemessageids  = $cachegroup->getMessageIDs();
-		
+
 		// Liste mit neuen Nachrichten aufstellen
 		$newmessages = array_diff($uplinkmessageids, $cachemessageids);
 		foreach ($newmessages as $messageid) {
@@ -205,21 +205,33 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	private function postCache() {
 		foreach ($this->getMessageQueue("message") as $msgid => $msg) {
 			list($auth, $message) = $msg;
-			$this->postCacheMessage($auth, $message);
+			try {
+				$this->postCacheMessage($auth, $message);
+			} catch (PostingException $e) {
+				$this->getGroup()->removeMessage($message);
+			}
 			$this->delMessageQueue("message", $msgid);
 		}
 		foreach ($this->getMessageQueue("acknowledge") as $msgid => $msg) {
 			list($auth, $ack, $message) = $msg;
-			$this->postCacheAcknowledge($auth, $ack, $message);
+			try {
+				$this->postCacheAcknowledge($auth, $ack, $message);
+			} catch (PostingException $e) {
+				$this->getGroup()->removeMessage($ack);
+			}
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
 		foreach ($this->getMessageQueue("cancel") as $msgid => $msg) {
 			list($auth, $cancel, $message) = $msg;
-			$this->postCacheCancel($auth, $cancel, $message);
+			try {
+				$this->postCacheCancel($auth, $cancel, $message);
+			} catch (PostingException $e) {
+				$this->getGroup()->removeMessage($cancel);
+			}
 			$this->delMessageQueue("cancel", $msgid);
 		}
 	}
-	
+
 	/**
 	 * Hole neue Daten vom Uplink / Cache-Update
 	 **/

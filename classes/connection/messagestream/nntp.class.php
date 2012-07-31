@@ -21,7 +21,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	private $mode = null;
 
 	private $nntpclient;
-	
+
 	public function __construct(Host $host, $group, Auth $auth = null) {
 		parent::__construct();
 
@@ -31,11 +31,11 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		// Verbindung initialisieren
 		$this->nntpclient = new Net_NNTP_Client;
 	}
-	
+
 	public function getGroupID() {
 		return __CLASS__ . ":" . $this->group . "@" . $this->host;
 	}
-	
+
 	public function open($auth) {
 		// Verbindung oeffnen
 		$ret = $this->nntpclient->connect($this->host->getHost(), false, $this->host->getPort());
@@ -44,7 +44,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		}
 		// Zwar unschoen, aber die PEAR-DB laesst keine andere Moeglichkeit
 		$this->nntpclient->cmdModeReader();
-		
+
 		// ggf. Authentifieren
 		if (isset($auth)) {
 			$ret = $this->nntpclient->authenticate($auth->getNNTPUsername(), $auth->getNNTPPassword());
@@ -59,10 +59,10 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			throw new Exception($ret);
 		}
 		$this->mode = $ret[$this->group]["posting"];
-		
+
 		$this->refreshCache();
 	}
-	
+
 	public function close() {
 		$this->nntpclient->disconnect();
 	}
@@ -76,7 +76,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		}
 		$this->firstartnr = $ret["first"];
 		$this->lastartnr = $ret["last"];
-		
+
 		$this->messageids = null;
 	}
 
@@ -91,7 +91,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 				foreach ($articles AS $article) {
 					$this->messageids[] = $article["Message-ID"];
 				}
-			}			
+			}
 		}
 		return $this->messageids;
 	}
@@ -115,7 +115,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			}
 			$message = NNTPMessage::parsePlain(implode("\r\n", $article));
 			$message = $message->getObject($this);
-			
+
 			// Schreibe die Nachricht in den Kurzzeit-Cache
 			$this->messages[$msgid] = $message;
 
