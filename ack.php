@@ -14,6 +14,10 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
+if (! $board->mayAcknowledge($session->getAuth())) {
+	$template->viewexception(new Exception("Keine Berechtigung!"));
+}
+
 $connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
