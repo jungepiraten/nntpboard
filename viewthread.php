@@ -1,10 +1,9 @@
 <?php
-
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
+
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-
 $boardid = stripslashes($_REQUEST["boardid"]);
 $threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["threadid"])) : null;
 $messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
@@ -24,6 +23,7 @@ if ($connection === null) {
 $connection->open($session->getAuth());
 $group = $connection->getGroup();
 $connection->close();
+
 if ($threadid === null && $messageid !== null) {
 	$message = $group->getMessage($messageid);
 	if (!($message instanceof Message)) {
@@ -52,6 +52,7 @@ if ($page < 0 || $page > $pages) {
 // Nachrichten laden
 $messageids = array_slice($thread->getMessageIDs(), $page * $config->getMessagesPerPage(), $config->getMessagesPerPage());
 $messages = array();
+
 foreach ($messageids AS $messageid) {
 	$message = array();
 	$message["message"] = $group->getMessage($messageid);
@@ -62,6 +63,7 @@ foreach ($messageids AS $messageid) {
 	}
 	$messages[] = $message;
 }
+
 $connection->close();
 if (!is_array($messages) || count($messages) < 1) {
 	$template->viewexception(new Exception("Thread ungueltig!"));
@@ -69,5 +71,4 @@ if (!is_array($messages) || count($messages) < 1) {
 
 $session->getAuth()->markReadThread($thread);
 $template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
-
 ?>

@@ -78,11 +78,14 @@ class Board {
 		if ($auth === null || $auth->isAnonymous()) {
 			return $this->anonMayPost;
 		}
+
 		return $this->authMayPost;
 	}
+
 	public function mayAcknowledge($auth) {
 		return $this->mayPost($auth);
 	}
+	
 	public function isModerated() {
 		return $this->isModerated;
 	}

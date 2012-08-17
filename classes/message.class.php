@@ -1,5 +1,4 @@
 <?php
-
 require_once(dirname(__FILE__)."/attachment.class.php");
 require_once(dirname(__FILE__)."/exceptions/message.exception.php");
 
@@ -13,7 +12,7 @@ class Message {
 	private $textbody;
 	private $signature;
 	private $htmlbody;
-	
+
 	private $attachments = array();
 	private $childs = array();
 	
@@ -130,5 +129,4 @@ class Message {
 		unset($this->childs[$msg->getMessageID()]);
 	}
 }
-
 ?>

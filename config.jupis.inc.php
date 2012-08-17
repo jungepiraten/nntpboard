@@ -143,16 +143,19 @@ class JuPiConfig extends DefaultConfig {
 		if ($host == "community.junge-piraten.de") {
 			return ucfirst($name);
 		}
+
 		if (!isset($this->mailusers[$mailto])) {
 			if ($this->memcachelink == null) {
 				$this->memcachelink = new Memcache;
 				$this->memcachelink->pconnect("storage", 11211);
 			}
+
 			$this->mailusers[$mailto] = $this->memcachelink->get("nntpboard-communityuser-" . $mailto);
 
 			if ($this->mailusers[$mailto] === false) {
 				$ldaplink = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
 				$search = $ldaplink->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
+
 				if ($search->count() != 1) {
 					$this->mailusers[$mailto] = null;
 				} else {
@@ -162,21 +165,26 @@ class JuPiConfig extends DefaultConfig {
 
 			$this->memcachelink->set("nntpboard-communityuser-" . $mailto, $this->mailusers[$mailto], 0, 24*60*60);
 		}
+
 		return $this->mailusers[$mailto];
 	}
 	public function getAddressText($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
+
 		if ($communityuser != null) {
 			return $communityuser;
 		}
 
 		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
 		list($name, $host) = explode("@", $mailto);
+
 		if ($host == "junge-piraten.de") {
 			return ucwords(str_replace("."," ",$name));
 		}
+
 		return ($address->hasName() ? $address->getName() . " " : "") . "<" . $name . "@...>";
 	}
+
 	public function getAddressLink($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
 		if ($communityuser != null) {
@@ -184,11 +192,14 @@ class JuPiConfig extends DefaultConfig {
 		}
 		return "";
 	}
+
 	public function getAddressImage($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
+
 		if ($communityuser != null) {
 			return "jupisavatar.php?name=" . urlencode($communityuser);
 		}
+
 		return parent::getAddressImage($address, $charset);
 	}
 
@@ -212,5 +223,4 @@ class JuPiConfig extends DefaultConfig {
 		return $this->secretkey;
 	}
 }
-
 ?>

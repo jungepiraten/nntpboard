@@ -19,15 +19,19 @@ abstract class DefaultConfig {
 		}
 		$this->boards[$board->getBoardID()] = $board;
 	}
+
 	public function hasBoard($id = null) {
 		return isset($this->boards[$id]);
 	}
+
 	public function getBoard($id = null) {
 		if (isset($this->boards[$id])) {
 			return $this->boards[$id];
 		}
+
 		throw new NotFoundBoardException($id);
 	}
+
 	public function getBoardIDs() {
 		return array_keys($this->boards);
 	}
@@ -42,6 +46,7 @@ abstract class DefaultConfig {
 	public function getThreadsPerPage() {
 		return 20;
 	}
+
 	public function getMessagesPerPage() {
 		return 15;
 	}
@@ -52,9 +57,11 @@ abstract class DefaultConfig {
 	public function getAddressText($address, $charset) {
 		return iconv($address->getCharset(), $charset, $address->__toString());
 	}
+
 	public function getAddressLink($address, $charset) {
 		return "mailto:" . $address->getAddress();
 	}
+
 	public function getAddressImage($address, $charset) {
 		return "images/genericperson.png";
 	}
@@ -69,9 +76,11 @@ abstract class DefaultConfig {
 		// TODO es ist nicht umbedingt schoen, die Versionsnummer hier festzulegen ;)
 		return "2.0";
 	}
+
 	public function generateMessageID() {
 		return "<" . uniqid("", true) . "@" . $this->getMessageIDHost() . ">";
 	}
+
 	abstract protected function getMessageIDHost();
 	abstract public function getTemplate($auth);
 	public function isAttachmentAllowed($board, $message, $attachment) {
@@ -87,15 +96,19 @@ abstract class DefaultConfig {
 	private function getXTEA() {
 		return new XTEA($this->getSecretKey());
 	}
+
 	public function encryptString($string) {
 		return $this->getXTEA()->encrypt($string);
 	}
+
 	public function decryptString($string) {
 		return $this->getXTEA()->decrypt($string);
 	}
+
 	public function encodeMessageID($messageid) {
 		return base64_encode($messageid);
 	}
+
 	public function decodeMessageID($messageid) {
 		return base64_decode($messageid);
 	}
@@ -106,12 +119,13 @@ abstract class DefaultConfig {
 	public function isCronRunning() {
 		return file_exists(dirname(__FILE__)."/../cron_running.txt");
 	}
+
 	public function markCronRunning() {
 		@file_put_contents(dirname(__FILE__)."/../cron_running.txt", date("Y-m-d H:i:s"));
 	}
+
 	public function markCronFinished() {
 		@unlink(dirname(__FILE__)."/../cron_running.txt");
 	}
 }
-
 ?>

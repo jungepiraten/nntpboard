@@ -1,13 +1,12 @@
 <?php
-
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
+
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-
 $boardid = !empty($_REQUEST["boardid"]) ? stripslashes($_REQUEST["boardid"]) : null;
-
 $board = $config->getBoard($boardid);
+
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
@@ -21,9 +20,11 @@ if ($connection !== null) {
 	// Erzwinge mindestens eine Seite
 	$pages = max(ceil($group->getThreadCount() / $config->getThreadsPerPage()), 1);
 	$page = 0;
+
 	if (isset($_REQUEST["page"])) {
 		$page = intval($_REQUEST["page"]);
 	}
+
 	// Vorsichtshalber erlauben wir nur Seiten, auf dennen auch Nachrichten stehen
 	if ($page < 0 || $page > $pages) {
 		$page = 0;
@@ -45,5 +46,4 @@ if ($connection !== null) {
 } else {
 	$template->viewboard($board, null);
 }
-
 ?>

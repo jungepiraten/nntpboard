@@ -57,6 +57,7 @@ abstract class AbstractAuth implements Auth {
 					$this->readthreads[$threadid] = $lastpostdate;
 				}
 			}
+
 			// Merge $readgroups
 			foreach ($auth->getReadGroups() as $groupid => $groupinfo) {
 				foreach ($groupinfo as $grouphash => $threadids) {
@@ -70,17 +71,16 @@ abstract class AbstractAuth implements Auth {
 
 	public function isUnreadThread($thread) {
 		// Ganz alte Posts
-		if ($thread->getLastPostDate() < $this->getReadDate()) {
+		if ($thread->getLastPostDate() < $this->getReadDate())
 			return false;
-		}
+
 		// Entweder wir kennen den Thread noch gar nicht ...
-		if (!isset($this->readthreads[$thread->getThreadID()])) {
-			return true;
-		}
 		// ... oder der Timestamp hat sich veraendert
-		if ($this->readthreads[$thread->getThreadID()] < $thread->getLastPostDate()) {
+		if (!isset($this->readthreads[$thread->getThreadID()])
+			|| $this->readthreads[$thread->getThreadID()] < $thread->getLastPostDate()) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -96,6 +96,7 @@ abstract class AbstractAuth implements Auth {
 				$unreadthreads[$threadid] = true;
 			}
 		}
+
 		$this->readgroups[$group->getGroupID()][$group->getGroupHash()] = $unreadthreads;
 	}
 
@@ -103,14 +104,15 @@ abstract class AbstractAuth implements Auth {
 		if (!isset($this->readgroups[$group->getGroupID()][$group->getGroupHash()])) {
 			$this->generateUnreadArray($group);
 		}
+
 		// Cache alle Thread-IDs, die in der Vergangenheit ungelesen waren
 		foreach (array_keys($this->readgroups[$group->getGroupID()][$group->getGroupHash()]) as $threadid) {
-			if ($group->hasThread($threadid) && $this->isUnreadThread($group->getThread($threadid))) {
+			if ($group->hasThread($threadid) && $this->isUnreadThread($group->getThread($threadid)))
 				return true;
-			} else {
+			else
 				unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
-			}
 		}
+
 		return false;
 	}
 
@@ -128,12 +130,15 @@ abstract class AbstractAuth implements Auth {
 	protected function loadReadDate() {
 		return time() - self::ZEITFRIST;
 	}
+
 	protected function loadReadThreads() {
 		return array();
 	}
+
 	protected function loadReadGroups() {
 		return array();
 	}
+
 	protected function saveReadDate($date) {}
 	protected function saveReadThreads($data) {}
 	protected function saveReadGroups($data) {}
@@ -142,5 +147,4 @@ abstract class AbstractAuth implements Auth {
 		return $this->getAddress() == null;
 	}
 }
-
 ?>

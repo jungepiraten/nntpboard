@@ -55,6 +55,7 @@ if (!is_resource($img)) {
 }
 $origw = ImageSx($img);
 $origh = ImageSy($img);
+
 if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 	if ($origw * THUMBHEIGHT > $origh * THUMBWIDTH) {
 		$thumbw = THUMBWIDTH;
@@ -63,6 +64,7 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 		$thumbw = $origw * (THUMBHEIGHT / $origh);
 		$thumbh = THUMBHEIGHT;
 	}
+
 	$thumb = ImageCreateTrueColor($thumbw, $thumbh);
 	ImageAlphaBlending($thumb, false);
 	ImageSaveAlpha($thumb, true);
@@ -72,9 +74,9 @@ if ($origw > THUMBWIDTH || $origh > THUMBHEIGHT) {
 	ImageAlphaBlending($thumb, false);
 	ImageSaveAlpha($thumb, true);
 }
+
 ImagePNG($thumb, $cachename . ".png");
 ImageDestroy($thumb);
 header("Content-Type: image/png");
 readfile($cachename . ".png");
-
 ?>

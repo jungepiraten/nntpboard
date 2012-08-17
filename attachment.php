@@ -1,9 +1,8 @@
 <?php
-
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
-$session = new Session($config);
 
+$session = new Session($config);
 $boardid = stripslashes($_REQUEST["boardid"]);
 $messageid = $config->decodeMessageID(stripslashes($_REQUEST["messageid"]));
 $partid = stripslashes($_REQUEST["partid"]);
@@ -17,6 +16,7 @@ $connection = $board->getConnection();
 if ($connection === null) {
 	die("Board enthaelt keine Group!");
 }
+
 $connection->open($session->getAuth());
 $group = $connection->getGroup();
 $connection->close();
@@ -43,10 +43,10 @@ if (preg_match("$^image/$", $attachment->getMimeType())) {
 // see RFC 2616 for these Headers
 header("Content-Type: ".$attachment->getMimeType());
 header("Content-Length: ".$attachment->getLength());
+
 if (!empty($disposition)) {
 	header("Content-Disposition: " . $disposition . (empty($filename) or $disposition == "inline" ? "" : "; filename=\"".addslashes($filename)."\""));
 }
 
 print($attachment->getContent());
-
 ?>
