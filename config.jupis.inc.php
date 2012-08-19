@@ -197,10 +197,10 @@ class JuPiConfig extends DefaultConfig {
 		$communityuser = $this->getCommunityUser($address, $charset);
 
 		if ($communityuser != null) {
-			return "jupisavatar.php?name=" . urlencode($communityuser);
+			return "jupisavatar.php?name=" . urlencode($communityuser) . "&gravatar-hash=" . md5(strtolower(trim($address->getAddress())));
 		}
 
-		return parent::getAddressImage($address, $charset);
+		return "jupisavatar.php?gravatar-hash=" . md5(strtolower(trim($address->getAddress())));
 	}
 
 	public function getTemplate($auth) {

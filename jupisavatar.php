@@ -4,16 +4,6 @@ define("CACHEPERIOD", 24 * 60 * 60);
 define("THUMBWIDTH", 100);
 define("THUMBHEIGHT", 140);
 
-$name = stripslashes($_REQUEST["name"]);
-$cachename = "avatarcache/" . md5($name);
-
-// Wenn unser Cachebild nicht zu alt ist, benutze es
-if (file_exists($cachename . ".png") && filemtime($cachename . ".png") > time() - CACHEPERIOD) {
-	header("Content-Type: image/png");
-	readfile($cachename . ".png");
-	exit;
-}
-
 // Funktion zum Laden eines Bildes aus der Wikiseite
 function getImage($page) {
 	$link = "http://wiki.junge-piraten.de/w/api.php?action=query&prop=images&format=xml&titles=" . urlencode($page);
@@ -33,22 +23,41 @@ function getImage($page) {
 	return null;
 }
 
-// Ladereihenfolge: Zuerst Benutzer/Avatar - falls dieses nicht existiert, probiere die Regulaere Benutzerseite
-$image = getImage("Benutzer:" . ucfirst($name) . "/Avatar");
-if ($image === null) {
-	$image = getImage("Benutzer:" . ucfirst($name));
+if (isset($_REQUEST["name"])) {
+	$name = stripslashes($_REQUEST["name"]);
+	$cachename = "avatarcache/" . md5($name);
+
+	// Wenn unser Cachebild nicht zu alt ist, benutze es
+	if (file_exists($cachename . ".png") && filemtime($cachename . ".png") > time() - CACHEPERIOD) {
+		header("Content-Type: image/png");
+		readfile($cachename . ".png");
+		exit;
+	}
+
+	// Ladereihenfolge: Zuerst Benutzer/Avatar - falls dieses nicht existiert, probiere die Regulaere Benutzerseite
+	$image = getImage("Benutzer:" . ucfirst($name) . "/Avatar");
+	if ($image === null) {
+		$image = getImage("Benutzer:" . ucfirst($name));
+	}
+} else {
+	$cachename = "avatarcache/" . $_REQUEST["gravatar-hash"];
 }
 
 if ($image === null) {
-	$image = "images/genericperson.png";
+	$image = "http://www.gravatar.com/avatar/" . $_REQUEST["gravatar-hash"] . "?s=" . min(THUMBWIDTH, THUMBHEIGHT);
 }
 
-if (strtolower(substr($image, -5)) == ".jpeg" || strtolower(substr($image, -4)) == ".jpg") {
+$meta = getimagesize($image);
+switch ($meta["mime"]) {
+case "image/jpg":
 	$img = ImageCreateFromJPEG($image);
-} else if (strtolower(substr($image, -4)) == ".gif") {
+	break;
+case "image/gif":
 	$img = ImageCreateFromGIF($image);
-} else if (strtolower(substr($image, -4)) == ".png") {
+	break;
+case "image/png":
 	$img = ImageCreateFromPNG($image);
+	break;
 }
 if (!is_resource($img)) {
 	die("Fail!");
@@ -79,4 +88,5 @@ ImagePNG($thumb, $cachename . ".png");
 ImageDestroy($thumb);
 header("Content-Type: image/png");
 readfile($cachename . ".png");
+
 ?>
