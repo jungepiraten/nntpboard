@@ -50,6 +50,7 @@ if ($image === null) {
 $meta = getimagesize($image);
 switch ($meta["mime"]) {
 case "image/jpg":
+case "image/jpeg":
 	$img = ImageCreateFromJPEG($image);
 	break;
 case "image/gif":
