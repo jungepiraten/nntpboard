@@ -2,12 +2,12 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset={$CHARSET}" />
-		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap.css" rel="stylesheet" />
-		<link href="https://static.junge-piraten.de/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
-		<link href="https://static.junge-piraten.de/bootstrap-jupis.css" rel="stylesheet" />
-		<script src="https://static.junge-piraten.de/jquery.min.js"></script>
-		<script src="https://static.junge-piraten.de/bootstrap/js/bootstrap.min.js"></script>
-		<link rel="icon" type="image/png" href="https://static.junge-piraten.de/favicon.png" />
+		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap.css" rel="stylesheet" />
+		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
+		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap-jupis.css" rel="stylesheet" />
+		<script src="https://d2bycxj0k00qr3.cloudfront.net/jquery.min.js"></script>
+		<script src="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/js/bootstrap.min.js"></script>
+		<link rel="icon" type="image/png" href="https://d2bycxj0k00qr3.cloudfront.net/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		{literal}
@@ -49,7 +49,7 @@
 		{/literal}
 
 		<!--[if lt IE 9]>
-			<script src="https://static.junge-piraten.de/ie-html5.js"></script>
+			<script src="https://d2bycxj0k00qr3.cloudfront.net/ie-html5.js"></script>
 		<![endif]-->
 
 		<title>Junge Piraten &bull; {$title|escape:html}</title>
