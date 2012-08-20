@@ -44,7 +44,7 @@ if (isset($_REQUEST["name"])) {
 }
 
 if ($image === null) {
-	$image = "http://www.gravatar.com/avatar/" . $_REQUEST["gravatar-hash"] . "?s=" . min(THUMBWIDTH, THUMBHEIGHT);
+	$image = "http://www.gravatar.com/avatar/" . $_REQUEST["gravatar-hash"] . "?s=" . min(THUMBWIDTH, THUMBHEIGHT) . "&default=mm";
 }
 
 $meta = getimagesize($image);
