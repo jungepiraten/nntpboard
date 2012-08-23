@@ -34,7 +34,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addEventStruktur(800, null);
 		
 		$this->addBoard(new Board(899, null, "Young Pirates International", ""));
-		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellanganeous");
+		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellaneous");
 
 		$this->addBoard(new Board(665, null, "Test", ""));
 		$this->addGenericBoard(666, 665, "test", "test", null, "Test", "Testforum. Spamgefahr!");
