@@ -50,21 +50,23 @@ if (!function_exists("mkdir_parents")) {
 class JuPisAuth extends JuPisAnonAuth {
 	protected static $MODERATORS = array("prauscher", "viirus", "gheed", "yuri", "smrqdt", "lutoma");
 
-	public static function authenticate($user, $pass) {
-		$auth = new JuPisAuth($user, $pass);
+	public static function authenticate($config, $user, $pass) {
+		$auth = new JuPisAuth($config, $user, $pass);
 		// fetchUserDetails() wirft eine AuthException, wenn es Probleme gab
 		$auth->fetchUserDetails();
 		return $auth;
 	}
 
+	private $config;
 	private $username;
 	private $password;
 
 	private $data;
 
-	public function __construct($username, $password) {
-		/* Nicht andersherum eintragen, da sonst getFilename()
+	public function __construct($config, $username, $password) {
+		/* Konstruktor nicht andersherum eintragen, da sonst getFilename()
 		 * ohne $this->username aufgerufen wird => ungut */
+		$this->config = $config;
 		$this->username = $username;
 		$this->password = $password;
 		$this->loadData();
@@ -92,7 +94,7 @@ class JuPisAuth extends JuPisAnonAuth {
 	}
 
 	public function getNNTPPassword() {
-		return $this->password;
+		return $this->config->getNNTPPassword();
 	}
 
 	private function getFilename() {
@@ -114,7 +116,7 @@ class JuPisAuth extends JuPisAnonAuth {
 		mkdir_parents(dirname($filename));
 		file_put_contents($filename, serialize($this->data));
 	}
-	
+
 	protected function loadReadDate() {
 		if (isset($this->data["readdate"])) {
 			return $this->data["readdate"];

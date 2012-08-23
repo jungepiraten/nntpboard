@@ -61,6 +61,10 @@ class JuPiConfig extends DefaultConfig {
 		return new Host("news.junge-piraten.de");
 	}
 
+	public function getNNTPPassword() {
+		return $this->secretkey;
+	}
+
 	private function getMemcacheHost($boardid) {
 		return new MemCacheHost("storage", 11211, "nntpboard" . $boardid);
 	}
@@ -168,6 +172,7 @@ class JuPiConfig extends DefaultConfig {
 
 		return $this->mailusers[$mailto];
 	}
+
 	public function getAddressText($address, $charset) {
 		$communityuser = $this->getCommunityUser($address, $charset);
 
@@ -208,7 +213,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	public function getAuth($user, $pass) {
-		return JuPisAuth::authenticate($user, $pass);
+		return JuPisAuth::authenticate($this, $user, $pass);
 	}
 
 	public function getAnonymousAuth() {
