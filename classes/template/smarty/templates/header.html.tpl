@@ -2,8 +2,8 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset={$CHARSET}" />
-		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap.css" rel="stylesheet" />
-		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
+		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
 		<link href="https://d2bycxj0k00qr3.cloudfront.net/bootstrap-jupis.css" rel="stylesheet" />
 		<script src="https://d2bycxj0k00qr3.cloudfront.net/jquery.min.js"></script>
 		<script src="https://d2bycxj0k00qr3.cloudfront.net/bootstrap/js/bootstrap.min.js"></script>
