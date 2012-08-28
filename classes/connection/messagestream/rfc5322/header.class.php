@@ -1,11 +1,11 @@
 <?php
 
-class NNTPHeader {
+class RFC5322Header {
 	public static function parsePlain($plain) {
 		if (!is_array($plain)) {
 			$plain = explode("\r\n", $plain);
 		}
-		$header = new NNTPHeader;
+		$header = new RFC5322Header;
 		for ($i=0; $i<count($plain); $i++) {
 			// Eventuellen Zeilenruecklauf abschneiden
 			$line = rtrim($plain[$i]);
@@ -14,7 +14,7 @@ class NNTPHeader {
 				$line .= " " . ltrim($plain[++$i]);
 			}
 			if (!empty($line)) {
-				$header->set(NNTPSingleHeader::parsePlain($line));
+				$header->set(RFC5322SingleHeader::parsePlain($line));
 			}
 		}
 		return $header;
@@ -38,7 +38,7 @@ class NNTPHeader {
 	}
 
 	public function extractMessageHeader() {
-		$headers = new NNTPHeader;
+		$headers = new RFC5322Header;
 		foreach ($this->headers as $name => $header) {
 			if (substr($name,0,7) != "content") {
 				$headers->set($header);
@@ -48,7 +48,7 @@ class NNTPHeader {
 	}
 
 	public function extractContentHeader() {
-		$headers = new NNTPHeader;
+		$headers = new RFC5322Header;
 		foreach ($this->headers as $name => $header) {
 			if (substr($name,0,7) == "content") {
 				$headers->set($header);
@@ -66,14 +66,14 @@ class NNTPHeader {
 	}
 }
 
-class NNTPSingleHeader {
+class RFC5322SingleHeader {
 	public static function parsePlain($line) {
 		list($name, $value) = explode(":", $line, 2);
 
 		// Eventuell vorhandene Extra-Attribute auffangen
 		$extras = explode(";", $value);
 		$value = trim(array_shift($extras));
-		$h = new NNTPSingleHeader(trim($name), $value);
+		$h = new RFC5322SingleHeader(trim($name), $value);
 		foreach ($extras AS $extra) {
 			// Fixe vermeindliche Extra-Header (z.b. Bei User-Agent)
 			if (strpos($extra, "=") === false) {
@@ -94,7 +94,7 @@ class NNTPSingleHeader {
 			mb_internal_encoding($charset);
 			$value = mb_encode_mimeheader($value, $charset, "B");
 		}
-		return new NNTPSingleHeader($name, $value);
+		return new RFC5322SingleHeader($name, $value);
 	}
 
 	private $name;

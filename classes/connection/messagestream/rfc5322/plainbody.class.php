@@ -12,37 +12,37 @@ if (!function_exists("quoted_printable_encode")) {
 	}
 }
 
-class NNTPPlainBody {
+class RFC5322PlainBody {
 	public static function parsePlain($header, $body) {
-		return new NNTPPlainBody($header, $body);
+		return new RFC5322PlainBody($header, $body);
 	}
 
 	public static function parseObject($attachment) {
-		$header = new NNTPHeader;
-		$header->set(	new NNTPSingleHeader("Content-Type",			$attachment->getMimeType()));
-		$header_disposition = new NNTPSingleHeader("Content-Disposition",	$attachment->getDisposition());
+		$header = new RFC5322Header;
+		$header->set(	new RFC5322SingleHeader("Content-Type",			$attachment->getMimeType()));
+		$header_disposition = new RFC5322SingleHeader("Content-Disposition",	$attachment->getDisposition());
 		if ($attachment->hasFilename()) {
 			$header_disposition->addExtra("filename", $attachment->getFilename());
 		}
 		$header->set($header_disposition);
 		
 		if ($attachment->isBinary()) {
-			$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"base64"));
+			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"base64"));
 			$content = base64_encode($attachment->getContent());
 		} else {
-			$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	"quoted-printable"));
+			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"quoted-printable"));
 			$content = quoted_printable_encode($attachment->getContent());
 		}
 		
-		return new NNTPPlainBody($header, $content);
+		return new RFC5322PlainBody($header, $content);
 	}
 
 	public static function parse($mimetype, $charset, $encoding, $body) {
-		$header = new NNTPHeader;
-		$contenttypeheader = new NNTPSingleHeader("Content-Type",		$mimetype);
+		$header = new RFC5322Header;
+		$contenttypeheader = new RFC5322SingleHeader("Content-Type",		$mimetype);
 		$contenttypeheader->addExtra("charset", $charset);
 		$header->set($contenttypeheader);
-		$header->set(	new NNTPSingleHeader("Content-Transfer-Encoding",	$encoding));
+		$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	$encoding));
 
 		switch ($encoding) {
 		case "7bit":
@@ -57,7 +57,7 @@ class NNTPPlainBody {
 			$body = quoted_printable_encode($body);
 			break;
 		}
-		return new NNTPPlainBody($header, $body);
+		return new RFC5322PlainBody($header, $body);
 	}
 
 	private $header;

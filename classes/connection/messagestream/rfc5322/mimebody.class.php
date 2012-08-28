@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . "/mimebody/related.class.php");
 require_once(dirname(__FILE__) . "/mimebody/alternative.class.php");
 require_once(dirname(__FILE__) . "/mimebody/signed.class.php");
 
-abstract class NNTPMimeBody {
+abstract class RFC5322MimeBody {
 	public static function parsePlain($header, $body) {
 		$parts = array();
 		$mimetype = null;
@@ -29,24 +29,24 @@ abstract class NNTPMimeBody {
 			
 			foreach ($mimeparts AS $mimepart) {
 				list($partheader, $partbody) = explode("\r\n\r\n", $mimepart, 2);
-				$partheader = NNTPHeader::parsePlain($partheader);
+				$partheader = RFC5322Header::parsePlain($partheader);
 				$parts[] = self::parsePlain($partheader, $partbody);
 			}
 		} else {
 			// Singlepart-Nachricht
-			$parts[] = NNTPPlainBody::parsePlain($header, $body);
+			$parts[] = RFC5322PlainBody::parsePlain($header, $body);
 		}
 
 		switch ($mimetype) {
 		case "multipart/signed":
-			return new NNTPSignedMimeBody($header, $parts);
+			return new RFC5322SignedMimeBody($header, $parts);
 		case "multipart/related":
-			return new NNTPRelatedMimeBody($header, $parts);
+			return new RFC5322RelatedMimeBody($header, $parts);
 		case "multipart/alternative":
-			return new NNTPAlternativeMimeBody($header, $parts);
+			return new RFC5322AlternativeMimeBody($header, $parts);
 		default:
 		case "multipart/mixed":
-			return new NNTPMixedMimeBody($header, $parts);
+			return new RFC5322MixedMimeBody($header, $parts);
 		}
 	}
 	
@@ -59,43 +59,43 @@ abstract class NNTPMimeBody {
 			if ($message->hasSignature()) {
 				$text .= "\r\n-- \r\n" . $message->getSignature();
 			}
-			$parts[] = NNTPPlainBody::parse("text/plain", $message->getCharset(), "base64", $text);
+			$parts[] = RFC5322PlainBody::parse("text/plain", $message->getCharset(), "base64", $text);
 		}
 		// HTML-Teil
 		if ($message->hasHTMLBody()) {
-			$parts[] = NNTPPlainBody::parse("text/html", $message->getCharset(), "base64", $message->getHTMLBody());
+			$parts[] = RFC5322PlainBody::parse("text/html", $message->getCharset(), "base64", $message->getHTMLBody());
 		}
 		// In einen alternative-Body packen (falls noetig)
 		if (count($parts) > 1) {
-			$header = new NNTPHeader;
-			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
+			$header = new RFC5322Header;
+			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
 			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
-			$parts = array(new NNTPAlternativeMimeBody($header, $parts));
+			$parts = array(new RFC5322AlternativeMimeBody($header, $parts));
 		}
 		// Eventuelle Attachments verpacken wir jetzt
 		foreach ($message->getAttachments() AS $attachment) {
-			$parts[] = NNTPPlainBody::parseObject($attachment);
+			$parts[] = RFC5322PlainBody::parseObject($attachment);
 		}
 		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
 		if (count($parts) > 1) {
-			$header = new NNTPHeader;
-			$header->set(NNTPSingleHeader::generate("MIME-Version", "1.0", $message->getCharset()));
-			$contenttype = NNTPSingleHeader::generate("Content-Type",	"multipart/mixed",	$message->getCharset());
+			$header = new RFC5322Header;
+			$header->set(RFC5322SingleHeader::generate("MIME-Version", "1.0", $message->getCharset()));
+			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/mixed",	$message->getCharset());
 			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
-			return new NNTPMixedMimeBody($header, $parts);
+			return new RFC5322MixedMimeBody($header, $parts);
 		}
 		// ansonsten nehmen wir einfach dieses eine Attachment
 		return array_shift($parts);
 	}
 
 	public static function parseAcknowledgeObject($ack, $message) {
-		return NNTPPlainBody::parse("text/plain", "UTF-8", "base64", ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()));
+		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()));
 	}
 
 	public static function parseCancelObject($cancel, $message) {
-		return NNTPPlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard\n-----CONTENT WAS-----\n" . $message->getTextBody());
+		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard\n-----CONTENT WAS-----\n" . $message->getTextBody());
 	}
 	
 	private $header;

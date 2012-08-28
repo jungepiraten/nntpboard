@@ -6,7 +6,7 @@
 
 require_once(dirname(__FILE__) . "/../mimebody.class.php");
 
-class NNTPRelatedMimeBody extends NNTPMimeBody {
+class RFC5322RelatedMimeBody extends RFC5322MimeBody {
 	private function getRootPart() {
 		if ($this->getHeader()->get("Content-Type")->hasExtra("start")) {
 			foreach ($this->getParts() AS $part) {
@@ -24,7 +24,7 @@ class NNTPRelatedMimeBody extends NNTPMimeBody {
 			$mimetype = array($mimetype);
 		}
 		$part = $this->getRootPart();
-		if ($part instanceof NNTPMimeBody) {
+		if ($part instanceof RFC5322MimeBody) {
 			return $part->getBodyPart($mimetype, $charset);
 		} else if (in_array($part->getMimeType(), $mimetype)) {
 			return $part->getBody($charset);
@@ -40,7 +40,7 @@ class NNTPRelatedMimeBody extends NNTPMimeBody {
 			if ($part == $rootpart) {
 				continue;
 			}
-			if ($part instanceof NNTPMimeBody) {
+			if ($part instanceof RFC5322MimeBody) {
 				$attachments = array_merge($attachments, $part->getAttachmentParts());
 			} else {
 				$attachments[] = $part;

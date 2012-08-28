@@ -17,14 +17,14 @@ class TestConfig extends DefaultConfig {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Testboards", ""));
 
-		$host = new Host("prauscher.homeip.net");
+		$host = new Host("localhost");
 		$memcache = new MemcacheHost("localhost", 11211, "nntpboard999");
 
 		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
 		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
-				false, true, true, $host, "prauscher.test"));
+				false, true, true, $host, "test.a"));
 		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
-				false, true, false, $memcache, $host, "prauscher.testing"));
+				false, true, false, $memcache, $host, "test.b"));
 
 		$this->secretkey = $secretkey;
 	}

@@ -6,17 +6,17 @@ require_once(dirname(__FILE__) . "/mimebody.class.php");
 require_once(dirname(__FILE__) . "/../../../message.class.php");
 require_once(dirname(__FILE__) . "/../../../acknowledge.class.php");
 
-class NNTPMessage {
+class RFC5322Message {
 	public static function parsePlain($plain) {
 		list($header, $body) = explode("\r\n\r\n", $plain, 2);
 
 		// Header parsen
-		$header = NNTPHeader::parsePlain($header);
+		$header = RFC5322Header::parsePlain($header);
 
 		// Body parsen
-		$body = NNTPMimeBody::parsePlain($header->extractContentHeader(), $body);
+		$body = RFC5322MimeBody::parsePlain($header->extractContentHeader(), $body);
 		
-		return new NNTPMessage($header->extractMessageHeader(), $body);
+		return new RFC5322Message($header->extractMessageHeader(), $body);
 	}
 
 	public static function generateReferences($connection, $message) {
@@ -27,19 +27,19 @@ class NNTPMessage {
 	public static function parseObject($connection, $group, $message) {
 		$charset = $message->getCharset();
 		
-		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
+		$header = new RFC5322Header;
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
 		if ($message->hasParent()) {
-			$header->set(	NNTPSingleHeader::generate("References",	self::generateReferences($connection, $message), $charset));
+			$header->set(	RFC5322SingleHeader::generate("References",	self::generateReferences($connection, $message), $charset));
 		}
-		$header->set(	NNTPSingleHeader::generate("From",
-				NNTPAddress::parseObject($message->getAuthor())->getPlain(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Subject",		$message->getSubject(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Date",
+		$header->set(	RFC5322SingleHeader::generate("From",
+				RFC5322Address::parseObject($message->getAuthor())->getPlain(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		$message->getSubject(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Date",
 				date("r", $message->getDate()), $charset));
 
-		return new NNTPMessage($header, NNTPMimeBody::parseObject($message));
+		return new RFC5322Message($header, RFC5322MimeBody::parseObject($message));
 	}
 
 	public static function parseAcknowledgeObject($connection, $group, $ack, $message) {
@@ -47,34 +47,34 @@ class NNTPMessage {
 		$references = self::generateReferences($connection, $message);
 		$references .= " " . $message->getMessageID();
 
-		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())), $charset));
-		$header->set(	NNTPSingleHeader::generate("References",	$references, $charset));
-		$header->set(	NNTPSingleHeader::generate("From",
-				NNTPAddress::parseObject($ack->getAuthor())->getPlain(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Date",
+		$header = new RFC5322Header;
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	RFC5322SingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())), $charset));
+		$header->set(	RFC5322SingleHeader::generate("References",	$references, $charset));
+		$header->set(	RFC5322SingleHeader::generate("From",
+				RFC5322Address::parseObject($ack->getAuthor())->getPlain(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Date",
 				date("r", $ack->getDate()), $charset));
 
-		return new NNTPMessage($header, NNTPMimeBody::parseAcknowledgeObject($ack, $message));
+		return new RFC5322Message($header, RFC5322MimeBody::parseAcknowledgeObject($ack, $message));
 	}
 
 	public static function parseCancelObject($connection, $group, $cancel, $message) {
 		$charset = $message->getCharset();
 
-		$header = new NNTPHeader;
-		$header->set(	NNTPSingleHeader::generate("Message-ID",	$cancel->getMessageID(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	NNTPSingleHeader::generate("From",
-				NNTPAddress::parseObject($cancel->getAuthor())->getPlain(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Control",		"cancel " . $cancel->getReference(), $charset));
-		$header->set(	NNTPSingleHeader::generate("Date",
+		$header = new RFC5322Header;
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$cancel->getMessageID(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	RFC5322SingleHeader::generate("From",
+				RFC5322Address::parseObject($cancel->getAuthor())->getPlain(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Control",		"cancel " . $cancel->getReference(), $charset));
+		$header->set(	RFC5322SingleHeader::generate("Date",
 				date("r", $cancel->getDate()), $charset));
 
-		return new NNTPMessage($header, NNTPMimeBody::parseCancelObject($cancel, $message));
+		return new RFC5322Message($header, RFC5322MimeBody::parseCancelObject($cancel, $message));
 	}
 
 	private $header;
@@ -115,10 +115,10 @@ class NNTPMessage {
 		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
 		if ($this->getHeader()->has("Sender")
 		 && (strtolower($this->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
-			$author =	NNTPAddress::parsePlain($this->getHeader()->get("Sender")->getValue($charset))->getObject();
+			$author =	RFC5322Address::parsePlain($this->getHeader()->get("Sender")->getValue($charset))->getObject();
 		} else {
 			// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
-			$author =	NNTPAddress::parsePlain(
+			$author =	RFC5322Address::parsePlain(
 						array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
 						)->getObject();
 		}

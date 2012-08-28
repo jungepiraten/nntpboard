@@ -4,8 +4,8 @@
 require_once("Net/NNTP/Client.php");
 
 require_once(dirname(__FILE__)."/../messagestream.class.php");
-require_once(dirname(__FILE__)."/nntp/header.class.php");
-require_once(dirname(__FILE__)."/nntp/message.class.php");
+require_once(dirname(__FILE__)."/rfc5322/header.class.php");
+require_once(dirname(__FILE__)."/rfc5322/message.class.php");
 require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
 
 class NNTPConnection extends AbstractMessageStreamConnection {
@@ -113,7 +113,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
-			$message = NNTPMessage::parsePlain(implode("\r\n", $article));
+			$message = RFC5322Message::parsePlain(implode("\r\n", $article));
 			$message = $message->getObject($this);
 
 			// Schreibe die Nachricht in den Kurzzeit-Cache
@@ -129,13 +129,19 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	 * Schreibe eine Nachricht
 	 **/
 	public function postMessage($message) {
-		return $this->post(NNTPMessage::parseObject($this, $this->group, $message));
+		$rfcmessage = RFC5322Message::parseObject($this, $this->group, $message);
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		return $this->post($rfcmessage);
 	}
 	public function postAcknowledge($ack, $message) {
-		return $this->post(NNTPMessage::parseAcknowledgeObject($this, $this->group, $ack, $message));
+		$rfcmessage = RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message);
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		return $this->post($rfcmessage);
 	}
 	public function postCancel($cancel, $message) {
-		return $this->post(NNTPMessage::parseCancelObject($this, $this->group, $cancel, $message));
+		$rfcmessage = RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message);
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		return $this->post($rfcmessage);
 	}
 	private function post($nntpmsg) {
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {

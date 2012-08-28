@@ -2,9 +2,9 @@
 
 require_once(dirname(__FILE__) . "/../../../address.class.php");
 
-class NNTPAddress extends Address {
+class RFC5322Address extends Address {
 	public static function parseObject($addr) {
-		return new NNTPAddress($addr->getName(), $addr->getAddress(), $addr->getComment(), $addr->getCharset());
+		return new RFC5322Address($addr->getName(), $addr->getAddress(), $addr->getComment(), $addr->getCharset());
 	}
 	
 	public static function parsePlain($addr, $charset = "UTF-8") {
@@ -20,7 +20,7 @@ class NNTPAddress extends Address {
 			$name = trim(array_shift($m)," \"'\t");
 			$addr = trim(array_shift($m));
 		}
-		return new NNTPAddress($name, trim($addr, "<>"), $comment, $charset);
+		return new RFC5322Address($name, trim($addr, "<>"), $comment, $charset);
 	}
 
 	public function getObject() {
