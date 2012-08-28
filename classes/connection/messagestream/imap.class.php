@@ -14,9 +14,6 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 	private $loginpassword;
 	private $folder;
 
-	// Erste ArtNr und Letzte ArtNr
-	private $firstartnr;
-	private $lastartnr;
 	// MessageIDs
 	private $messageids = null;
 
@@ -90,21 +87,14 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 		return in_array($msgid, $this->getMessageIDs());
 	}
 	public function getMessage($msgid) {
-		// Frage zuerst den Kurzzeitcache
-		if (isset($this->messages[$msgid])) {
-			return $this->messages[$msgid];
-		}
+		// Lade die Nachricht und Parse sie
 		if ($this->hasMessage($msgid)) {
-			// Lade die Nachricht und Parse sie
 			$article = array_shift($this->imapclient->getMessages($this->getArticleNr($msgid)));
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
 			$message = RFC5322Message::parsePlain($article);
 			$message = $message->getObject($this);
-
-			// Schreibe die Nachricht in den Kurzzeit-Cache
-			$this->messages[$msgid] = $message;
 
 			return $message;
 		}

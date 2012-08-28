@@ -103,10 +103,6 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		return in_array($msgid, $this->getMessageIDs());
 	}
 	public function getMessage($msgid) {
-		// Frage zuerst den Kurzzeitcache
-		if (isset($this->messages[$msgid])) {
-			return $this->messages[$msgid];
-		}
 		if ($this->hasMessage($msgid)) {
 			// Lade die Nachricht und Parse sie
 			$article = $this->nntpclient->getArticle($msgid);
@@ -115,9 +111,6 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			}
 			$message = RFC5322Message::parsePlain(implode("\r\n", $article));
 			$message = $message->getObject($this);
-
-			// Schreibe die Nachricht in den Kurzzeit-Cache
-			$this->messages[$msgid] = $message;
 
 			return $message;
 		}
