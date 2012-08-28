@@ -45,6 +45,9 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 			throw new Exception($ret);
 		}
 
+		// Mailbox auswaehlen
+		$this->imapclient->selectMailbox($this->folder);
+
 		$this->refreshCache();
 	}
 
@@ -93,7 +96,7 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 		}
 		if ($this->hasMessage($msgid)) {
 			// Lade die Nachricht und Parse sie
-			$article = $this->imapclient->getMsg($this->getArticleNr($msgid));
+			$article = array_shift($this->imapclient->getMessages($this->getArticleNr($msgid)));
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
