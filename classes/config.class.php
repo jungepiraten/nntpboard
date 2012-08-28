@@ -63,7 +63,7 @@ abstract class DefaultConfig {
 	}
 
 	public function getAddressImage($address, $charset) {
-		return "//secure.gravatar.com/avatar/" . md5(trim(strtolower($address->getAddress()))) . "?s=100";
+		return "//secure.gravatar.com/avatar/" . md5(trim(strtolower($address->getAddress()))) . "?default=mm&s=100";
 	}
 	
 	abstract public function getAuth($user, $pass);
