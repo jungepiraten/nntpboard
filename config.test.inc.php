@@ -6,6 +6,7 @@ require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/filecachednntp.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
+require_once(dirname(__FILE__)."/classes/board/memcachedimap.class.php");
 
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
@@ -25,6 +26,9 @@ class TestConfig extends DefaultConfig {
 				false, true, true, $host, "test.a"));
 		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
 				false, true, false, $memcache, $host, "test.b"));
+
+		$this->addBoard(new MemCachedIMAPBoard(1000, 900, "imap", "Z",
+				false, true, false, $memcache, new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
 
 		$this->secretkey = $secretkey;
 	}
