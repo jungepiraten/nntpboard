@@ -22,7 +22,7 @@ abstract class RFC5322MimeBody {
 			$mimeparts = explode("--" . $boundary, $body);
 			// Normalerweise bestehen der erste (This is an multipart ...) und letzte Teil (-- nur aus Sinnlosem Inhalt
 			// Falls das nicht so ist, fixen wir das halt ...
-			if (($last = trim(array_pop($mimeparts))) != "--") {
+			if (substr($last = array_pop($mimeparts), 0, 2) != "--") {
 				array_push($mimeparts, $last);
 			}
 			array_shift($mimeparts);
