@@ -89,7 +89,7 @@ class RFC5322Message {
 		return $this->charset;
 	}
 
-	private function getHeader() {
+	public function getHeader() {
 		return $this->header;
 	}
 
