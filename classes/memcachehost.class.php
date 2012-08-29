@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . "/host.class.php");
 
-class MemCacheHost {
+class MemCacheHost extends Host {
 	private $prefix = "";
 
 	public function __construct($host = null, $port = null, $prefix = "") {
