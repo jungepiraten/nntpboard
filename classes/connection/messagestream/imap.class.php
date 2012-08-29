@@ -6,7 +6,7 @@ include_once('Net/IMAP.php');
 require_once(dirname(__FILE__)."/../messagestream.class.php");
 require_once(dirname(__FILE__)."/rfc5322/header.class.php");
 require_once(dirname(__FILE__)."/rfc5322/message.class.php");
-require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
+require_once(dirname(__FILE__)."/../../exceptions/message.exception.php");
 
 class IMAPConnection extends AbstractMessageStreamConnection {
 	private $host;
@@ -89,11 +89,11 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 	public function getMessage($msgid) {
 		// Lade die Nachricht und Parse sie
 		if ($this->hasMessage($msgid)) {
-			$article = array_shift($this->imapclient->getMessages($this->getArticleNr($msgid)));
+			$article = $this->imapclient->getMessages($this->getArticleNr($msgid));
 			if (PEAR::isError($article)) {
-				throw new NotFoundMessageException($msgid, $this->group);
+				throw new NotFoundMessageException($msgid, $this->folder);
 			}
-			$message = RFC5322Message::parsePlain($article);
+			$message = RFC5322Message::parsePlain(array_shift($article));
 			$message = $message->getObject($this);
 
 			return $message;
