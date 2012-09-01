@@ -208,7 +208,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			try {
 				$this->postCacheMessage($auth, $message);
 			} catch (PostingException $e) {
-				$this->getGroup()->removeMessage($message);
+				$this->getGroup()->removeMessage($msgid);
 			}
 			$this->delMessageQueue("message", $msgid);
 		}
@@ -217,7 +217,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			try {
 				$this->postCacheAcknowledge($auth, $ack, $message);
 			} catch (PostingException $e) {
-				$this->getGroup()->removeMessage($ack);
+				$this->getGroup()->removeMessage($msgid);
 			}
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
@@ -226,7 +226,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			try {
 				$this->postCacheCancel($auth, $cancel, $message);
 			} catch (PostingException $e) {
-				$this->getGroup()->removeMessage($cancel);
+				$this->getGroup()->removeMessage($msgid);
 			}
 			$this->delMessageQueue("cancel", $msgid);
 		}
