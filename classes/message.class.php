@@ -68,6 +68,10 @@ class Message {
 		return $this->author;
 	}
 
+	public function setAuthor($author) {
+		$this->author = $author;
+	}
+
 	public function hasTextBody() {
 		return isset($this->textbody) && trim($this->textbody) != "";
 	}
