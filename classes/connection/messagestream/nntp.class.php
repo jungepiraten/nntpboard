@@ -123,17 +123,17 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	 **/
 	public function postMessage($message) {
 		$rfcmessage = RFC5322Message::parseObject($this, $this->group, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
 	public function postAcknowledge($ack, $message) {
 		$rfcmessage = RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
 	public function postCancel($cancel, $message) {
 		$rfcmessage = RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $group, $charset));
+		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
 	private function post($nntpmsg) {
