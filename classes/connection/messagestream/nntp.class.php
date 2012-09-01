@@ -109,8 +109,13 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
-			$message = RFC5322Message::parsePlain(implode("\r\n", $article));
-			$message = $message->getObject($this);
+			$rfcmessage = RFC5322Message::parsePlain(implode("\r\n", $article));
+			$message = $rfcmessage->getObject($this);
+			// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
+			if ($rfcmessage->getHeader()->has("Sender")
+			  && (strtolower($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
+				$message->setAuthor(RFC5322Address::parsePlain($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8"))->getObject());
+			}
 
 			return $message;
 		}

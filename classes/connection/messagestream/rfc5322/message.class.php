@@ -112,16 +112,10 @@ class RFC5322Message {
 		$messageid =	$this->getHeader()->get("Message-ID")->getValue($charset);
 		$subject =	$this->getHeader()->get("Subject")->getValue($charset);
 		$date =		strtotime($this->getHeader()->get("Date")->getValue($charset));
-		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
-		if ($this->getHeader()->has("Sender")
-		 && (strtolower($this->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
-			$author =	RFC5322Address::parsePlain($this->getHeader()->get("Sender")->getValue($charset))->getObject();
-		} else {
-			// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
-			$author =	RFC5322Address::parsePlain(
-						array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
-						)->getObject();
-		}
+		// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
+		$author =	RFC5322Address::parsePlain(
+					array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
+					)->getObject();
 
 		// References (per Default als neuer Thread)
 		$parentid = null;
