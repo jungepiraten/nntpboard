@@ -12,6 +12,10 @@ if ($board === null) {
 	die("Board nicht gefunden!");
 }
 
+if (!$board->mayRead($session->getAuth())) {
+	$template->viewexception(new Exception("Keine Berechtigung!"));
+}
+
 $connection = $board->getConnection();
 if ($connection === null) {
 	die("Board enthaelt keine Group!");

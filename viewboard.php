@@ -11,12 +11,16 @@ if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
 }
 
+if (!$board->mayRead($session->getAuth())) {
+	$template->viewexception(new Exception("Keine Berechtigung!"));
+}
+
 $connection = $board->getConnection();
 if ($connection !== null) {
 	$connection->open($session->getAuth());
 	$group = $connection->getGroup();
 	$connection->close();
-	
+
 	// Erzwinge mindestens eine Seite
 	$pages = max(ceil($group->getThreadCount() / $config->getThreadsPerPage()), 1);
 	$page = 0;

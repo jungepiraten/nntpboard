@@ -19,12 +19,12 @@ class TestConfig extends DefaultConfig {
 
 	public function __construct($secretkey) {
 		parent::__construct();
-		$this->addBoard(new Board(null, null, "Testboards", ""));
+		$this->addBoard(new Board(null, null, "Testboards", "", new StaticAuthManager(true)));
 
 		$host = new Host("localhost");
 		$memcache = new MemcacheHost("localhost", 11211, "nntpboard999");
 
-		$this->addBoard(new Board(900, null, "Boards", "Unterforen"));
+		$this->addBoard(new Board(900, null, "Boards", "Unterforen", new StaticAuthManager(true), new StaticAuthManager(true)));
 		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
 				new StaticAuthManager(true), new StaticAuthManager(true), true, $host, "test.a"));
 		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",

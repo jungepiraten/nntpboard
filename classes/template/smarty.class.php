@@ -98,24 +98,27 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($board->hasSubBoards()) {
 			$row["childs"]	= array();
 			foreach ($board->getSubBoardIDs() AS $childid) {
-				// Kleiner Hack, um eine Endlosschleife zu vermeiden
-				$child = $this->parseBoard($board->getSubBoard($childid), false);
-				$child["parent"] = &$row;
-				$row["childs"][] = $child;
-				// Markiere auch obere Hierarchien ungelesen
-				if ($child["unread"] == true) {
-					$row["unread"] = $child["unread"];
-				}
-				$row["threadcount"]	+= $child["threadcount"];
-				$row["messagecount"]	+= $child["messagecount"];
-				if (!$board->hasThreads()
-				 and $row["lastpostdate"] < $child["lastpostdate"]) {
-					$row["lastpostboardid"]   = $child["lastpostboardid"];
-					$row["lastpostsubject"]	  = $child["lastpostsubject"];
-					$row["lastpostthreadid"]  = $child["lastpostthreadid"];
-					$row["lastpostmessageid"] = $child["lastpostmessageid"];
-					$row["lastpostdate"]      = $child["lastpostdate"];
-					$row["lastpostauthor"]    = $child["lastpostauthor"];
+				$subboard = $board->getSubBoard($childid);
+				if ($subboard->mayRead($this->getAuth())) {
+					// Kleiner Hack, um eine Endlosschleife zu vermeiden
+					$child = $this->parseBoard($subboard, false);
+					$child["parent"] = &$row;
+					$row["childs"][] = $child;
+					// Markiere auch obere Hierarchien ungelesen
+					if ($child["unread"] == true) {
+						$row["unread"] = $child["unread"];
+					}
+					$row["threadcount"]	+= $child["threadcount"];
+					$row["messagecount"]	+= $child["messagecount"];
+					if (!$board->hasThreads()
+					 and $row["lastpostdate"] < $child["lastpostdate"]) {
+						$row["lastpostboardid"]   = $child["lastpostboardid"];
+						$row["lastpostsubject"]	  = $child["lastpostsubject"];
+						$row["lastpostthreadid"]  = $child["lastpostthreadid"];
+						$row["lastpostmessageid"] = $child["lastpostmessageid"];
+						$row["lastpostdate"]      = $child["lastpostdate"];
+						$row["lastpostauthor"]    = $child["lastpostauthor"];
+					}
 				}
 			}
 		}
@@ -326,6 +329,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("message", $exception->getMessage());
 		$this->sendHeaders();
 		$this->smarty->display("exception.html.tpl");
+		exit;
 	}
 
 	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false, $mayAcknowledge = false) {

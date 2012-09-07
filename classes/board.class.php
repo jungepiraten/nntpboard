@@ -72,10 +72,16 @@ class Board {
 	}
 
 	public function mayRead($auth) {
+		if ($this->readAuthManager == null) {
+			return null;
+		}
 		return $this->readAuthManager->isAllowed($auth);
 	}
 
 	public function mayPost($auth) {
+		if ($this->writeAuthManager == null) {
+			return null;
+		}
 		return $this->writeAuthManager->isAllowed($auth);
 	}
 
