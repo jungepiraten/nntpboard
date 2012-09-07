@@ -70,24 +70,28 @@ abstract class AbstractAuth implements Auth {
 		}
 	}
 
-	private function isUnreadThreadTimestamp($thread, $timestamp) {
+	private function isUnreadThreadTimestamp($threadid, $timestamp) {
 		// Ganz alte Posts
 		if ($timestamp < $this->getReadDate())
 			return false;
 
 		// Entweder wir kennen den Thread noch gar nicht ...
 		// ... oder der Timestamp hat sich veraendert
-		if (!isset($this->readthreads[$thread->getThreadID()])
-			|| $this->readthreads[$thread->getThreadID()] < $timestamp) {
+		if (!isset($this->readthreads[$threadid])
+			|| $this->readthreads[$threadid] < $timestamp) {
 			return true;
 		}
 
 		return false;
 	}
 
+	private function markReadThreadTimestamp($threadid, $timestamp) {
+		$this->readthreads[$threadid] = $timestamp;
+	}
+
 	public function markReadThread($thread, $message) {
 		// Trage den aktuellen Timestamp ein
-		$this->readthreads[$thread->getThreadID()] = $message->getDate();
+		$this->markReadThreadTimestamp($thread->getThreadID(), $message->getDate());
 	}
 
 	public function isUnreadMessage($thread, $message) {
@@ -127,7 +131,7 @@ abstract class AbstractAuth implements Auth {
 
 	public function markReadGroup($group) {
 		foreach ($group->getThreadIDs() as $threadid) {
-			$this->markReadThread($group->getThread($threadid));
+			$this->markReadThreadTimestamp($threadid, $group->getLastPostDate());
 			unset($this->readgroups[$group->getGroupID()][$group->getGroupHash()][$threadid]);
 		}
 	}
