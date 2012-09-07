@@ -10,6 +10,7 @@ require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
 
 require_once(dirname(__FILE__)."/classes/authmanager/static.class.php");
+require_once(dirname(__FILE__)."/classes/authmanager/allowauthed.class.php");
 
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
