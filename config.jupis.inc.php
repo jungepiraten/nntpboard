@@ -77,7 +77,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addCategoryBoard($id, $parentid, $name, $desc) {
-		$this->addCategoryBoard($id, $parentid, $name, $desc, new StaticAuthManager(true));
+		$this->addBoard(new Board($id, $parentid, $name, $desc, new StaticAuthManager(true)));
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
