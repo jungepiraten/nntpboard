@@ -64,7 +64,7 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 
 	public function getMessageIDs() {
 		if ($this->messageids == null) {
-			$messageCount = $this->imapclient->getNumberOfMessages();
+			$messageCount = $this->getMessageCount();
 			if ($messageCount == 0) {
 				return array();
 			}
@@ -85,11 +85,13 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 	}
 
 	public function getMessageCount() {
-		return count($this->getMessageIDs());
+		return $this->imapclient->getNumberOfMessages();
 	}
+
 	public function hasMessage($msgid) {
 		return in_array($msgid, $this->getMessageIDs());
 	}
+
 	public function getMessage($msgid) {
 		// Lade die Nachricht und Parse sie
 		if ($this->hasMessage($msgid)) {

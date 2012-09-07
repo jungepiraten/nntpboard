@@ -13,6 +13,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	private $group;
 
 	// Erste ArtNr und Letzte ArtNr
+	private $messageCount;
 	private $firstartnr;
 	private $lastartnr;
 	// MessageIDs
@@ -74,6 +75,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		if (PEAR::isError($ret)) {
 			throw new Exception($ret);
 		}
+		$this->messageCount = $ret["count"];
 		$this->firstartnr = $ret["first"];
 		$this->lastartnr = $ret["last"];
 
@@ -97,11 +99,13 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	}
 
 	public function getMessageCount() {
-		return count($this->getMessageIDs());
+		return $this->messageCount;
 	}
+
 	public function hasMessage($msgid) {
 		return in_array($msgid, $this->getMessageIDs());
 	}
+
 	public function getMessage($msgid) {
 		if ($this->hasMessage($msgid)) {
 			// Lade die Nachricht und Parse sie
@@ -126,21 +130,25 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	/**
 	 * Schreibe eine Nachricht
 	 **/
+
 	public function postMessage($message) {
 		$rfcmessage = RFC5322Message::parseObject($this, $this->group, $message);
 		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
+
 	public function postAcknowledge($ack, $message) {
 		$rfcmessage = RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message);
 		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
+
 	public function postCancel($cancel, $message) {
 		$rfcmessage = RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message);
 		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
 		return $this->post($rfcmessage);
 	}
+
 	private function post($nntpmsg) {
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
