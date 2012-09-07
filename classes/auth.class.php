@@ -11,8 +11,9 @@ interface Auth {
 	public function mayCancel($message);
 
 	public function transferRead($auth);
+	public function isUnreadMessage($thread, $message);
 	public function isUnreadThread($thread);
-	public function markReadThread($thread);
+	public function markReadThread($thread, $message);
 	public function isUnreadGroup($group);
 	public function markReadGroup($group);
 	public function saveRead();
@@ -69,24 +70,32 @@ abstract class AbstractAuth implements Auth {
 		}
 	}
 
-	public function isUnreadThread($thread) {
+	private function isUnreadThreadTimestamp($thread, $timestamp) {
 		// Ganz alte Posts
-		if ($thread->getLastPostDate() < $this->getReadDate())
+		if ($timestamp < $this->getReadDate())
 			return false;
 
 		// Entweder wir kennen den Thread noch gar nicht ...
 		// ... oder der Timestamp hat sich veraendert
 		if (!isset($this->readthreads[$thread->getThreadID()])
-			|| $this->readthreads[$thread->getThreadID()] < $thread->getLastPostDate()) {
+			|| $this->readthreads[$thread->getThreadID()] < $timestamp) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public function markReadThread($thread) {
+	public function markReadThread($thread, $message) {
 		// Trage den aktuellen Timestamp ein
-		$this->readthreads[$thread->getThreadID()] = $thread->getLastPostDate();
+		$this->readthreads[$thread->getThreadID()] = $message->getDate();
+	}
+
+	public function isUnreadMessage($thread, $message) {
+		return $this->isUnreadThreadTimestamp($thread, $message->getDate());
+	}
+
+	public function isUnreadThread($thread) {
+		return $this->isUnreadThreadTimestamp($thread, $thread->getLastPostDate());
 	}
 
 	public function generateUnreadArray($group) {

@@ -63,12 +63,13 @@ foreach ($messageids AS $messageid) {
 	}
 	$messages[] = $message;
 }
+// $message will now contain the last message on that page
 
 $connection->close();
 if (!is_array($messages) || count($messages) < 1) {
 	$template->viewexception(new Exception("Thread ungueltig!"));
 }
 
-$session->getAuth()->markReadThread($thread);
+$session->getAuth()->markReadThread($thread, $message);
 $template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
 ?>

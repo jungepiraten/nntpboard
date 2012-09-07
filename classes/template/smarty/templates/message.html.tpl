@@ -1,6 +1,9 @@
 <tr class="messagehead">
 <td colspan="2">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
+ {if $message.isRead}{else}
+  <i class="icon-bell"></i>
+ {/if}
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
