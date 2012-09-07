@@ -95,11 +95,11 @@ abstract class AbstractAuth implements Auth {
 	}
 
 	public function isUnreadMessage($thread, $message) {
-		return $this->isUnreadThreadTimestamp($thread, $message->getDate());
+		return $this->isUnreadThreadTimestamp($thread->getThreadID(), $message->getDate());
 	}
 
 	public function isUnreadThread($thread) {
-		return $this->isUnreadThreadTimestamp($thread, $thread->getLastPostDate());
+		return $this->isUnreadThreadTimestamp($thread->getThreadID(), $thread->getLastPostDate());
 	}
 
 	public function generateUnreadArray($group) {
