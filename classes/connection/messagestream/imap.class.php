@@ -64,12 +64,16 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 
 	public function getMessageIDs() {
 		if ($this->messageids == null) {
+			$messageCount = $this->imapclient->getNumberOfMessages();
+			if ($messageCount == 0) {
+				return array();
+			}
 			// Hole eine Uebersicht ueber alle verfuegbaren Posts
-			$ret = $this->imapclient->cmdFetch("1:" . $this->imapclient->getNumberOfMessages(), "envelope");
-			$articles = $ret["PARSED"];
-			if (PEAR::isError($articles)) {
-				throw new Exception($articles);
+			$ret = $this->imapclient->cmdFetch("1:" . $messageCount, "envelope");
+			if ($ret["RESPONSE"]["CODE"] != "OK") {
+				throw new Exception($ret["RESPONSE"]["STR_CODE"]);
 			} else {
+				$articles = $ret["PARSED"];
 				$this->messageids = array();
 				foreach ($articles AS $article) {
 					$this->articles[$article["EXT"]["ENVELOPE"]["MESSAGE_ID"]] = $article["NRO"];
