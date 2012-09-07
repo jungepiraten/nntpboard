@@ -25,10 +25,6 @@ function parseFacEs($text, $host, &$cache) {
 	return $text;
 }
 
-/**
- * NOTE: _all_ view* functions quit execution!
- */
-
 class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private $smarty;
 
@@ -218,7 +214,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		if ($message->hasHTMLBody() and $text == strip_tags($text, "<b><i><u><a><tt><small><big>")) {
 			return $text;
 		}
-		
+
 		$text = $message->getTextBody($this->getCharset());
 		$text = $this->formatText($text);
 		return $text;
@@ -319,7 +315,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$text = str_replace($mail, $html, $text);
 			}
 		}
-		
+
 		// Zeilenumbrueche
 		$text = nl2br(trim($text));
 		return $text;
@@ -330,7 +326,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("message", $exception->getMessage());
 		$this->sendHeaders();
 		$this->smarty->display("exception.html.tpl");
-		exit;
 	}
 
 	public function viewboard($board, $group, $page = 0, $pages = 0, $threadobjs = null, $mayPost = false, $mayAcknowledge = false) {
@@ -351,7 +346,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("mayAcknowledge", $mayAcknowledge);
 		$this->sendHeaders();
 		$this->smarty->display("viewboard.html.tpl");
-		exit;
 	}
 
 	public function viewthread($board, $thread, $page, $pages, $messagesobjs, $mayPost = false, $mayAcknowledge = false) {
@@ -372,7 +366,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("mayAcknowledge", $mayAcknowledge);
 		$this->sendHeaders();
 		$this->smarty->display("viewthread.html.tpl");
-		exit;
 	}
 
 	public function viewmessage($board, $thread, $message, $mayPost = false, $mayAcknowledge = false) {
@@ -384,7 +377,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		header("Location: " . $location);
 		$this->sendHeaders();
 		echo "<a href=\"".htmlentities($location)."\">Weiter</a>";
-		exit;
 	}
 
 	public function viewpostform($board, $referencemessages = null, $reference = null, $quote = false, $preview = null, $attachmentobjects = null) {
@@ -424,13 +416,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("preview", $this->parseMessage(null, $preview));
 		$this->sendHeaders();
 		$this->smarty->display("postform.html.tpl");
-		exit;
 	}
 
 	public function viewpostsuccess($board, $thread, $message) {
 		$this->sendHeaders();
 		$this->viewmessage($board, $thread, $message, true);
-		exit;
 	}
 
 	public function viewpostmoderated($board, $thread, $message) {
@@ -438,13 +428,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("message", $this->parseMessage($thread, $message));
 		$this->sendHeaders();
 		$this->smarty->display("postmoderated.html.tpl");
-		exit;
 	}
 
 	public function viewacknowledgesuccess($board, $thread, $message, $ack) {
 		$this->sendHeaders();
 		$this->viewmessage($board, $thread, $message, true);
-		exit;
 	}
 
 	public function viewacknowledgemoderated($board, $thread, $message, $ack) {
@@ -452,13 +440,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("message", $this->parseMessage($thread, $message));
 		$this->sendHeaders();
 		$this->smarty->display("postmoderated.html.tpl");
-		exit;
 	}
 
 	public function viewcancelsuccess($board, $thread, $message, $cancel) {
 		$this->sendHeaders();
 		$this->viewmessage($board, $thread, $message, true);
-		exit;
 	}
 
 	public function viewcancelmoderated($board, $thread, $message, $cancel) {
@@ -466,27 +452,24 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("message", $this->parseMessage($thread, $message));
 		$this->sendHeaders();
 		$this->smarty->display("postmoderated.html.tpl");
-		exit;
 	}
 
 	public function viewloginform() {
 		$this->smarty->assign("referer", isset($_REQUEST["referer"]) ? $_REQUEST["referer"] : (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : "index.php"));
 		$this->sendHeaders();
 		$this->smarty->display("loginform.html.tpl");
-		exit;
 	}
 
 	public function viewloginfailed() {
 		$this->smarty->assign("loginfailed", true);
 		$this->sendHeaders();
 		$this->smarty->display("loginform.html.tpl");
-		exit;
 	}
 
 	public function viewloginsuccess($auth) {
 		// Da sich nach einem erfolgreichen Login das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->smarty->assign("auth", $auth);
-		
+
 		if (!empty($_REQUEST["redirect"])) {
 			header("Location: " . stripslashes($_REQUEST["redirect"]));
 		} elseif (!empty($_SERVER["HTTP_REFERER"])) {
@@ -495,13 +478,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			header("Location: index.php");
 		}
 		$this->sendHeaders();
-		exit;
 	}
 
 	public function viewlogoutsuccess() {
 		// Da sich nach einem erfolgreichen Logout das Authobjekt geaendert hat, updaten wir hier mal schnell
 		$this->smarty->assign("auth", null);
-		
+
 		if (!empty($_REQUEST["redirect"])) {
 			header("Location: " . stripslashes($_REQUEST["redirect"]));
 		} elseif (!empty($_SERVER["HTTP_REFERER"])) {
@@ -510,13 +492,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			header("Location: index.php");
 		}
 		$this->sendHeaders();
-		exit;
 	}
-	
+
 	public function viewuserpanel() {
 		$this->sendHeaders();
 		$this->smarty->display("userpanel.html.tpl");
-		exit;
 	}
 }
 
