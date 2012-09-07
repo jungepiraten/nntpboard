@@ -9,6 +9,8 @@ require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
 
+require_once(dirname(__FILE__)."/classes/authmanager/static.class.php");
+
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
@@ -17,7 +19,7 @@ class JuPiConfig extends DefaultConfig {
 	private $memcachelink;
 	private $ldappass;
 	private $mailusers = array();
-	
+
 	public function __construct($secretkey, $ldappass) {
 		parent::__construct();
 		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
@@ -32,7 +34,7 @@ class JuPiConfig extends DefaultConfig {
 
 		$this->addTalkStruktur(700, null);
 		$this->addEventStruktur(800, null);
-		
+
 		$this->addBoard(new Board(899, null, "Young Pirates International", ""));
 		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellaneous");
 
@@ -74,10 +76,10 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
 	}
 	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, false, true, false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
+		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {

@@ -9,28 +9,28 @@ class Board {
 	private $name = "";
 	private $desc = "";
 	private $subboards = array();
-	private $anonMayPost = false;
-	private $authMayPost = true;
+	private $readAuthManager;
+	private $writeAuthManager;
 	private $isModerated = false;
 
-	public function __construct($boardid, $parentid, $name, $desc, $anonMayPost = false, $authMayPost = true, $isModerated = false) {
+	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager = null, $writeAuthManager = null, $isModerated = false) {
 		$this->boardid = $boardid;
 		$this->parentid = $parentid;
 		$this->name = $name;
 		$this->desc = $desc;
-		$this->anonMayPost = $anonMayPost;
-		$this->authMayPost = $authMayPost;
+		$this->readAuthManager = $readAuthManager;
+		$this->writeAuthManager = $writeAuthManager;
 		$this->isModerated = $isModerated;
 	}
 
 	public function getName() {
 		return $this->name;
 	}
-	
+
 	public function setName($name) {
 		$this->name = $name;
 	}
-	
+
 	public function getDesc() {
 		return $this->desc;
 	}
@@ -58,7 +58,7 @@ class Board {
 	public function addSubBoard($board) {
 		$this->subboards[$board->getBoardID()] = $board;
 	}
-	
+
 	public function hasSubBoards() {
 		return !empty($this->subboards);
 	}
@@ -72,20 +72,17 @@ class Board {
 	}
 
 	public function mayRead($auth) {
-		return true;
+		return $this->readAuthManager->isAllowed($auth);
 	}
-	public function mayPost($auth) {
-		if ($auth === null || $auth->isAnonymous()) {
-			return $this->anonMayPost;
-		}
 
-		return $this->authMayPost;
+	public function mayPost($auth) {
+		return $this->writeAuthManager->isAllowed($auth);
 	}
 
 	public function mayAcknowledge($auth) {
 		return $this->mayPost($auth);
 	}
-	
+
 	public function isModerated() {
 		return $this->isModerated;
 	}

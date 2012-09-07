@@ -4,8 +4,8 @@ require_once(dirname(__FILE__) . "/cachednntp.class.php");
 require_once(dirname(__FILE__) . "/../connection/itemcache/file.class.php");
 
 class FileCachedNNTPBoard extends CachedNNTPBoard {
-	public function __construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated, $host, $group) {
-		parent::__construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated, $host, $group);
+	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $group) {
+		parent::__construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $group);
 	}
 
 	public function getConnection() {

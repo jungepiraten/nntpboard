@@ -9,8 +9,8 @@ class IMAPBoard extends Board {
 	private $loginpassword;
 	private $folder;
 
-	public function __construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated, $host, $loginusername, $loginpassword, $folder) {
-		parent::__construct($boardid, $parentid, $name, $desc, $anonMayPost, $authMayPost, $isModerated);
+	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
+		parent::__construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated);
 		$this->host = $host;
 		$this->loginusername = $loginusername;
 		$this->loginpassword = $loginpassword;
