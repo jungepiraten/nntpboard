@@ -134,6 +134,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row["threadid"]		= $thread->getThreadID();
 		$row["subject"]			= $thread->getSubject($this->getCharset());
 		$row["posts"]			= $thread->getPosts();
+		$row["pages"]			= ceil($thread->getPosts() / $this->getConfig()->getThreadsPerPage());
 		$row["date"]			= $thread->getDate();
 		$row["author"]			= $this->parseAddress($thread->getAuthor());
 		$row["lastpostmessageid"]	= $thread->getLastPostMessageID();
