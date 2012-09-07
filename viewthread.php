@@ -70,6 +70,7 @@ if (!is_array($messages) || count($messages) < 1) {
 	$template->viewexception(new Exception("Thread ungueltig!"));
 }
 
-$session->getAuth()->markReadThread($thread, $message["message"]);
+// order is important: the template will check if the message is unread
 $template->viewthread($board, $thread, $page, $pages, $messages, $board->mayPost($session->getAuth()), $board->mayAcknowledge($session->getAuth()));
+$session->getAuth()->markReadThread($thread, $message["message"]);
 ?>
