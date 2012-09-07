@@ -52,11 +52,13 @@
   <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden"/></td>
   <td class="title">
   <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}">{$thread.subject|escape:html}</a>
+  {if $thread.pages > 1}
   <div class="threadpages">
    {section name=pages loop=$thread.pages start=0}
    <a class="badge" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
    {/section}
   </div>
+  {/if}
   </td>
   <td class="postcount">
   <span class="posts">{$thread.posts}</span>
