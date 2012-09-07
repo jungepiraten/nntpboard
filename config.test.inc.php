@@ -2,11 +2,13 @@
 
 require_once(dirname(__FILE__)."/classes/host.class.php");
 require_once(dirname(__FILE__)."/classes/memcachehost.class.php");
+require_once(dirname(__FILE__)."/classes/redishost.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/filecachednntp.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
 require_once(dirname(__FILE__)."/classes/board/memcachedimap.class.php");
+require_once(dirname(__FILE__)."/classes/board/rediscachedimap.class.php");
 
 require_once(dirname(__FILE__)."/classes/authmanager/static.class.php");
 require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
@@ -29,7 +31,9 @@ class TestConfig extends DefaultConfig {
 				new StaticAuthManager(true), new StaticAuthManager(true), false, $memcache, $host, "test.b"));
 
 		$this->addBoard(new MemCachedIMAPBoard(1000, 900, "imap", "Z",
-				new StaticAuthManager(true), new StaticAuthManager(true), false, $memcache, new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
+				new StaticAuthManager(true), new StaticAuthManager(false), false, new MemCacheHost("localhost", 11211, "nntpboard1000"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
+		$this->addBoard(new RedisCachedIMAPBoard(1001, 900, "imap2", "Y",
+				new StaticAuthManager(true), new StaticAuthManager(false), false, new RedisHost("localhost", 6379, "nntpboard1001"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
 
 		$this->secretkey = $secretkey;
 	}

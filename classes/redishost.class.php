@@ -2,10 +2,10 @@
 
 require_once(dirname(__FILE__) . "/host.class.php");
 
-class MemCacheHost extends Host {
+class RedisHost extends Host {
 	private $prefix = "";
 
-	public function __construct($host = null, $port = 11211, $prefix = "") {
+	public function __construct($host = null, $port = 6379, $prefix = "") {
 		parent::__construct($host, $port);
 		$this->prefix = $prefix;
 	}
