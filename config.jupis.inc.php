@@ -23,7 +23,7 @@ class JuPiConfig extends DefaultConfig {
 
 	public function __construct($secretkey, $ldappass) {
 		parent::__construct();
-		$this->addBoard(new Board(null, null, "Junge Piraten", ""));
+		$this->addCategoryBoard(null, null, "Junge Piraten", "");
 
 		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Allgemeine Ankündigungen");
 		$this->addGenericBoard(2, null, "misc", "aktive", null, "Allgemeines", "Globale Themen der Jungen Piraten");
@@ -36,10 +36,10 @@ class JuPiConfig extends DefaultConfig {
 		$this->addTalkStruktur(700, null);
 		$this->addEventStruktur(800, null);
 
-		$this->addBoard(new Board(899, null, "Young Pirates International", ""));
+		$this->addCategoryBoard(899, null, "Young Pirates International", "");
 		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellaneous");
 
-		$this->addBoard(new Board(665, null, "Test", ""));
+		$this->addCategoryBoard(665, null, "Test", "");
 		$this->addGenericBoard(666, 665, "test", "test", null, "Test", "Testforum. Spamgefahr!");
 
 		$this->secretkey = $secretkey;
@@ -76,15 +76,20 @@ class JuPiConfig extends DefaultConfig {
 		return "pirates.youth.{$name}";
 	}
 
+	private function addCategoryBoard($id, $parentid, $name, $desc) {
+		$this->addCategoryBoard($id, $parentid, $name, $desc, new StaticAuthManager(true));
+	}
+
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
 	}
+
 	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
 		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {
-		$this->addBoard(new Board($id, $parentid, "Organisation", ""));
+		$this->addCategoryBoard($id, $parentid, "Organisation", "");
 		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
 		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"Öffentlichkeitsarbeit", "AG_Oe", "ag-oe");
 	}
@@ -94,7 +99,7 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addRegionStruktur($id, $parentid) {
 		// Folge hier komplett den "alten" ids
-		$this->addBoard(new Board(13, $parentid, "Regionale Gliederungen", "Unterforen der Gebietsgruppen"));
+		$this->addCategoryBoard(13, $parentid, "Regionale Gliederungen", "Unterforen der Gebietsgruppen");
 		$this->addRegionBoard(14, 13, "be", "Berlin", "", "BE:Hauptseite", "be");
 		$this->addRegionBoard(25, 13, "nrw", "Nordrhein-Westfalen", "", "NRW:Hauptseite", "nrw");
 		$this->addRegionBoard(110,25, "nrw.do", "Dortmund", "", "NRW:Dortmund", "nrw-do");
@@ -128,7 +133,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addTalkStruktur($id, $parentid) {
-		$this->addBoard(new Board($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co."));
+		$this->addCategoryBoard($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co.");
 		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", null, "talk-bildung");
 		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", null, "talk-umwelt");
 		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null, "talk-kekse");
@@ -139,7 +144,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addEventStruktur($id, $parentid) {
-		$this->addBoard(new Board($id, $parentid, "Events", ""));
+		$this->addCategoryBoard($id, $parentid, "Events", "");
 		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "JuPi-Camp", "pg-jupi-camp");
 		$this->addEventBoard($id+2, $id, "you-messe",	"YOU 2012",	"Vorbereitung zur YOU", "YOU_2012", "you-messe");
 	}
