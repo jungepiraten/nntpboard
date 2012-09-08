@@ -51,9 +51,6 @@ class JuPiConfig extends DefaultConfig {
 		if ($name != null) {
 			$links .= '[<a href="nntp://'.$this->getNNTPHost().'/'.$this->getNNTPGroup($name).'" class="nntplink">NNTP</a>] ';
 		}
-		if ($mlname != null) {
-			$links .= '[<a href="http://lists.junge-piraten.de/listinfo/' . $mlname . '" class="mllink">ML</a>] ';
-		}
 		if ($wiki != null) {
 			$links .= '[<a href="http://wiki.junge-piraten.de/wiki/' . $wiki . '" class="wiki">WIKI</a>] ';
 		}
