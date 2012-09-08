@@ -109,6 +109,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addRegionBoard(114,25, "nrw.aachen", "Aachen", "", "NRW:Aachen", "nrw-aachen");
 		$this->addRegionBoard(115,25, "nrw.krefeld", "Krefeld", "", "NRW:Krefeld", "nrw-krefeld");
 		$this->addRegionBoard(116,25, "nrw.dueren", "Dueren", "", "NRW:Dueren", "nrw-dueren");
+		$this->addRegionBoard(117,25, "nrw.ak.jugend", "AK Jugend", "", "", "nrw-ak-jugend");
 		$this->addRegionBoard(26, 13, "he", "Hessen", "", "HE:Hauptseite", "he");
 		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "", "BW:Hauptseite", "bw");
 		$this->addRegionBoard(601,28, "bw.freiburg", "Freiburg", "", "BW:Freiburg", "crew-freiburg");
