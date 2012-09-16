@@ -130,9 +130,8 @@ class JuPiConfig extends DefaultConfig {
 	private function addTalkStruktur($id, $parentid) {
 		$this->addCategoryBoard($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co.");
 		$this->addTalkBoard($id+1, $id, "bildung",	"Bildungspolitik",	"", null, "talk-bildung");
-		$this->addTalkBoard($id+2, $id, "umwelt",	"Umweltpolitik",	"", null, "talk-umwelt");
 		$this->addTalkBoard($id+3, $id, "kekse",	"Kekspolitik",		"Gegen das Keks-Embargo!", null, "talk-kekse");
-		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Was sonst nicht relevant waere", null, "talk-sonstiges");
+		$this->addTalkBoard($id+4, $id, "misc",		"Sonstiges",		"Sonstige (politische) Themen", null, "talk-sonstiges");
 	}
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "talk.{$kuerzel}", $mlname, $wiki, $name, $desc);
