@@ -36,9 +36,6 @@ class JuPiConfig extends DefaultConfig {
 		$this->addTalkStruktur(700, null);
 		$this->addEventStruktur(800, null);
 
-		$this->addCategoryBoard(899, null, "Young Pirates International", "");
-		$this->addInternationalBoard(900, 899, "misc", "ypi", null, "Misc", "Miscellaneous");
-
 		$this->addCategoryBoard(665, null, "Test", "");
 		$this->addGenericBoard(666, 665, "test", "test", null, "Test", "Testforum. Spamgefahr!");
 
@@ -106,7 +103,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addRegionBoard(114,25, "nrw.aachen", "Aachen", "", "NRW:Aachen", "nrw-aachen");
 		$this->addRegionBoard(115,25, "nrw.krefeld", "Krefeld", "", "NRW:Krefeld", "nrw-krefeld");
 		$this->addRegionBoard(116,25, "nrw.dueren", "Dueren", "", "NRW:Dueren", "nrw-dueren");
-		$this->addRegionBoard(117,25, "nrw.ak.jugend", "AK Jugend", "", "", "nrw-ak-jugend");
+		$this->addRegionBoard(117,25, "nrw.ak.jugend", "AK Jugend", "", "NRW:AK_Jugend", "nrw-ak-jugend");
 		$this->addRegionBoard(26, 13, "he", "Hessen", "", "HE:Hauptseite", "he");
 		$this->addRegionBoard(28, 13, "bw", "Baden-Württemberg", "", "BW:Hauptseite", "bw");
 		$this->addRegionBoard(601,28, "bw.freiburg", "Freiburg", "", "BW:Freiburg", "crew-freiburg");
@@ -133,7 +130,7 @@ class JuPiConfig extends DefaultConfig {
 	private function addTalkStruktur($id, $parentid) {
 		$this->addCategoryBoard($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co.");
 		$this->addTalkBoard($id+1, $id, "bildung",		"Bildungspolitik",		"", null, "talk-bildung");
-		$this->addTalkBoard($id+2, $id, "umwelt",		"Umweltpolitik",		"", null, "talk-umwelt");
+//		$this->addTalkBoard($id+2, $id, "umwelt",		"Umweltpolitik",		"", null, "talk-umwelt");
 		$this->addTalkBoard($id+3, $id, "kekse",		"Kekspolitik",			"Gegen das Keks-Embargo!", null, "talk-kekse");
 		$this->addTalkBoard($id+4, $id, "netzpolitik-kultur",	"Netzpolitik und Kultur",	"Netzpolitik und Kultur", null, "talk-netzpolitik-kultur");
 		$this->addTalkBoard($id+4, $id, "misc",			"Sonstiges",			"Was sonst nicht relevant waere", null, "talk-sonstiges");
