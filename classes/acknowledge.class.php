@@ -27,6 +27,10 @@ class Acknowledge {
 		return $this->date;
 	}
 
+	public function setAuthor($author) {
+		$this->author = $author;
+	}
+
 	public function getAuthor() {
 		return $this->author;
 	}
