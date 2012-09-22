@@ -1,13 +1,10 @@
 <table class="table table-striped table-bordered">
-<thead>
 <tr>
  <th colspan=2>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
  <th class="hidden-phone">Themen</th>
  <th class="hidden-phone">Beitr&auml;ge</th>
  <th>Letzte Antwort</th>
 </tr>
-</thead>
-<tbody>
 {foreach from=$boards item=board name=counter}
 {if $zeigekategorien || $board.hasthreads}
  <tr class="clickable">
@@ -42,7 +39,6 @@
   </tr>
 {/if}
 {/foreach}
-</tbody>
 </table>
 
 {literal}

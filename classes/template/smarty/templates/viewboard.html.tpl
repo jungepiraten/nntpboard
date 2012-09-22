@@ -38,15 +38,12 @@
 </div>
 
 <table class="row-fluid table table-striped table-bordered">
-<thead>
 <tr>
  <th class="title" colspan="2">Thema</th>
  <th class="postcount">Posts</th>
  <th class="poster">Geschrieben</th>
  <th class="lastpost">Letzte Antwort</th>
 </tr>
-</thead>
-<tbody>
 {foreach from=$threads item=thread name=counter}
  <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}">
   <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden"/></td>
@@ -77,7 +74,6 @@
   <td colspan="5">Es wurden noch keine Threads verfasst.</td>
  </tr>
 {/foreach}
-</tbody>
 </table>
 
 <div class="row-fluid">
