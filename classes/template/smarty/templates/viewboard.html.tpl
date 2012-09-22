@@ -46,7 +46,7 @@
 </tr>
 {foreach from=$threads item=thread name=counter}
  <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}">
-  <td class="icon"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden"/></td>
+  <td class="icon" width="29px !important"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden" /></td>
   <td class="title">
   <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}">{$thread.subject|escape:html}</a>
   {if $thread.pages > 1}
