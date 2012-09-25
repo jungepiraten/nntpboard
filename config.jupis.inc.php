@@ -4,10 +4,10 @@
 require_once("Net/LDAP2.php");
 
 require_once(dirname(__FILE__)."/classes/host.class.php");
-require_once(dirname(__FILE__)."/classes/memcachehost.class.php");
+require_once(dirname(__FILE__)."/classes/redishost.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
-require_once(dirname(__FILE__)."/classes/board/memcachednntp.class.php");
+require_once(dirname(__FILE__)."/classes/board/rediscachednntp.class.php");
 
 require_once(dirname(__FILE__)."/classes/authmanager/static.class.php");
 require_once(dirname(__FILE__)."/classes/authmanager/allowauthed.class.php");
@@ -62,8 +62,8 @@ class JuPiConfig extends DefaultConfig {
 		return $this->secretkey;
 	}
 
-	private function getMemcacheHost($boardid) {
-		return new MemCacheHost("storage", 11211, "nntpboard" . $boardid);
+	private function getRedisHost($boardid) {
+		return new RedisHost("storage", 6379, "nntpboard" . $boardid);
 	}
 
 	private function getNNTPGroup($name) {
@@ -75,11 +75,11 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
+		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
 	}
 
 	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new MemCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getMemcacheHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
+		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {
