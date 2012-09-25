@@ -31,8 +31,8 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	// Used for ragefac.es, ponyfac.es, lauerfac.es
 	private $apiCache;
 
-	public function __construct($config, $charset, $auth) {
-		parent::__construct($config, $charset, $auth);
+	public function __construct($config, $auth) {
+		parent::__construct($config, $auth);
 
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
@@ -41,7 +41,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->register_modifier("calculateFileSize", array($this, "calculateFileSize"));
 		$this->smarty->assign("ROOTBOARD", $this->parseBoard($config->getBoard()));
 		$this->smarty->assign("VERSION", $config->getVersion());
-		$this->smarty->assign("CHARSET", $this->getCharset());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());
 		$this->smarty->assign("ADDRESS", $this->getAuth()->getAddress());
 	}
@@ -61,7 +60,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	private function sendHeaders() {
-		header("Content-Type: text/html; Charset={$this->getCharset()}");
+		header("Content-Type: text/html; Charset=UTF-8");
 	}
 
 	private function parseBoard($board, $parseParent = true) {
@@ -88,7 +87,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$row["threadcount"]		= $group->getThreadCount();
 			$row["messagecount"]		= $group->getMessageCount();
 			$row["lastpostboardid"]		= $board->getBoardID();
-			$row["lastpostsubject"]		= $group->getLastPostSubject($this->getCharset());
+			$row["lastpostsubject"]		= $group->getLastPostSubject();
 			$row["lastpostthreadid"]	= $group->getLastPostThreadID();
 			$row["lastpostmessageid"]	= $group->getLastPostMessageID();
 			$row["lastpostdate"]		= $group->getLastPostDate();
@@ -131,7 +130,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	private function parseThread($thread) {
 		$row = array();
 		$row["threadid"]		= $thread->getThreadID();
-		$row["subject"]			= $thread->getSubject($this->getCharset());
+		$row["subject"]			= $thread->getSubject();
 		$row["posts"]			= $thread->getPosts();
 		$row["pages"]			= ceil($thread->getPosts() / $this->getConfig()->getMessagesPerPage());
 		$row["date"]			= $thread->getDate();
@@ -157,7 +156,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$row = array();
 
 		$row["messageid"]	= $message->getMessageID();
-		$row["subject"]		= $message->getSubject($this->getCharset());
+		$row["subject"]		= $message->getSubject();
 		$row["author"]		= $this->parseAddress($message->getAuthor());
 		$row["date"]		= $message->getDate();
 		$row["body"]		= $this->formatMessage($message);
@@ -206,19 +205,19 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			return null;
 		}
 		$row = array();
-		$row["text"]	= $this->getConfig()->getAddressText($address, $this->getCharset());
-		$row["link"]	= $this->getConfig()->getAddressLink($address, $this->getCharset());
-		$row["image"]	= $this->getConfig()->getAddressImage($address, $this->getCharset());
+		$row["text"]	= $this->getConfig()->getAddressText($address);
+		$row["link"]	= $this->getConfig()->getAddressLink($address);
+		$row["image"]	= $this->getConfig()->getAddressImage($address);
 		return $row;
 	}
 
 	private function formatMessage($message) {
-		$text = $message->getHTMLBody($this->getCharset());
+		$text = $message->getHTMLBody();
 		if ($message->hasHTMLBody() and $text == strip_tags($text, "<b><i><u><a><tt><small><big>")) {
 			return $text;
 		}
 
-		$text = $message->getTextBody($this->getCharset());
+		$text = $message->getTextBody();
 		$text = $this->formatText($text);
 		return $text;
 	}
@@ -233,8 +232,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
 		
 		// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
-		$text = iconv("UTF-8", $this->getCharset(),
-			htmlentities(iconv($this->getCharset(), "UTF-8", $text), ENT_COMPAT, "UTF-8") );
+		$text = htmlentities($text, ENT_COMPAT, "UTF-8");
 
 		// Zitate sind eine fiese sache ...
 		$lines = explode("\n", $text);
@@ -313,7 +311,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 					$mail = substr($mail, 0, strlen($mail) - 4);
 				}
 				$address = new Address("", $mail);
-				$html = '<a href="' . htmlentities($this->getConfig()->getAddressLink($address, $this->getCharset())) . '">' . htmlentities($this->getConfig()->getAddressText($address, $this->getCharset())) . '</a>';
+				$html = '<a href="' . htmlentities($this->getConfig()->getAddressLink($address)) . '">' . htmlentities($this->getConfig()->getAddressText($address)) . '</a>';
 				$text = str_replace("&lt;" . $mail . "&gt;", $html, $text);
 				$text = str_replace($mail, $html, $text);
 			}
@@ -390,7 +388,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$this->smarty->assign("subject", (!in_array(substr($subject,0,3), array("Re:","Aw:")) ? "Re: ".$subject : $subject));
 			$this->smarty->assign("reference", $reference->getMessageID());
 			if ($quote == true) {
-				$body  = $this->getConfig()->getAddressText($reference->getAuthor(), $this->getCharset()) . " schrieb:" . "\r\n";
+				$body  = $this->getConfig()->getAddressText($reference->getAuthor()) . " schrieb:" . "\r\n";
 				$lines = explode("\n", $reference->getTextBody());
 				foreach ($lines as $line) {
 					$body .= "> " . rtrim($line) . "\r\n";

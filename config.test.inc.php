@@ -39,7 +39,7 @@ class TestConfig extends DefaultConfig {
 	}
 
 	public function getTemplate($auth) {
-		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
+		return new NNTPBoardSmarty($this, $auth);
 	}
 
 	public function getAuth($user, $pass) {
@@ -51,13 +51,13 @@ class TestConfig extends DefaultConfig {
 		return new JuPisAnonAuth();
 	}
 
-	public function getAddressText($address, $charset) {
-		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
+	public function getAddressText($address) {
+		$mailto = $address->getAddress();
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "auth.invalid") {
 			return ucfirst($name);
 		}
-		return parent::getAddressText($address, $charset);
+		return parent::getAddressText($address);
 	}
 
 	public function getMessageIDHost() {

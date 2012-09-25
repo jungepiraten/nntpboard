@@ -26,14 +26,12 @@ interface Template {
 
 abstract class AbstractTemplate implements Template {
 	private $config;
-	private $charset;
 	private $auth;
 	private $threadsperpage;
 	private $messagesperpage;
 
-	public function __construct($config, $charset, $auth, $threadsperpage = null, $messagesperpage = null) {
+	public function __construct($config, $auth, $threadsperpage = null, $messagesperpage = null) {
 		$this->config = $config;
-		$this->charset = $charset;
 		$this->auth = $auth;
 		$this->threadsperpage = $threadsperpage;
 		$this->messagesperpage = $messagesperpage;
@@ -41,10 +39,6 @@ abstract class AbstractTemplate implements Template {
 
 	protected function getConfig() {
 		return $this->config;
-	}
-
-	protected function getCharset() {
-		return $this->charset;
 	}
 
 	protected function getAuth() {

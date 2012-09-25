@@ -11,12 +11,12 @@ abstract class RFC5322MimeBody {
 	public static function parsePlain($header, $body) {
 		$parts = array();
 		$mimetype = null;
-		
+
 		if ($header->has("Content-Type")
 		 && substr($header->get("Content-Type")->getValue(),0,9) == "multipart"
 		 && $header->get("Content-Type")->hasExtra("boundary"))
 		{
-			// Multipart-Nachricht	
+			// Multipart-Nachricht
 			$mimetype = $header->get("Content-Type")->getValue();
 			$boundary = $header->get("Content-Type")->getExtra("boundary");
 			$mimeparts = explode("--" . $boundary, $body);
@@ -26,7 +26,7 @@ abstract class RFC5322MimeBody {
 				array_push($mimeparts, $last);
 			}
 			array_shift($mimeparts);
-			
+
 			foreach ($mimeparts AS $mimepart) {
 				list($partheader, $partbody) = explode("\r\n\r\n", $mimepart, 2);
 				$partheader = RFC5322Header::parsePlain($partheader);
@@ -49,7 +49,7 @@ abstract class RFC5322MimeBody {
 			return new RFC5322MixedMimeBody($header, $parts);
 		}
 	}
-	
+
 	public static function parseObject($message) {
 		$parts = array();
 
@@ -59,16 +59,16 @@ abstract class RFC5322MimeBody {
 			if ($message->hasSignature()) {
 				$text .= "\r\n-- \r\n" . $message->getSignature();
 			}
-			$parts[] = RFC5322PlainBody::parse("text/plain", $message->getCharset(), "base64", $text);
+			$parts[] = RFC5322PlainBody::parse("text/plain", "base64", $text);
 		}
 		// HTML-Teil
 		if ($message->hasHTMLBody()) {
-			$parts[] = RFC5322PlainBody::parse("text/html", $message->getCharset(), "base64", $message->getHTMLBody());
+			$parts[] = RFC5322PlainBody::parse("text/html", "base64", $message->getHTMLBody());
 		}
 		// In einen alternative-Body packen (falls noetig)
 		if (count($parts) > 1) {
 			$header = new RFC5322Header;
-			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/alternative",	$message->getCharset());
+			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/alternative");
 			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
 			$parts = array(new RFC5322AlternativeMimeBody($header, $parts));
@@ -80,8 +80,8 @@ abstract class RFC5322MimeBody {
 		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
 		if (count($parts) > 1) {
 			$header = new RFC5322Header;
-			$header->set(RFC5322SingleHeader::generate("MIME-Version", "1.0", $message->getCharset()));
-			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/mixed",	$message->getCharset());
+			$header->set(RFC5322SingleHeader::generate("MIME-Version", "1.0"));
+			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/mixed");
 			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
 			$header->set($contenttype);
 			return new RFC5322MixedMimeBody($header, $parts);
@@ -97,7 +97,7 @@ abstract class RFC5322MimeBody {
 	public static function parseCancelObject($cancel, $message) {
 		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard\n-----CONTENT WAS-----\n" . $message->getTextBody());
 	}
-	
+
 	private $header;
 	private $parts;
 
@@ -130,7 +130,7 @@ abstract class RFC5322MimeBody {
 		return $this->parts;
 	}
 
-	abstract public function getBodyPart($mimetype, $charset = null);
+	abstract public function getBodyPart($mimetype, $charset = "UTF-8");
 	abstract public function getAttachmentParts();
 
 	public function getPlain() {

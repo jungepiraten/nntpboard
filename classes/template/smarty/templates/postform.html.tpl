@@ -45,8 +45,8 @@ function addAttachmentField() {
 </table>
 {/if}
 
-<form action="post.php" method="post" enctype="multipart/form-data" accept-charset="{$CHARSET}" class="form-horizontal">
-	<input type="hidden" name="charset" value="{$CHARSET}" />
+<form action="post.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8" class="form-horizontal">
+	<input type="hidden" name="charset" value="UTF-8" />
 	<input type="hidden" name="boardid" value="{$board.boardid|escape:html}" />
 	<input type="hidden" name="reference" value="{$reference|encodeMessageID|escape:html}" />
 

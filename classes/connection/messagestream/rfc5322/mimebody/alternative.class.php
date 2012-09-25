@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . "/../mimebody.class.php");
 
 class RFC5322AlternativeMimeBody extends RFC5322MimeBody {
-	public function getBodyPart($mimetype, $charset = null) {
+	public function getBodyPart($mimetype, $charset = "UTF-8") {
 		if (!is_array($mimetype)) {
 			$mimetype = array($mimetype);
 		}

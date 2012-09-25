@@ -9,7 +9,7 @@ interface Connection {
 
 	// Zum Schnellen Cache-Abgleich
 	public function getGroupHash();
-	public function getLastPostSubject($charset = null);
+	public function getLastPostSubject();
 	public function getLastPostThreadID();
 	public function getLastPostMessageID();
 	public function getLastPostDate();
@@ -26,8 +26,8 @@ abstract class AbstractConnection implements Connection {
 
 	abstract protected function getGroupID();
 
-	public function getLastPostSubject($charset = null) {
-		return $this->getGroup()->getLastPostSubject($charset);
+	public function getLastPostSubject() {
+		return $this->getGroup()->getLastPostSubject();
 	}
 
 	public function getLastPostThreadID() {

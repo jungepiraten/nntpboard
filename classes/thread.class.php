@@ -2,24 +2,22 @@
 
 class Thread {
 	private $threadid;
-	private $charset;
 	private $subject;
 	private $date;
 	private $author;
 	private $messages = array();
-	
+
 	public static function getByMessage($message) {
-		return new Thread($message->getMessageID(), $message->getSubject(), $message->getDate(), $message->getAuthor(), $message->getCharset());
+		return new Thread($message->getMessageID(), $message->getSubject(), $message->getDate(), $message->getAuthor());
 	}
-	
-	public function __construct($threadid, $subject, $date, $author, $charset) {
+
+	public function __construct($threadid, $subject, $date, $author) {
 		$this->threadid = $threadid;
 		$this->subject = $subject;
 		$this->date = $date;
 		$this->author = $author;
-		$this->charset = $charset;
 	}
-	
+
 	public function getMessageIDs() {
 		return array_keys($this->messages);
 	}
@@ -27,7 +25,7 @@ class Thread {
 	public function getMessageCount() {
 		return count($this->messages);
 	}
-	
+
 	public function addMessage($message) {
 		$this->messages[$message->getMessageID()] = array("date" => $message->getDate(), "author" => $message->getAuthor());
 		$this->sort();
@@ -53,26 +51,23 @@ class Thread {
 	public function removeMessage($messageid) {
 		unset($this->messages[$messageid]);
 	}
-	
+
 	public function getThreadID() {
 		return $this->threadid;
 	}
-	
-	public function getSubject($charset = null) {
-		if ($charset !== null) {
-			return iconv($this->getCharset(), $charset, $this->getSubject());
-		}
+
+	public function getSubject() {
 		return $this->subject;
 	}
-	
+
 	public function getDate() {
 		return $this->date;
 	}
-	
+
 	public function getAuthor() {
 		return $this->author;
 	}
-	
+
 	public function getPosts() {
 		return count($this->messages);
 	}
@@ -80,21 +75,17 @@ class Thread {
 	public function isEmpty() {
 		return $this->getPosts() <= 0;
 	}
-	
+
 	public function getLastPostMessageID() {
 		return array_shift(array_slice(array_keys($this->messages),-1));
 	}
-	
+
 	public function getLastPostDate() {
 		return $this->messages[$this->getLastPostMessageID()]["date"];
 	}
-	
+
 	public function getLastPostAuthor() {
 		return $this->messages[$this->getLastPostMessageID()]["author"];
-	}
-	
-	public function getCharset() {
-		return $this->charset;
 	}
 }
 

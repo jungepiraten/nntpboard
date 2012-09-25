@@ -15,7 +15,7 @@ interface Group {
 
 	public function getLastPostMessageID();
 	public function getLastPostThreadID();
-	public function getLastPostSubject($charset = null);
+	public function getLastPostSubject();
 	public function getLastPostDate();
 	public function getLastPostAuthor();
 
@@ -69,9 +69,9 @@ abstract class AbstractGroup implements Group {
 		}
 	}
 
-	public function getLastPostSubject($charset = null) {
+	public function getLastPostSubject() {
 		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getSubject($charset);
+			return $this->getLastThread()->getSubject();
 		}
 	}
 
@@ -81,9 +81,9 @@ abstract class AbstractGroup implements Group {
 		}
 	}
 
-	public function getLastPostAuthor($charset = null) {
+	public function getLastPostAuthor() {
 		if ($this->hasLastThread()) {
-			return $this->getLastThread()->getLastPostAuthor($charset);
+			return $this->getLastThread()->getLastPostAuthor();
 		}
 	}
 

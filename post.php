@@ -62,10 +62,9 @@ function generateMessage($config, $session, $board, $reference) {
 		$author = $session->getAuth()->getAddress();
 	}
 
-	$charset = (!empty($_REQUEST["charset"]) ? trim(stripslashes($_REQUEST["charset"])) : $config->getCharSet());
 	$storedattachments = isset($_REQUEST["storedattachment"]) && is_array($_REQUEST["storedattachment"]) ? $_REQUEST["storedattachment"] : array();
 	$attachment = $_FILES["attachment"];
-	
+
 	if ($reference !== null) {
 		$parentid = $reference->getMessageID();
 	} else {
@@ -77,9 +76,9 @@ function generateMessage($config, $session, $board, $reference) {
 	}
 
 	$textbody = stripslashes($_REQUEST["body"]);
-	$message = new Message($messageid, time(), $author, $subject, $charset, $parentid, $textbody);
-	
-	// Speichere alte Attachments und 
+	$message = new Message($messageid, time(), $author, $subject, $parentid, $textbody);
+
+	// Speichere alte Attachments und fuege aus allen die Message zusammen
 	$as = array();
 	foreach ($storedattachments as $partid) {
 		$as[] = $session->getAttachment($partid);

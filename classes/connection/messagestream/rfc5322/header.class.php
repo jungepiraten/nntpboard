@@ -88,7 +88,7 @@ class RFC5322SingleHeader {
 		return $h;
 	}
 
-	public static function generate($name, $value, $charset) {
+	public static function generate($name, $value, $charset = "UTF-8") {
 		// Nur encoden wenn noetig
 		if (preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $value, $matches)) {
 			mb_internal_encoding($charset);
@@ -110,25 +110,18 @@ class RFC5322SingleHeader {
 		return $this->name;
 	}
 
-	public function getValue($charset = null) {
-		if ($charset != null) {
-			$value = $this->getValue();
-			preg_match_all('$\\s?=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
-			foreach ($parts as $part) {
-				$decoded = ltrim($part[0]);
-				if (strtolower($part[2]) == "q") {
-					$decoded = str_replace("_", " ", $decoded);
-				}
-				$decoded = iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($decoded));
-				$value = str_replace($part[0], $decoded, $value);
+	public function getValue($charset = "UTF-8") {
+		$value = $this->value;
+		preg_match_all('$\\s?=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
+		foreach ($parts as $part) {
+			$decoded = ltrim($part[0]);
+			if (strtolower($part[2]) == "q") {
+				$decoded = str_replace("_", " ", $decoded);
 			}
-			return $value;
+			$decoded = iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($decoded));
+			$value = str_replace($part[0], $decoded, $value);
 		}
-		return $this->value;
-	}
-
-	public function getCharset() {
-		return $this->charset;
+		return $value;
 	}
 
 	public function addExtra($name, $value) {
@@ -139,11 +132,8 @@ class RFC5322SingleHeader {
 		return isset($this->extra[strtolower($name)]);
 	}
 
-	public function getExtra($name, $charset = null) {
-		if ($charset != null) {
-			return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->getValue())));
-		}
-		return $this->extra[strtolower($name)];
+	public function getExtra($name, $charset = "UTF-8") {
+		return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->extra[strtolower($name)])));
 	}
 
 	public function getPlain() {

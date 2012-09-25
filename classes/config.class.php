@@ -5,7 +5,7 @@ require_once(dirname(__FILE__)."/../libs/xtea.class.php");
 
 abstract class DefaultConfig {
 	private $boards;
-	
+
 	public function __construct() {}
 
 	/**
@@ -35,14 +35,10 @@ abstract class DefaultConfig {
 	public function getBoardIDs() {
 		return array_keys($this->boards);
 	}
-	
+
 	/**
 	 * Optionen
 	 **/
-	public function getCharset() {
-		return "UTF-8";
-	}
-
 	public function getThreadsPerPage() {
 		return 20;
 	}
@@ -54,18 +50,18 @@ abstract class DefaultConfig {
 	/**
 	 * Erweiterte Optionen
 	 **/
-	public function getAddressText($address, $charset) {
-		return iconv($address->getCharset(), $charset, $address->__toString());
+	public function getAddressText($address) {
+		return $address->__toString();
 	}
 
-	public function getAddressLink($address, $charset) {
+	public function getAddressLink($address) {
 		return "mailto:" . $address->getAddress();
 	}
 
-	public function getAddressImage($address, $charset) {
+	public function getAddressImage($address) {
 		return "//secure.gravatar.com/avatar/" . md5(trim(strtolower($address->getAddress()))) . "?default=mm&s=100";
 	}
-	
+
 	abstract public function getAuth($user, $pass);
 	abstract public function getAnonymousAuth();
 

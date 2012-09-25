@@ -132,24 +132,20 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	 **/
 
 	public function postMessage($message) {
-		$rfcmessage = RFC5322Message::parseObject($this, $this->group, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
-		return $this->post($rfcmessage);
+		return $this->post( RFC5322Message::parseObject($this, $this->group, $message) );
 	}
 
 	public function postAcknowledge($ack, $message) {
-		$rfcmessage = RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
-		return $this->post($rfcmessage);
+		return $this->post( RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message) );
 	}
 
 	public function postCancel($cancel, $message) {
-		$rfcmessage = RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message);
-		$rfcmessage->getHeader()->set(   RFC5322SingleHeader::generate("Newsgroups",     $this->group, $charset));
-		return $this->post($rfcmessage);
+		return $this->post( RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message) );
 	}
 
 	private function post($nntpmsg) {
+		$nntpmsg->getHeader()->set( RFC5322SingleHeader::generate("Newsgroups", $this->group, "UTF-8") );
+
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {

@@ -15,7 +15,7 @@ class RFC5322Message {
 
 		// Body parsen
 		$body = RFC5322MimeBody::parsePlain($header->extractContentHeader(), $body);
-		
+
 		return new RFC5322Message($header->extractMessageHeader(), $body);
 	}
 
@@ -24,55 +24,47 @@ class RFC5322Message {
 		return $message->getParentID();
 	}
 
-	public static function parseObject($connection, $group, $message) {
-		$charset = $message->getCharset();
-		
+	public static function parseObject($connection, $message) {
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$message->getMessageID(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$message->getMessageID()));
 		if ($message->hasParent()) {
-			$header->set(	RFC5322SingleHeader::generate("References",	self::generateReferences($connection, $message), $charset));
+			$header->set(	RFC5322SingleHeader::generate("References",	self::generateReferences($connection, $message)));
 		}
 		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($message->getAuthor())->getPlain(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		$message->getSubject(), $charset));
+				RFC5322Address::parseObject($message->getAuthor())->getPlain()));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		$message->getSubject()));
 		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $message->getDate()), $charset));
+				date("r", $message->getDate()) ));
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseObject($message));
 	}
 
-	public static function parseAcknowledgeObject($connection, $group, $ack, $message) {
-		$charset = $message->getCharset();
+	public static function parseAcknowledgeObject($connection, $ack, $message) {
 		$references = self::generateReferences($connection, $message);
 		$references .= " " . $message->getMessageID();
 
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$ack->getMessageID(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
-		$header->set(	RFC5322SingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())), $charset));
-		$header->set(	RFC5322SingleHeader::generate("References",	$references, $charset));
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$ack->getMessageID()));
+		$header->set(	RFC5322SingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) ));
+		$header->set(	RFC5322SingleHeader::generate("References",	$references ));
 		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($ack->getAuthor())->getPlain(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject(), $charset));
+				RFC5322Address::parseObject($ack->getAuthor())->getPlain() ));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject() ));
 		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $ack->getDate()), $charset));
+				date("r", $ack->getDate()) ));
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseAcknowledgeObject($ack, $message));
 	}
 
-	public static function parseCancelObject($connection, $group, $cancel, $message) {
-		$charset = $message->getCharset();
-
+	public static function parseCancelObject($connection, $cancel, $message) {
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$cancel->getMessageID(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Newsgroups",	$group, $charset));
+		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$cancel->getMessageID() ));
 		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($cancel->getAuthor())->getPlain(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject(), $charset));
-		$header->set(	RFC5322SingleHeader::generate("Control",		"cancel " . $cancel->getReference(), $charset));
+				RFC5322Address::parseObject($cancel->getAuthor())->getPlain() ));
+		$header->set(	RFC5322SingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject() ));
+		$header->set(	RFC5322SingleHeader::generate("Control",		"cancel " . $cancel->getReference() ));
 		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $cancel->getDate()), $charset));
+				date("r", $cancel->getDate()) ));
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseCancelObject($cancel, $message));
 	}
@@ -94,7 +86,7 @@ class RFC5322Message {
 	}
 
 	public function isAcknowledge() {
-		return preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain","UTF-8"));
+		return preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain"));
 	}
 
 	public function getPlain() {
@@ -105,22 +97,18 @@ class RFC5322Message {
 	}
 
 	public function getObject($connection) {
-		// Diktatorisch beschlossen :P
-		$charset = "UTF-8";
-		
 		// Header interpretieren
-		$messageid =	$this->getHeader()->get("Message-ID")->getValue($charset);
-		$subject =	$this->getHeader()->get("Subject")->getValue($charset);
-		$date =		strtotime($this->getHeader()->get("Date")->getValue($charset));
+		$messageid =	$this->getHeader()->get("Message-ID")->getValue();
+		$subject =	$this->getHeader()->get("Subject")->getValue();
+		$date =		strtotime($this->getHeader()->get("Date")->getValue());
 		// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
 		$author =	RFC5322Address::parsePlain(
-					array_shift(explode(",", $this->getHeader()->get("From")->getValue($charset))), $charset
-					)->getObject();
+					array_shift(explode(",", $this->getHeader()->get("From")->getValue())) )->getObject();
 
 		// References (per Default als neuer Thread)
 		$parentid = null;
-		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue($charset)) != "") {
-			$references = preg_split('$\\s$', $this->getHeader()->get("References")->getValue($charset));
+		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue()) != "") {
+			$references = preg_split('$\\s$', $this->getHeader()->get("References")->getValue());
 			do {
 				$parentid = array_pop($references);
 			} while ($parentid != false && !$connection->hasMessage($parentid));
@@ -141,26 +129,26 @@ class RFC5322Message {
 		} catch (NotFoundMessageException $e) {}
 
 		if ($this->isAcknowledge()) {
-			preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain","UTF-8"), $match);
+			preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain"), $match);
 			return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
 		}
 
 		// Nachrichteninhalt
-		$textbodys = explode("\n-- ", $this->body->getBodyPart("text/plain", $charset), 2);
+		$textbodys = explode("\n-- ", $this->body->getBodyPart("text/plain"), 2);
 		$signature = null;
 		if (count($textbodys) >= 2) {
 			$signature = array_pop($textbodys);
 		}
 		$textbody = implode("\n-- ", $textbodys);
-		$htmlbody = $this->body->getBodyPart("text/html", $charset);
-		
-		$message = new Message($messageid, $date, $author, $subject, $charset, $parentid, $textbody, $signature, $htmlbody);
-		
+		$htmlbody = $this->body->getBodyPart("text/html");
+
+		$message = new Message($messageid, $date, $author, $subject, $parentid, $textbody, $signature, $htmlbody);
+
 		/* Strukturanalyse des Bodys */
 		foreach ($this->body->getAttachmentParts() AS $attachment) {
 			$message->addAttachment($attachment->getObject());
 		}
-		
+
 		return $message;
 	}
 }

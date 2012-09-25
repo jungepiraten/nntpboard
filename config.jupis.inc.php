@@ -148,8 +148,8 @@ class JuPiConfig extends DefaultConfig {
 		$this->addGenericBoard($id, $parentid, "event.{$kuerzel}", $mlname, $wiki, $name, $desc);
 	}
 
-	private function getCommunityUser($address, $charset) {
-		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
+	private function getCommunityUser($address) {
+		$mailto = $address->getAddress();
 		list($name, $host) = explode("@", $mailto);
 		if ($host == "community.junge-piraten.de") {
 			return ucfirst($name);
@@ -180,14 +180,14 @@ class JuPiConfig extends DefaultConfig {
 		return $this->mailusers[$mailto];
 	}
 
-	public function getAddressText($address, $charset) {
-		$communityuser = $this->getCommunityUser($address, $charset);
+	public function getAddressText($address) {
+		$communityuser = $this->getCommunityUser($address);
 
 		if ($communityuser != null) {
 			return $communityuser;
 		}
 
-		$mailto = iconv($address->getCharset(), $charset, $address->getAddress());
+		$mailto = $address->getAddress();
 		list($name, $host) = explode("@", $mailto);
 
 		if ($host == "junge-piraten.de") {
@@ -197,16 +197,16 @@ class JuPiConfig extends DefaultConfig {
 		return ($address->hasName() ? $address->getName() . " " : "") . "<" . $name . "@...>";
 	}
 
-	public function getAddressLink($address, $charset) {
-		$communityuser = $this->getCommunityUser($address, $charset);
+	public function getAddressLink($address) {
+		$communityuser = $this->getCommunityUser($address);
 		if ($communityuser != null) {
 			return "http://wiki.junge-piraten.de/wiki/Benutzer:" . $communityuser;
 		}
 		return "";
 	}
 
-	public function getAddressImage($address, $charset) {
-		$communityuser = $this->getCommunityUser($address, $charset);
+	public function getAddressImage($address) {
+		$communityuser = $this->getCommunityUser($address);
 
 		if ($communityuser != null) {
 			return "jupisavatar.php?name=" . urlencode($communityuser) . "&gravatar-hash=" . md5(strtolower(trim($address->getAddress())));
@@ -216,7 +216,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	public function getTemplate($auth) {
-		return new NNTPBoardSmarty($this, $this->getCharset(), $auth);
+		return new NNTPBoardSmarty($this, $auth);
 	}
 
 	public function getAuth($user, $pass) {

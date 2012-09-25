@@ -25,7 +25,7 @@ class RFC5322PlainBody {
 			$header_disposition->addExtra("filename", $attachment->getFilename());
 		}
 		$header->set($header_disposition);
-		
+
 		if ($attachment->isBinary()) {
 			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"base64"));
 			$content = base64_encode($attachment->getContent());
@@ -33,11 +33,11 @@ class RFC5322PlainBody {
 			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"quoted-printable"));
 			$content = quoted_printable_encode($attachment->getContent());
 		}
-		
+
 		return new RFC5322PlainBody($header, $content);
 	}
 
-	public static function parse($mimetype, $charset, $encoding, $body) {
+	public static function parse($mimetype, $encoding, $body, $charset = "UTF-8") {
 		$header = new RFC5322Header;
 		$contenttypeheader = new RFC5322SingleHeader("Content-Type",		$mimetype);
 		$contenttypeheader->addExtra("charset", $charset);
@@ -110,23 +110,17 @@ class RFC5322PlainBody {
 		return null;
 	}
 
-	public function getBody($charset = null) {
-		if ($charset != null) {
-			return iconv($this->getCharset(), $charset, $this->getBody());
-		}
+	public function getBody($charset = "UTF-8") {
 		switch ($this->getTransferEncoding()) {
 		default:
 		case "7bit":
 		case "8bit":
 		case "binary":
-			return $this->body;
-			break;
+			return iconv($this->getCharset(), $charset, $this->body);
 		case "quoted-printable":
-			return quoted_printable_decode($this->body);
-			break;
+			return iconv($this->getCharset(), $charset, quoted_printable_decode($this->body));
 		case "base64":
-			return base64_decode($this->body);
-			break;
+			return iconv($this->getCharset(), $charset, base64_decode($this->body));
 		}
 	}
 

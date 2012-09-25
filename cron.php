@@ -13,7 +13,7 @@ $config->markCronRunning();
  **/
 foreach ($config->getBoardIDs() as $boardid) {
 	$cache = $config->getBoard($boardid)->getConnection();
-	
+
 	// Nur bei CacheConnections macht das wirklich Sinn ...
 	if (!($cache instanceof AbstractCacheConnection)) {
 		continue;

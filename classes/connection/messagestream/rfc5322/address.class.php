@@ -4,9 +4,9 @@ require_once(dirname(__FILE__) . "/../../../address.class.php");
 
 class RFC5322Address extends Address {
 	public static function parseObject($addr) {
-		return new RFC5322Address($addr->getName(), $addr->getAddress(), $addr->getComment(), $addr->getCharset());
+		return new RFC5322Address($addr->getName(), $addr->getAddress(), $addr->getComment() );
 	}
-	
+
 	public static function parsePlain($addr, $charset = "UTF-8") {
 		$name = null;
 		$comment = null;

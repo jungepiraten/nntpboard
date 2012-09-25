@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html dir="ltr">
 	<head>
-		<meta http-equiv="content-type" content="text/xhtml; charset={$CHARSET}" />
+		<meta http-equiv="content-type" content="text/xhtml; charset=UTF-8" />
 		<link href="https://static.junge-piraten.de/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="https://static.junge-piraten.de/bootstrap-2.1.1/css/bootstrap-responsive.min.css" rel="stylesheet" />
 		<link href="https://static.junge-piraten.de/bootstrap-jupis.css" rel="stylesheet" />
