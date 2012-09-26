@@ -133,7 +133,17 @@ class RFC5322SingleHeader {
 	}
 
 	public function getExtra($name, $charset = "UTF-8") {
-		return iconv(mb_internal_encoding(), $charset, str_replace("_", " ", mb_decode_mimeheader($this->extra[strtolower($name)])));
+		$value = $this->extra[strtolower($name)];
+		preg_match_all('$\\s?=\\?(.*?)\\?([bBqQ])\\?(.*?)\\?=$', $value, $parts, PREG_SET_ORDER);
+		foreach ($parts as $part) {
+			$decoded = ltrim($part[0]);
+			if (strtolower($part[2]) == "q") {
+				$decoded = str_replace("_", " ", $decoded);
+			}
+			$decoded = iconv(mb_internal_encoding(), $charset, mb_decode_mimeheader($decoded));
+			$value = str_replace($part[0], $decoded, $value);
+		}
+		return $value;
 	}
 
 	public function getPlain() {
