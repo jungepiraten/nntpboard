@@ -132,15 +132,15 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	 **/
 
 	public function postMessage($message) {
-		return $this->post( RFC5322Message::parseObject($this, $this->group, $message) );
+		return $this->post( RFC5322Message::parseObject($this, $message) );
 	}
 
 	public function postAcknowledge($ack, $message) {
-		return $this->post( RFC5322Message::parseAcknowledgeObject($this, $this->group, $ack, $message) );
+		return $this->post( RFC5322Message::parseAcknowledgeObject($this, $ack, $message) );
 	}
 
 	public function postCancel($cancel, $message) {
-		return $this->post( RFC5322Message::parseCancelObject($this, $this->group, $cancel, $message) );
+		return $this->post( RFC5322Message::parseCancelObject($this, $cancel, $message) );
 	}
 
 	private function post($nntpmsg) {
