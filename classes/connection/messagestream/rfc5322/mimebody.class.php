@@ -89,11 +89,11 @@ abstract class RFC5322MimeBody {
 	}
 
 	public static function parseAcknowledgeObject($ack, $message) {
-		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()));
+		return RFC5322PlainBody::parse("text/plain", "base64", ($ack->getWertung() >= 0 ? "+" : "") . intval($ack->getWertung()) );
 	}
 
 	public static function parseCancelObject($cancel, $message) {
-		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard. Dump following:\n\n" . serialize($message) );
+		return RFC5322PlainBody::parse("text/plain", "base64", "Message canceled by NNTPBoard. Dump following:\n\n" . serialize($message) );
 	}
 
 	private $header;
