@@ -27,8 +27,6 @@ class JuPiConfig extends DefaultConfig {
 
 		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Allgemeine Ankündigungen");
 		$this->addGenericBoard(2, null, "misc", "aktive", null, "Allgemeines", "Globale Themen der Jungen Piraten");
-		$this->addGenericBoard(7, null, "board.public", "vorstand-public", null, "Vorstand", "Öffentliche Vorstandsliste");
-		$this->addGenericBoard(8, null, "verwaltung.public", "verwaltung-public", null, "Verwaltung", "Öffentliche Verwaltungsliste");
 
 		$this->addOrgaStruktur(300, null);
 
@@ -85,8 +83,10 @@ class JuPiConfig extends DefaultConfig {
 
 	private function addOrgaStruktur($id, $parentid) {
 		$this->addCategoryBoard($id, $parentid, "Organisation", "");
-		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
 		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"Öffentlichkeitsarbeit", "AG_Oe", "ag-oe");
+		$this->addGenericBoard(8, null, "verwaltung.public", "verwaltung-public", null, "Verwaltung", "Öffentliche Verwaltungsliste");
+		$this->addGenericBoard(7, null, "board.public", "vorstand-public", null, "Vorstand", "Öffentliche Vorstandsliste");
+		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
 	}
 	private function addOrgaBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "orga.{$kuerzel}", $mlname, $wiki, $name, $desc);
