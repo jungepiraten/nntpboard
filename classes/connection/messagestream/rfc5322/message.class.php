@@ -136,9 +136,9 @@ class RFC5322Message {
 		if (strpos($textbody, "\n-- ") !== false) {
 			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
 		}
-		// Default-Signaturtrenner von Mailman :-(
-		if ($signature == null && strpos($textbody, "\n_______________________________________________") !== false) {
-			list($textbody, $signature) = explode("\n_______________________________________________", $textbody, 2);
+		// Workaround fuer Mailman und andere Clients
+		if ($signature == null && preg_match('~\n[-_]{2,}\n~m', $textbody) !== false) {
+			list($textbody, $signature) = preg_split('~\n[-_]{2,}\n~m', $textbody, 2);
 		}
 
 		$htmlbody = $this->body->getBodyPart("text/html");
