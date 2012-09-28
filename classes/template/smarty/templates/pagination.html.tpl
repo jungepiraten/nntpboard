@@ -7,7 +7,7 @@
 			{if $pagecount > 5}
 			<li class="disabled"><a>...</a></li>
 			{elseif $pagecount == 5}
-			<li><a href="{$pageurl}2">3</a></li>
+			<li><a href="{$baseurl}2">3</a></li>
 			{/if}
 			{section name=pages loop=$pagecount start=$page-1 max=1}
 			<li><a href="{$baseurl}{$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
