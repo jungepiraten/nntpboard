@@ -14,7 +14,7 @@
  {if isset($message.signature)}
  <div class="signature">
   <a href="javascript:toggleSignature('{$id}');" id="signaturelink{$id}" class="signaturlink">Signatur zeigen</a>
-  <p class="signature" id="signature{$id}" style="display:none;">{$message.signature}</p>
+  <div class="signature" id="signature{$id}" style="display:none;">{$message.signature}</div>
  </div>
  {/if}
  {if $message.attachments}
