@@ -1,8 +1,6 @@
 {include file=header.html.tpl title=$thread.subject}
 
-<ul class="breadcrumb">
-	{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}
-</ul>
+<ul class="breadcrumb">{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}</ul>
 
 {literal}
 <script type="text/javascript">
