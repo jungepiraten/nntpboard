@@ -45,18 +45,6 @@
 					</a>
 					<ul class="nav">
 						<li class="active"><a href="index.php">Forenübersicht</a></li>
-						<li class="dropdown hidden-phone">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								<li><a href="https://www.junge-piraten.de/">Homepage</a></li>
-								<li><a href="https://www.junge-piraten.de/community/">Mitmachen</a></li>
-								<li class="active"><a href="index.php">Forum</a></li>
-								<li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
-								<li><a href="https://ucp.junge-piraten.de/">UCP</a></li>
-								<li><a href="https://pad.junge-piraten.de/">Pads</a></li>
-								<li><a href="https://www.junge-piraten.de/presse">Presse</a></li>
-							</ul>
-						</li>
 					</ul>
 
 					{if $ISANONYMOUS}
