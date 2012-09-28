@@ -228,7 +228,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	public function getMessageIDHost() {
-		return "webnntp.junge-piraten.de";
+		return "forum.junge-piraten.de";
 	}
 
 	protected function getSecretKey() {
