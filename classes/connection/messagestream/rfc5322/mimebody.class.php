@@ -93,7 +93,7 @@ abstract class RFC5322MimeBody {
 	}
 
 	public static function parseCancelObject($cancel, $message) {
-		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard\n-----CONTENT WAS-----\n" . $message->getTextBody());
+		return RFC5322PlainBody::parse("text/plain", "UTF-8", "base64", "Message canceled by NNTPBoard. Dump following:\n\n" . serialize($message) );
 	}
 
 	private $header;
