@@ -137,7 +137,7 @@ class RFC5322Message {
 			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
 		}
 		// Workaround fuer Mailman und andere Clients
-		if ($signature == null && preg_match('~\n[-_]{2,}\n~m', $textbody) !== false) {
+		if ($signature == null && preg_match('~\n[-_]{2,}\n~m', $textbody) > 0) {
 			list($textbody, $signature) = preg_split('~\n[-_]{2,}\n~m', $textbody, 2);
 		}
 
