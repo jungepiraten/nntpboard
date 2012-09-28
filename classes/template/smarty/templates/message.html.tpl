@@ -13,8 +13,7 @@
  <p class="body">{$message.body}</p>
  {if isset($message.signature)}
  <div class="signature">
-  <a href="javascript:toggleSignature('{$id}');"
-   id="signaturelink{$id}" class="signaturlink">Signatur zeigen</a>
+  <a href="javascript:toggleSignature('{$id}');" id="signaturelink{$id}" class="signaturlink">Signatur zeigen</a>
   <p class="signature" id="signature{$id}" style="display:none;">{$message.signature}</p>
  </div>
  {/if}
@@ -29,6 +28,7 @@
   <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
   {/if}
  {/foreach}
+ </dl>
  {/if}
  {if count($message.acknowledges) >= 1}
  <dl class="acknowledgebox">

@@ -230,7 +230,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 
 		// Erkenne auch nicht ausgezeichnete Links
 		$text = preg_replace('%([^<]|^)((http|https|ftp|ftps|mailto|xmpp):[^\s>]{6,})([^>]|$)%', '$1<$2>$4', $text);
-		
+
 		// htmlentities kommt nur mit wenigen Zeichensaetzen zurecht :(
 		$text = htmlentities($text, ENT_COMPAT, "UTF-8");
 
