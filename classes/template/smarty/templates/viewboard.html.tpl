@@ -41,7 +41,7 @@
 <tr>
  <th class="title">Thema</th>
  <th class="postcount">Posts</th>
- <th class="poster">Geschrieben</th>
+ <th class="poster hidden-phone">Geschrieben</th>
  <th class="lastpost">Letzte Antwort</th>
 </tr>
 {foreach from=$threads item=thread name=counter}
@@ -60,7 +60,7 @@
   <td class="postcount">
   <span class="posts">{$thread.posts}</span>
   </td>
-  <td class="poster">
+  <td class="poster hidden-phone">
   <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.author}</span>
   <br /><span class="info">am </span><span class="date">{$thread.date|date_format:"%d.%m.%Y %H:%M"}</span>
   </td>
