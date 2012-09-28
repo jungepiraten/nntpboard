@@ -133,11 +133,11 @@ class RFC5322Message {
 		// Nachrichteninhalt
 		$signature = null;
 		$textbody = $this->body->getBodyPart("text/plain");
-		if (strpos($textbody, "\n-- ") !== null) {
+		if (strpos($textbody, "\n-- ") !== false) {
 			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
 		}
 		// Default-Signaturtrenner von Mailman :-(
-		if ($signature == null && strpos($textbody, "\n_______________________________________________") !== null) {
+		if ($signature == null && strpos($textbody, "\n_______________________________________________") !== false) {
 			list($textbody, $signature) = explode("\n_______________________________________________", $textbody, 2);
 		}
 
