@@ -84,8 +84,8 @@ class JuPiConfig extends DefaultConfig {
 	private function addOrgaStruktur($id, $parentid) {
 		$this->addCategoryBoard($id, $parentid, "Organisation", "");
 		$this->addOrgaBoard($id+2, $id, "oe",	"Öffentlichkeitsarbeit",	"Öffentlichkeitsarbeit", "AG_Oe", "ag-oe");
-		$this->addGenericBoard(8, null, "verwaltung.public", "verwaltung-public", null, "Verwaltung", "Öffentliche Verwaltungsliste");
-		$this->addGenericBoard(7, null, "board.public", "vorstand-public", null, "Vorstand", "Öffentliche Vorstandsliste");
+		$this->addGenericBoard(8, $id, "verwaltung.public", "verwaltung-public", null, "Verwaltung", "Öffentliche Verwaltungsliste");
+		$this->addGenericBoard(7, $id, "board.public", "vorstand-public", null, "Vorstand", "Öffentliche Vorstandsliste");
 		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
 	}
 	private function addOrgaBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
@@ -134,7 +134,7 @@ class JuPiConfig extends DefaultConfig {
 //		$this->addTalkBoard($id+2, $id, "umwelt",		"Umweltpolitik",		"", null, "talk-umwelt");
 		$this->addTalkBoard($id+3, $id, "kekse",		"Kekspolitik",			"Gegen das Keks-Embargo!", null, "talk-kekse");
 		$this->addTalkBoard($id+4, $id, "netzpolitik-kultur",	"Netzpolitik und Kultur",	"Netzpolitik und Kultur", null, "talk-netzpolitik-kultur");
-		$this->addTalkBoard($id+5, $id, "misc",			"Sonstiges",			"Was sonst nicht relevant waere", null, "talk-sonstiges");
+		$this->addTalkBoard($id+5, $id, "misc",			"Sonstiges",			"Sonstige Thematische Diskussion", null, "talk-sonstiges");
 	}
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "talk.{$kuerzel}", $mlname, $wiki, $name, $desc);
