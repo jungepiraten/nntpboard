@@ -4,7 +4,9 @@
 			{section name=pages loop=$pagecount start=0 max=2}
 			<li><a href="{$baseurl}{$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 			{/section}
+			{if $pagecount > 4}
 			<li class="disabled"><a>...</a></li>
+			{/if}
 			{section name=pages loop=$pagecount start=$page-1 max=1}
 			<li><a href="{$baseurl}{$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 			{/section}
@@ -18,7 +20,9 @@
 			{section name=pages loop=$pagecount start=$page+1 max=1}
 			<li><a href="{$baseurl}{$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 			{/section}
+			{if $pagecount-$page > 4}
 			<li class="disabled"><a>...</a></li>
+			{/if}
 			{section name=pages loop=$pagecount start=$pagecount-2 max=2}
 			<li><a href="{$baseurl}{$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 			{/section}
