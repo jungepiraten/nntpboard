@@ -25,6 +25,10 @@ class RFC5322Header {
 	public function __construct() {
 	}
 
+	public function setValue($header, $value, $charset = "UTF-8") {
+		$this->set(RFC5322SingleHeader::generate($header, $value, $charset));
+	}
+
 	public function set($header) {
 		$this->headers[strtolower($header->getName())] = $header;
 	}

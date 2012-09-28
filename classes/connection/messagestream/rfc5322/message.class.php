@@ -26,15 +26,13 @@ class RFC5322Message {
 
 	public static function parseObject($connection, $message) {
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$message->getMessageID()));
+		$header->setValue("Message-ID",		$message->getMessageID() );
+		$header->setValue("From", 		RFC5322Address::parseObject($message->getAuthor())->getPlain() );
+		$header->setValue("Date",		date("r", $message->getDate()) );
+		$header->setValue("Subject",		$message->getSubject() );
 		if ($message->hasParent()) {
-			$header->set(	RFC5322SingleHeader::generate("References",	self::generateReferences($connection, $message)));
+			$header->setValue("References", self::generateReferences($connection, $message) );
 		}
-		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($message->getAuthor())->getPlain()));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		$message->getSubject()));
-		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $message->getDate()) ));
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseObject($message));
 	}
@@ -44,27 +42,23 @@ class RFC5322Message {
 		$references .= " " . $message->getMessageID();
 
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$ack->getMessageID()));
-		$header->set(	RFC5322SingleHeader::generate("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) ));
-		$header->set(	RFC5322SingleHeader::generate("References",	$references ));
-		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($ack->getAuthor())->getPlain() ));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject() ));
-		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $ack->getDate()) ));
+		$header->setValue("Message-ID",		$ack->getMessageID() );
+		$header->setValue("From",		RFC5322Address::parseObject($ack->getAuthor())->getPlain() );
+		$header->setValue("Date",		date("r", $ack->getDate()) );
+		$header->setValue("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject() );
+		$header->setValue("References",		$references );
+		$header->setValue("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) );
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseAcknowledgeObject($ack, $message));
 	}
 
 	public static function parseCancelObject($connection, $cancel, $message) {
 		$header = new RFC5322Header;
-		$header->set(	RFC5322SingleHeader::generate("Message-ID",	$cancel->getMessageID() ));
-		$header->set(	RFC5322SingleHeader::generate("From",
-				RFC5322Address::parseObject($cancel->getAuthor())->getPlain() ));
-		$header->set(	RFC5322SingleHeader::generate("Subject",		"[CANCEL] " . $message->getSubject() ));
-		$header->set(	RFC5322SingleHeader::generate("Control",		"cancel " . $cancel->getReference() ));
-		$header->set(	RFC5322SingleHeader::generate("Date",
-				date("r", $cancel->getDate()) ));
+		$header->setValue("Message-ID",		$cancel->getMessageID() );
+		$header->setValue("From",		RFC5322Address::parseObject($cancel->getAuthor())->getPlain() );
+		$header->setValue("Date",		date("r", $cancel->getDate()) );
+		$header->setValue("Subject",		"[CANCEL] " . $message->getSubject() );
+		$header->setValue("Control",		"cancel " . $cancel->getReference() );
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseCancelObject($cancel, $message));
 	}

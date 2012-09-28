@@ -19,18 +19,17 @@ class RFC5322PlainBody {
 
 	public static function parseObject($attachment) {
 		$header = new RFC5322Header;
-		$header->set(	new RFC5322SingleHeader("Content-Type",			$attachment->getMimeType()));
-		$header_disposition = new RFC5322SingleHeader("Content-Disposition",	$attachment->getDisposition());
+		$header->setValue("Content-Type",			$attachment->getMimeType() );
+		$header->setValue("Content-Disposition",		$attachment->getDisposition() );
 		if ($attachment->hasFilename()) {
-			$header_disposition->addExtra("filename", $attachment->getFilename());
+			$header->get("Content-Disposition")->addExtra("filename", $attachment->getFilename());
 		}
-		$header->set($header_disposition);
 
 		if ($attachment->isBinary()) {
-			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"base64"));
+			$header->setValue("Content-Transfer-Encoding",	"base64");
 			$content = base64_encode($attachment->getContent());
 		} else {
-			$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	"quoted-printable"));
+			$header->setValue("Content-Transfer-Encoding",	"quoted-printable");
 			$content = quoted_printable_encode($attachment->getContent());
 		}
 
@@ -39,10 +38,9 @@ class RFC5322PlainBody {
 
 	public static function parse($mimetype, $encoding, $body, $charset = "UTF-8") {
 		$header = new RFC5322Header;
-		$contenttypeheader = new RFC5322SingleHeader("Content-Type",		$mimetype);
-		$contenttypeheader->addExtra("charset", $charset);
-		$header->set($contenttypeheader);
-		$header->set(	new RFC5322SingleHeader("Content-Transfer-Encoding",	$encoding));
+		$header->setValue("Content-Type",		$mimetype);
+		$header->get("Content-Type")->addExtra("charset", $charset);
+		$header->setValue("Content-Transfer-Encoding",	$encoding);
 
 		switch ($encoding) {
 		case "7bit":

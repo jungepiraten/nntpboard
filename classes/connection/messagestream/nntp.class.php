@@ -144,7 +144,7 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 	}
 
 	private function post($nntpmsg) {
-		$nntpmsg->getHeader()->set( RFC5322SingleHeader::generate("Newsgroups", $this->group, "UTF-8") );
+		$nntpmsg->getHeader()->setValue("Newsgroups", $this->group);
 
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
 			/* Bekannte Fehler */

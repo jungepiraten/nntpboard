@@ -68,9 +68,8 @@ abstract class RFC5322MimeBody {
 		// In einen alternative-Body packen (falls noetig)
 		if (count($parts) > 1) {
 			$header = new RFC5322Header;
-			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/alternative");
-			$contenttype->setExtra("boundary", "--" . md5(uniqid()));
-			$header->set($contenttype);
+			$header->setValue("Content-Type",	"multipart/alternative");
+			$header->get("Content-Type")->setExtra("boundary", "--" . md5(uniqid()));
 			$parts = array(new RFC5322AlternativeMimeBody($header, $parts));
 		}
 		// Eventuelle Attachments verpacken wir jetzt
@@ -80,10 +79,9 @@ abstract class RFC5322MimeBody {
 		// ein multipart/mixed lohnt sich wirklich nur, wenn wir auch Attachments haben
 		if (count($parts) > 1) {
 			$header = new RFC5322Header;
-			$header->set(RFC5322SingleHeader::generate("MIME-Version", "1.0"));
-			$contenttype = RFC5322SingleHeader::generate("Content-Type",	"multipart/mixed");
-			$contenttype->addExtra("boundary", "--" . md5(uniqid()));
-			$header->set($contenttype);
+			$header->setValue("MIME-Version",	"1.0");
+			$header->setValue("Content-Type",	"multipart/mixed");
+			$header->get("Content-Type")->addExtra("boundary", "--" . md5(uniqid()));
 			return new RFC5322MixedMimeBody($header, $parts);
 		}
 		// ansonsten nehmen wir einfach dieses eine Attachment
