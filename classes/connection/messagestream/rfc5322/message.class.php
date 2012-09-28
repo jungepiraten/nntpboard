@@ -131,12 +131,16 @@ class RFC5322Message {
 		}
 
 		// Nachrichteninhalt
-		$textbodys = explode("\n-- ", $this->body->getBodyPart("text/plain"), 2);
 		$signature = null;
-		if (count($textbodys) >= 2) {
-			$signature = array_pop($textbodys);
+		$textbody = $this->body->getBodyPart("text/plain");
+		if (strpos($textbody, "\n-- ") !== null) {
+			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
 		}
-		$textbody = implode("\n-- ", $textbodys);
+		// Default-Signaturtrenner von Mailman :-(
+		if ($signature == null && strpos($textbody, "\n_______________________________________________") !== null) {
+			list($textbody, $signature) = explode("\n_______________________________________________", $textbody, 2);
+		}
+
 		$htmlbody = $this->body->getBodyPart("text/html");
 
 		$message = new Message($messageid, $date, $author, $subject, $parentid, $textbody, $signature, $htmlbody);
