@@ -2,6 +2,7 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset=UTF-8" />
+		<script src="libs/jquery-1.8.2.min.js"></script>
 		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
