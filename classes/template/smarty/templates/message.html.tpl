@@ -7,7 +7,7 @@
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  <span class="info">von</span>
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
- {if isset($message.author.image)}<img src="{$message.author.image}" class="author thumbnail" />{/if}
+ {if isset($message.author.image)}<img src="{$message.author.image|escape:html}" class="author thumbnail" />{/if}
 </div>
 <div class="body">
  <p class="body">{$message.body}</p>
@@ -25,7 +25,7 @@
   {if $part.isinline && $part.isimage}
   <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" /></a>
   {else}
-  <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename}</a>
+  <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename|escape:html}</a>
   {/if}
  {/foreach}
  </dl>
