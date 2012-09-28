@@ -1,0 +1,37 @@
+h1
+	{margin-bottom: 20px;}
+
+.sidebar-nav.well
+	{padding: 8px 0;}
+
+.message
+	{border-radius:4px; border:1px solid #ddd; margin-bottom:15px;}
+
+.message>.head
+	{background:#f9f9f9; padding:8px; border-bottom:1px solid #ddd;}
+
+.message>.head img.author
+	{float:right; margin-left:8px; margin-bottom:4px;}
+
+.message>.body
+	{padding:8px;}
+
+.message>.controls
+	{background:#f9f9f9; padding:8px; border-top:1px solid #ddd;}
+
+footer
+	{margin-left:20px;}
+
+/* Bugfix for bootstrap on desktop, where the navbar will hide some content otherwise */
+.spacer-top
+	{padding-top: 60px;}
+
+.no-padding
+	{padding:0px;}
+
+.no-top-bottom-margin
+	{margin-top:0px; margin-bottom:0px;}
+
+/* Bugfix for browsers with defaultcolor != white */
+input, textarea
+	{background-color:white;}

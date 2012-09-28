@@ -1,33 +1,15 @@
-<tr class="messagehead">
-<td colspan="2">
+<div class="message">
+<div class="head">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
- {if $message.isRead}{else}
-  <i class="icon-bell"></i>
- {/if}
+ {if ! $message.isRead}<i class="icon-comments"></i>{/if}
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
-{if !isset($hidecontrols)}
- <div class="btn-group pull-right">
-  {if ($message.mayCancel)}<a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-danger btn-mini deletePost"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
-  {if ($mayAcknowledge)}<a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-ok"></i> Zustimmen</a><a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="btn btn-mini"><i class="icon-remove"></i> Ablehnen</a>{/if}
-
-  {if ($mayPost)}
-	<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-file"></i> Zitieren</a>
-	<a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="btn btn-inverse btn-mini"><i class="icon-share-alt icon-white"></i> Antworten</a>
-  {/if}
-
-  </div>
-{/if}
- </span>
- </td>
-</tr>
-<tr class="message">
-<td class="author span2">
- {if isset($message.author.image)}<p><img src="{$message.author.image}" class="thumbnail" /></p>{/if}
- <p>{include file=address.html.tpl address=$message.author}</p>
-</td>
-<td class="message">
+ <span class="info">von</span>
+ <span class="author">{include file=address.html.tpl address=$message.author}</span>
+ {if isset($message.author.image)}<img src="{$message.author.image}" class="author thumbnail" />{/if}
+</div>
+<div class="body">
  <p class="body">{$message.body}</p>
  {if isset($message.signature)}
  <div class="signature">
@@ -60,4 +42,20 @@
  {foreach from=$message.nacknowledges item=acknowledge name=nacks}{if !$smarty.foreach.nacks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
  </dl>
  {/if}
-</td></tr>
+</div>
+{if !isset($hidecontrols)}
+<div class="controls">
+<div class="btn-group pull-right">
+  {if ($message.mayCancel)}<a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-danger btn-mini deletePost"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
+  {if ($mayAcknowledge)}<a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-ok"></i> Zustimmen</a><a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="btn btn-mini"><i class="icon-remove"></i> Ablehnen</a>{/if}
+
+  {if ($mayPost)}
+	<a href="post.php?boardid={$board.boardid|escape:url}&amp;quote={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-file"></i> Zitieren</a>
+	<a href="post.php?boardid={$board.boardid|escape:url}&amp;reply={$message.messageid|encodeMessageID|escape:url}" class="btn btn-inverse btn-mini"><i class="icon-share-alt icon-white"></i> Antworten</a>
+  {/if}
+
+</div>
+<div style="clear:both;"></div>
+</div>
+{/if}
+</div>

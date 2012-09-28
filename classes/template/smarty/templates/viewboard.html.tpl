@@ -39,15 +39,15 @@
 
 <table class="row-fluid table table-striped table-bordered">
 <tr>
- <th class="title" colspan="2">Thema</th>
+ <th class="title">Thema</th>
  <th class="postcount">Posts</th>
  <th class="poster">Geschrieben</th>
  <th class="lastpost">Letzte Antwort</th>
 </tr>
 {foreach from=$threads item=thread name=counter}
  <tr class="boardentry thread {cycle values="even,odd"} {if $smarty.foreach.counter.first}first{/if}">
-  <td class="icon" width="29px !important"><img src="images/flagge{if $thread.unread}_unread{/if}.png" alt="Es sind {if $thread.unread}ungelesene{else}keine ungelesenen{/if} Posts vorhanden" /></td>
   <td class="title">
+  {if $thread.unread}<i class="icon-comments" title="Es sind ungelesene Posts vorhanden"></i>{/if}
   <a class="subject" id="thread{$smarty.foreach.counter.iteration}" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}">{$thread.subject|escape:html}</a>
   {if $thread.pages > 1}
   <div class="threadpages">

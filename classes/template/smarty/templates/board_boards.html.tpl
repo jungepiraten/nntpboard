@@ -1,6 +1,6 @@
 <table class="table table-striped table-bordered">
 <tr>
- <th colspan=2>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
+ <th>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
  <th class="hidden-phone">Themen</th>
  <th class="hidden-phone">Beitr&auml;ge</th>
  <th>Letzte Antwort</th>
@@ -8,10 +8,10 @@
 {foreach from=$boards item=board name=counter}
 {if $zeigekategorien || $board.hasthreads}
  <tr class="clickable">
-  <td class="icon">{if $board.unread}<a href="unread.php?markread={$boardid|escape:url}">{/if}<img src="images/flagge{if $board.unread}_unread{/if}.png" style="width:29px;" />{if $board.unread}</a>{/if}</td>
   <td>
   <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
-	  <span>{$board.desc}</span>
+    {if $board.unread}<a href="unread.php?markread={$boardid|escape:url}"><i class="icon-comments"></i></a>{/if}
+    <span>{$board.desc}</span>
    </td>
    <td class="span1 hidden-phone">
   {if isset($board.threadcount)}

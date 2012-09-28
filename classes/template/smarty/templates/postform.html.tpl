@@ -40,9 +40,7 @@ function addAttachmentField() {
 {/literal}
 
 {if isset($preview)}
-<table class="table table-striped table-bordered">
 {include file=message.html.tpl message=$preview first=1 id="post" hidecontrols=1}
-</table>
 {/if}
 
 <form action="post.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8" class="form-horizontal">

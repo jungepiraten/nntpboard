@@ -2,34 +2,14 @@
 <html dir="ltr">
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset=UTF-8" />
-		<link href="https://static.junge-piraten.de/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="https://static.junge-piraten.de/bootstrap-2.1.1/css/bootstrap-responsive.min.css" rel="stylesheet" />
-		<link href="https://static.junge-piraten.de/bootstrap-jupis.css" rel="stylesheet" />
-		<script src="https://static.junge-piraten.de/jquery.min.js"></script>
-		<script src="https://static.junge-piraten.de/bootstrap-2.1.1/js/bootstrap.min.js"></script>
-		<link rel="icon" type="image/png" href="https://static.junge-piraten.de/favicon.png" />
+		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="libs/bootstrap-2.1.1/css/bootstrap-responsive.min.css" rel="stylesheet" />
+		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
+		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
+		<link href="classes/template/smarty/style.css" rel="stylesheet" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		{literal}
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 40px;
-			}
-
-			.no-padding {
-				padding:0px;
-			}
-
-			.no-top-bottom-margin {
-				margin-top:0px;
-				margin-bottom:0px;
-			}
-
-			input, textarea {
-				background-color:white;
-			}
-		</style>
 		<script type="text/javascript">
 		$(function() {
 			$("a.btn").click(function (event) {
@@ -49,12 +29,14 @@
 		{/literal}
 
 		<!--[if lt IE 9]>
-			<script src="https://static.junge-piraten.de/ie-html5.js"></script>
+			<script src="libs/ie-html5.js"></script>
 		<![endif]-->
 
-		<title>Junge Piraten &bull; {$title|escape:html}</title>
+		<title>NNTPBoard &bull; {$title|escape:html}</title>
 	</head>
 	<body>
+		<div class="visible-desktop spacer-top">&nbsp;</div>
+
 		<div class="navbar navbar-fixed-top navbar-inverse">
 			<div class="navbar-inner">
 				<div class="container-fluid">
@@ -94,7 +76,7 @@
 		<div class="container-fluid">
 			<div class="row-fluid">
 				<div class="span3 hidden-phone">
-					<div class="well sidebar-nav" style="padding: 8px 0;">
+					<div class="well sidebar-nav">
 						<ul class="nav nav-list">
 							<li class="nav-header">Navigation</li>
 							<li><a href="index.php"><i class="icon-home"></i> Forenübersicht</a></li>
@@ -125,5 +107,5 @@ function isSubBoard($destBoard, $curBoard) {
 				</div>
 
 			        <div class="span9">
-					<h1 style="margin-bottom: 20px;">{$title|escape:html}</h1>
+					<h1>{$title|escape:html}</h1>
 
