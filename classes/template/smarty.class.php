@@ -244,12 +244,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 			$quoted_loc = 0;
 			$line = "";
 			if ($i < count($lines)) {
-				$line = rtrim($lines[$i]);
+				$line = trim($lines[$i]);
 				// Wir haben vorher schon htmlentities rausgeparst ...
 				while (substr($line,0,5) == "&gt; " ||
 				       $line == "&gt;" ||
 				       substr($line,0,8) == "&gt;&gt;") {
-					$line = ltrim(substr($line,4));
+					$line = substr($line,4);
 					$quoted_loc++;
 				}
 			}
