@@ -33,6 +33,7 @@ class RFC5322Message {
 		if ($message->hasParent()) {
 			$header->setValue("References", self::generateReferences($connection, $message) );
 		}
+		$header->setValue("User-Agent",		"NNTPBoard <https://github.com/jungepiraten/nntpboard>");
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseObject($message));
 	}
@@ -48,6 +49,7 @@ class RFC5322Message {
 		$header->setValue("Subject",		"[" . ($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) . "] " . $message->getSubject() );
 		$header->setValue("References",		$references );
 		$header->setValue("X-Acknowledge",	($ack->getWertung() >= 0 ? "+" : "-") . abs(intval($ack->getWertung())) );
+		$header->setValue("User-Agent",		"NNTPBoard <https://github.com/jungepiraten/nntpboard>");
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseAcknowledgeObject($ack, $message));
 	}
@@ -59,6 +61,7 @@ class RFC5322Message {
 		$header->setValue("Date",		date("r", $cancel->getDate()) );
 		$header->setValue("Subject",		"[CANCEL] " . $message->getSubject() );
 		$header->setValue("Control",		"cancel " . $cancel->getReference() );
+		$header->setValue("User-Agent",		"NNTPBoard <https://github.com/jungepiraten/nntpboard>");
 
 		return new RFC5322Message($header, RFC5322MimeBody::parseCancelObject($cancel, $message));
 	}
