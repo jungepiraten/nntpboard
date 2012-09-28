@@ -2,12 +2,12 @@
 <div class="head">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
  {if ! $message.isRead}<i class="icon-comments"></i>{/if}
- <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a>
+ {if isset($message.author.image)}<img src="{$message.author.image|escape:html}" class="author thumbnail" alt="{$message.author.text|escape:html}" />{/if}
+ <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a><br />
  <span class="info">am</span>
  <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
  <span class="info">von</span>
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
- {if isset($message.author.image)}<img src="{$message.author.image|escape:html}" class="author thumbnail" />{/if}
 </div>
 <div class="body">
  <p class="body">{$message.body}</p>
@@ -23,7 +23,7 @@
  {foreach from=$message.attachments key=partid item=part}
   {capture assign=attachmentlink}attachment.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;partid={$partid|escape:url}{/capture}
   {if $part.isinline && $part.isimage}
-  <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" /></a>
+  <hr class="attachmentsep"><a href="{$attachmentlink}"><img src="{$attachmentlink}" width="200px" alt="{$part.filename|escape:html}" /></a>
   {else}
   <hr class="attachmentsep"><a href="{$attachmentlink}" class="attachment body">{$part.filename|escape:html}</a>
   {/if}
