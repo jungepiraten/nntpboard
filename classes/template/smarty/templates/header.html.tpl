@@ -3,7 +3,6 @@
 	<head>
 		<meta http-equiv="content-type" content="text/xhtml; charset=UTF-8" />
 		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="libs/bootstrap-2.1.1/css/bootstrap-responsive.min.css" rel="stylesheet" />
 		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
 		<link href="classes/template/smarty/style.css" rel="stylesheet" />
