@@ -151,7 +151,7 @@ class RFC5322SingleHeader {
 	}
 
 	public function getPlain() {
-		$text = $this->getName() . ": " . $this->getValue();
+		$text = $this->name . ": " . $this->value;
 		// Fuege Zusaetzliche Informationen hinzu
 		foreach ($this->extra AS $name => $extra) {
 			$text .= "; " . $name . "=\"" . addcslashes($extra, '"') . "\"";
