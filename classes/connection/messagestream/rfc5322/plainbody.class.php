@@ -76,7 +76,7 @@ class RFC5322PlainBody {
 		 && $this->getHeader()->get("Content-Type")->hasExtra("charset")) {
 			return $this->getHeader()->get("Content-Type")->getExtra("charset");
 		}
-		return "UTF-8";
+		return null;
 	}
 
 	public function getMimeType() {
@@ -110,17 +110,18 @@ class RFC5322PlainBody {
 	}
 
 	public function getBody($charset = "UTF-8") {
-		switch ($this->getTransferEncoding()) {
-		default:
-		case "7bit":
-		case "8bit":
-		case "binary":
-			return iconv($this->getCharset(), $charset, $this->body);
-		case "quoted-printable":
-			return iconv($this->getCharset(), $charset, quoted_printable_decode($this->body));
-		case "base64":
-			return iconv($this->getCharset(), $charset, base64_decode($this->body));
+		$body = $this->body;
+
+		if ($this->getTransferEncoding() == "quoted-printable") {
+			$body = quoted_printable_decode($body);
+		} elseif ($this->getTransferEncoding() == "base64") {
+			$body = base64_decode($body);
 		}
+
+		if ($this->getCharset() != null) {
+			$body = iconv($this->getCharset(), $charset, $body);
+		}
+		return $body;
 	}
 
 	public function getPlain() {
