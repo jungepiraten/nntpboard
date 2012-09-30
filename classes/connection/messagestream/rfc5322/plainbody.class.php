@@ -29,6 +29,7 @@ class RFC5322PlainBody {
 			$header->setValue("Content-Transfer-Encoding",	"base64");
 			$content = base64_encode($attachment->getContent());
 		} else {
+			$header->get("Content-Type")->addExtra("charset", "UTF-8");
 			$header->setValue("Content-Transfer-Encoding",	"quoted-printable");
 			$content = quoted_printable_encode($attachment->getContent());
 		}
