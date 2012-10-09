@@ -87,6 +87,7 @@ class JuPiConfig extends DefaultConfig {
 		$this->addGenericBoard(8, $id, "verwaltung.public", "verwaltung-public", null, "Verwaltung", "Öffentliche Verwaltungsliste");
 		$this->addGenericBoard(7, $id, "board.public", "vorstand-public", null, "Vorstand", "Öffentliche Vorstandsliste");
 		$this->addOrgaBoard($id+1, $id, "it",	"IT",				"Planung der Infrastruktur", "IT:Hauptseite", "ag-it");
+		$this->addOrgaBoard($id+3, $id, "loko", "Lokalkoordination",		"", "Lokalkoordination", "loko");
 	}
 	private function addOrgaBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "orga.{$kuerzel}", $mlname, $wiki, $name, $desc);
