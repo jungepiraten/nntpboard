@@ -40,7 +40,7 @@
 <table class="row-fluid table table-striped table-bordered">
 <tr>
  <th class="title">Thema</th>
- <th class="postcount">Posts</th>
+ <th class="postcount hidden-phone">Posts</th>
  <th class="poster hidden-phone">Geschrieben</th>
  <th class="lastpost">Letzte Antwort</th>
 </tr>
@@ -57,7 +57,7 @@
   </div>
   {/if}
   </td>
-  <td class="postcount">
+  <td class="postcount hidden-phone">
   <span class="posts">{$thread.posts}</span>
   </td>
   <td class="poster hidden-phone">
