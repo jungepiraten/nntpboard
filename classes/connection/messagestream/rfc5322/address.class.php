@@ -17,7 +17,7 @@ class RFC5322Address extends Address {
 		}
 		if (preg_match('/^(.*) <(.*)>\s*$/', $addr, $m)) {
 			array_shift($m);
-			$name = trim(array_shift($m)," \"'\t");
+			$name = stripslashes(trim(array_shift($m)," \"'\t"));
 			$addr = trim(array_shift($m));
 		}
 		return new RFC5322Address($name, trim($addr, "<>"), $comment, $charset);
