@@ -10,6 +10,8 @@ interface MessageStream {
 }
 
 abstract class AbstractMessageStreamConnection extends AbstractConnection implements MessageStream {
+	private $group;
+
 	public function __construct() {
 		parent::__construct();
 	}
