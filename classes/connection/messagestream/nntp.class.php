@@ -147,16 +147,17 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		$nntpmsg->getHeader()->setValue("Newsgroups", $this->group);
 
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
+			$errstring = "#" . $ret->getCode() . ": " . $ret->getUserInfo() . " on Message\n" . $nntpmsg->getPlain();
 			/* Bekannte Fehler */
 			switch ($ret->getCode()) {
 			case 440:
-				throw new PostingNotAllowedException($this->group, $ret);
+				throw new PostingNotAllowedException($this->group, $errstring);
 			case 441:
 				// Nachricht Syntaktisch inkorrekt
-				throw new PostingFailedException($this->group, $ret);
+				throw new PostingFailedException($this->group, $errstring);
 			}
 			// Ein unerwarteter Fehler - wie spannend *g*
-			throw new PostingException($this->group, "#" . $ret->getCode() . ": " . $ret->getUserInfo());
+			throw new PostingException($this->group, $errstring);
 		}
 		// u.a. um zu bemerken, dass wir einen neuen GroupCache haben
 		$this->refreshCache();
