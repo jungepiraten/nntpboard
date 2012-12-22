@@ -22,6 +22,9 @@ h1
 footer
 	{margin-left:20px;}
 
+.thumbnail
+	{background-color:white;}
+
 /* Bugfix for bootstrap on desktop, where the navbar will hide some content otherwise */
 .spacer-top
 	{padding-top: 60px;}
