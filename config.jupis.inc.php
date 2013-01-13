@@ -169,10 +169,10 @@ class JuPiConfig extends DefaultConfig {
 				$ldaplink = Net_LDAP2::connect(array("binddn" => "cn=nntpboard,ou=community,o=Junge Piraten,c=DE", "bindpw" => $this->ldappass, "host" => "storage", "port" => 389) );
 				$search = $ldaplink->search("ou=accounts,ou=community,o=Junge Piraten,c=DE", Net_LDAP2_Filter::create('mail', 'equals', $mailto), array("scope" => "one", "attributes" => array("uid")));
 
-				if ($search->count() != 1) {
-					$this->mailusers[$mailto] = null;
-				} else {
+				if ($search->count() >= 1) {
 					$this->mailusers[$mailto] = ucfirst($search->shiftEntry()->getValue("uid"));
+				} else {
+					$this->mailusers[$mailto] = null;
 				}
 			}
 
