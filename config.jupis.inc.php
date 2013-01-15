@@ -97,6 +97,7 @@ class JuPiConfig extends DefaultConfig {
 		// Folge hier komplett den "alten" ids
 		$this->addCategoryBoard(13, $parentid, "Regionale Gliederungen", "Unterforen der Gebietsgruppen");
 		$this->addRegionBoard(14, 13, "be", "Berlin", "", "BE:Hauptseite", "be");
+		$this->addRegionBoard(130,14, "be.orga", "Organisatorisches", "", "BE:Hauptseite", "be-orga");
 		$this->addRegionBoard(25, 13, "nrw", "Nordrhein-Westfalen", "", "NRW:Hauptseite", "nrw");
 		$this->addRegionBoard(110,25, "nrw.do", "Dortmund", "", "NRW:Dortmund", "nrw-do");
 		$this->addRegionBoard(111,25, "nrw.koeln", "Köln", "", "NRW:Koeln", "nrw-koeln");
