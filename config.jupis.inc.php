@@ -26,7 +26,8 @@ class JuPiConfig extends DefaultConfig {
 		$this->addCategoryBoard(null, null, "Junge Piraten", "");
 
 		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Allgemeine Ankündigungen");
-		$this->addGenericBoard(2, null, "misc", "aktive", null, "Allgemeines", "Globale Themen der Jungen Piraten");
+		$this->addGenericBoard(2, null, "misc", "aktive", null, "Allgemeines", "Politische Diskussion");
+		$this->addGenericBoard(3, null, "orga", "orga", null, "Organisatorisches", "Strukturdebatten");
 
 		$this->addOrgaStruktur(300, null);
 
