@@ -299,7 +299,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$text = preg_replace('%(\s|^)(_[^\s]+_)(\s|$)%', '$1<u>$2</u>$3', $text);
 
 		// ragefac.es
-		$text = parseFacEs($text, "ragefac.es", $this->apiCache);
 		$text = parseFacEs($text, "ponyfac.es", $this->apiCache);
 		$text = parseFacEs($text, "lauerfac.es", $this->apiCache);
 
