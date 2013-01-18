@@ -20,8 +20,8 @@ if (isset($_REQUEST["login"])) {
 	} catch (AuthException $e) {
 		$template->viewloginfailed();
 	}
+} else {
+	$template->viewloginform();
 }
-
-$template->viewloginform();
 
 ?>
