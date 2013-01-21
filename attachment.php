@@ -49,7 +49,7 @@ header("Content-Type: ".$attachment->getMimeType());
 header("Content-Length: ".$attachment->getLength());
 
 if (!empty($disposition)) {
-	header("Content-Disposition: " . $disposition . (empty($filename) or $disposition == "inline" ? "" : "; filename=\"".addslashes($filename)."\""));
+	header("Content-Disposition: " . $disposition . ( (empty($filename) or $disposition == "inline") ? "" : "; filename=\"".addslashes($filename)."\"" ) );
 }
 
 print($attachment->getContent());
