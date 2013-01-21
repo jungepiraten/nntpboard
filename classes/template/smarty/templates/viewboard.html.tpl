@@ -37,7 +37,7 @@
 	</div>
 </div>
 
-<table class="row-fluid table table-striped table-bordered">
+<table class="row-fluid table table-striped">
 <tr>
  <th class="title">Thema</th>
  <th class="postcount hidden-phone">Posts</th>

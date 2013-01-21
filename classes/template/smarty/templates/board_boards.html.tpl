@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered">
+<table class="table table-striped">
 <tr>
  <th>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
  <th class="hidden-phone">Themen</th>
