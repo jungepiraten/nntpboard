@@ -106,6 +106,10 @@ class RFC5322PlainBody {
 		 && $this->getHeader()->get("Content-Disposition")->hasExtra("filename")) {
 			return $this->getHeader()->get("Content-Disposition")->getExtra("filename");
 		}
+		if ($this->getHeader()->has("Content-Type")
+		 && $this->getHeader()->get("Content-Type")->hasExtra("name")) {
+			return $this->getHeader()->get("Content-Type")->getExtra("name");
+		}
 		return null;
 	}
 
