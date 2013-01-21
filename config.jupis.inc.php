@@ -25,9 +25,9 @@ class JuPiConfig extends DefaultConfig {
 		parent::__construct();
 		$this->addCategoryBoard(null, null, "Junge Piraten", "");
 
-		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Allgemeine Ankündigungen");
+		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Ankündigungen & PMs");
 		$this->addGenericBoard(2, null, "misc", "aktive", null, "Politisches", "Allgemeine Politikdiskussionen");
-		$this->addGenericBoard(3, null, "orga", "orga", null, "Organisatorisches", "Strukturdebatten");
+		$this->addGenericBoard(3, null, "orga", "orga", null, "Organisatorisches", "Strukturdebatten & internes");
 
 		$this->addOrgaStruktur(300, null);
 
@@ -49,7 +49,7 @@ class JuPiConfig extends DefaultConfig {
 			$links .= '[<a href="nntp://'.$this->getNNTPHost().'/'.$this->getNNTPGroup($name).'" class="nntplink">NNTP</a>] ';
 		}
 		if ($wiki != null) {
-			$links .= '[<a href="http://wiki.junge-piraten.de/wiki/' . $wiki . '" class="wiki">WIKI</a>] ';
+			$links .= '[<a href="http://wiki.junge-piraten.de/wiki/' . $wiki . '" class="wiki">Wiki</a>] ';
 		}
 		return $links;
 	}
