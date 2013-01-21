@@ -3,6 +3,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<script src="libs/jquery-1.8.2.min.js"></script>
+		<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,700|Viga:400' />
 		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
@@ -32,7 +33,10 @@
 			<script src="libs/ie-html5.js"></script>
 		<![endif]-->
 
-		<title>NNTPBoard &bull; {$title|escape:html}</title>
+		<link rel="icon" type="image/png" href="https://static.junge-piraten.de/favicon.png" />
+		<link href="https://static.junge-piraten.de/bootstrap-jupis-2.css" rel="stylesheet" />
+
+		<title>Junge Piraten &bull; {$title|escape:html}</title>
 	</head>
 	<body>
 		<div class="visible-desktop spacer-top">&nbsp;</div>
@@ -45,6 +49,18 @@
 					</a>
 					<ul class="nav">
 						<li class="active"><a href="index.php">Forenübersicht</a></li>
+						<li class="dropdown hidden-phone">
+                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
+                                                        <ul class="dropdown-menu">
+                                                                <li><a href="https://www.junge-piraten.de/">Homepage</a></li>
+                                                                <li><a href="https://www.junge-piraten.de/community/">Mitmachen</a></li>
+                                                                <li class="active"><a href="index.php">Forum</a></li>
+                                                                <li><a href="https://wiki.junge-piraten.de/">Wiki</a></li>
+                                                                <li><a href="https://ucp.junge-piraten.de/">UCP</a></li>
+                                                                <li><a href="https://pad.junge-piraten.de/">Pads</a></li>
+                                                                <li><a href="https://www.junge-piraten.de/presse">Presse</a></li>
+                                                        </ul>
+                                                </li>
 					</ul>
 
 					{if $ISANONYMOUS}
