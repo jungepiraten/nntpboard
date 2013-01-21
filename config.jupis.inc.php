@@ -135,9 +135,8 @@ class JuPiConfig extends DefaultConfig {
 		$this->addCategoryBoard($id, $parentid, "Diskussion", "Allgemeine Unterhaltungen zu Politik & Co.");
 		$this->addTalkBoard($id+1, $id, "bildung",		"Bildungspolitik",		"", null, "talk-bildung");
 //		$this->addTalkBoard($id+2, $id, "umwelt",		"Umweltpolitik",		"", null, "talk-umwelt");
-		$this->addTalkBoard($id+3, $id, "kekse",		"Kekspolitik",			"Gegen das Keks-Embargo!", null, "talk-kekse");
 		$this->addTalkBoard($id+4, $id, "netzpolitik-kultur",	"Netzpolitik und Kultur",	"Netzpolitik und Kultur", null, "talk-netzpolitik-kultur");
-		$this->addTalkBoard($id+5, $id, "misc",			"Sonstiges",			"Sonstige thematische Diskussion", null, "talk-sonstiges");
+		$this->addTalkBoard($id+5, $id, "misc",			"Offtopic",			"Mehr oder weniger sinnvolle Diskussionen zu diesem und jenem", null, "talk-sonstiges");
 	}
 	private function addTalkBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "talk.{$kuerzel}", $mlname, $wiki, $name, $desc);
@@ -146,7 +145,6 @@ class JuPiConfig extends DefaultConfig {
 	private function addEventStruktur($id, $parentid) {
 		$this->addCategoryBoard($id, $parentid, "Events", "");
 		$this->addEventBoard($id+1, $id, "camp",	"JuPi-Camp",	"Planungsbereich fuer das JuPi-Camp", "JuPi-Camp", "pg-jupi-camp");
-		$this->addEventBoard($id+2, $id, "you-messe",	"YOU 2012",	"Vorbereitung zur YOU", "YOU_2012", "you-messe");
 	}
 	private function addEventBoard($id, $parentid, $kuerzel, $name, $desc, $wiki, $mlname) {
 		$this->addGenericBoard($id, $parentid, "event.{$kuerzel}", $mlname, $wiki, $name, $desc);
