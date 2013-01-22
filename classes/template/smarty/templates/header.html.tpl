@@ -48,7 +48,7 @@
 						NNTPBoard
 					</a>
 					<ul class="nav">
-						<li class="active"><a href="index.php">Forenübersicht</a></li>
+						<li class="active hidden-phone"><a href="index.php">Forenübersicht</a></li>
 						<li class="dropdown hidden-phone">
                                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Junge Piraten <b class="caret"></b></a>
                                                         <ul class="dropdown-menu">
@@ -64,7 +64,8 @@
 					</ul>
 
 					{if $ISANONYMOUS}
-						<form class="navbar-form pull-right form-inline" action="login.php" method="POST">
+						<a href="login.php" class="btn btn-success pull-right hidden-desktop"><i class="icon-home icon-white"></i> Anmelden</a>
+						<form class="navbar-form pull-right form-inline visible-desktop" action="login.php" method="POST">
 							<input type="hidden" name="login" value="1" />
 							<input type="text" name="username" class="span2" placeholder="Loginname" />
 							<input type="password" name="password" class="span2" placeholder="Passwort" />
