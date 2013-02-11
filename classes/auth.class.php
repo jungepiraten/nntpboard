@@ -86,7 +86,9 @@ abstract class AbstractAuth implements Auth {
 	}
 
 	private function markReadThreadTimestamp($threadid, $timestamp) {
-		$this->readthreads[$threadid] = $timestamp;
+		if (!isset($this->readthreads[$threadid]) || $timestamp > $this->readthreads[$threadid]) {
+			$this->readthreads[$threadid] = $timestamp;
+		}
 	}
 
 	public function markReadThread($thread, $message) {
