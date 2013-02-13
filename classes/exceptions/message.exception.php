@@ -11,6 +11,7 @@ class MessageException extends GroupException {
 	}
 }
 
+class InvalidMessageException extends MessageException {}
 class NotFoundMessageException extends MessageException {}
 class MessageIDNotMatchingMessageException extends MessageException {}
 
