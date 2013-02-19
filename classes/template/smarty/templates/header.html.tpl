@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html dir="ltr">
+<html>
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta charset="utf-8" />
+
 		<script src="libs/jquery-1.8.2.min.js"></script>
-		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
+
+		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
 		<link href="classes/template/smarty/style.css" rel="stylesheet" />
+
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		{literal}
@@ -16,12 +19,15 @@
 				if ($(this).hasClass("disabled")) {
 					return false;
 				}
+
 				$(this).addClass("disabled");
 			});
+
 			$("form").submit(function (event) {
 				if ($(this).hasClass("disabled")) {
 					return false;
 				}
+
 				$(this).addClass("disabled").find(".btn").addClass("disabled");
 			});
 		});
@@ -34,6 +40,7 @@
 
 		<title>NNTPBoard &bull; {$title|escape:html}</title>
 	</head>
+
 	<body>
 		<div class="visible-desktop spacer-top">&nbsp;</div>
 
