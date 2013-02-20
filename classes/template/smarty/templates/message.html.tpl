@@ -1,14 +1,14 @@
-<div class="message">
-<div class="head">
+<article class="message">
+<header class="head">
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
  {if ! $message.isRead}<i class="icon-comments"></i>{/if}
  {if isset($message.author.image)}<img src="{$message.author.image|escape:html}" class="author thumbnail" alt="{$message.author.text|escape:html}" />{/if}
  <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a><br />
  <span class="info">am</span>
- <span class="date">{$message.date|date_format:"%d.%m.%Y %H:%M"}</span>
+ <time class="date" datetime="{$message.date|date_format:"%Y-%m-%dT%H:%M+01:00"}" pubdate>{$message.date|date_format:"%d.%m.%Y %H:%M"}</time>
  <span class="info">von</span>
  <span class="author">{include file=address.html.tpl address=$message.author}</span>
-</div>
+</header>
 <div class="body">
  <p class="body">{$message.body}</p>
  {if isset($message.signature)}
@@ -44,7 +44,7 @@
  {/if}
 </div>
 {if !isset($hidecontrols)}
-<div class="controls">
+<footer class="controls">
 <div class="btn-group pull-right">
   {if ($message.mayCancel)}<a href="cancel.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-danger btn-mini deletePost"><i class="icon-trash icon-white"></i> L&ouml;schen</a>{/if}
   {if ($mayAcknowledge)}<a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}" class="btn btn-mini"><i class="icon-ok"></i> Zustimmen</a><a href="ack.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}&amp;wertung=-1" class="btn btn-mini"><i class="icon-remove"></i> Ablehnen</a>{/if}
@@ -56,6 +56,6 @@
 
 </div>
 <div style="clear:both;"></div>
-</div>
+</footer>
 {/if}
-</div>
+</article>
