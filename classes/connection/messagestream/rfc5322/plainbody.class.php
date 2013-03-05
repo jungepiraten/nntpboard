@@ -27,7 +27,7 @@ class RFC5322PlainBody {
 
 		if ($attachment->isBinary()) {
 			$header->setValue("Content-Transfer-Encoding",	"base64");
-			$content = base64_encode($attachment->getContent());
+			$content = chunk_split(base64_encode($attachment->getContent()), 76, "\r\n");
 		} else {
 			$header->get("Content-Type")->addExtra("charset", "UTF-8");
 			$header->setValue("Content-Transfer-Encoding",	"quoted-printable");

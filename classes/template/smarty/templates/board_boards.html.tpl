@@ -10,7 +10,7 @@
  <tr class="clickable">
   <td>
   <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
-    {if $board.unread}<a href="unread.php?markread={$boardid|escape:url}"><i class="icon-comments"></i></a>{/if}
+    {if $board.unread}<a href="unread.php?markread={$board.boardid|escape:url}"><i class="icon-comments"></i></a>{/if}
     <span>{$board.desc}</span>
    </td>
    <td class="span1 hidden-phone">
