@@ -54,7 +54,7 @@ if ($reference !== null) {
 
 function generateMessage($config, $session, $board, $reference) {
 	$messageid = $config->generateMessageID();
-	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : null);
+	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : "");
 
 	if($session->getAuth()->isAnonymous()) {
 		$author = new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])));
@@ -69,6 +69,10 @@ function generateMessage($config, $session, $board, $reference) {
 		$parentid = $reference->getMessageID();
 	} else {
 		$parentid = null;
+	}
+
+	if (empty($_REQUEST["subject"])) {
+		throw new Exception("Subject empty");
 	}
 
 	if (empty($_REQUEST["body"])) {
