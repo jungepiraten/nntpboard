@@ -38,7 +38,7 @@
 			<script src="libs/ie-html5.js"></script>
 		<![endif]-->
 
-		<title>NNTPBoard &bull; {$title|escape:html}</title>
+		<title>{$title|escape:html} – NNTPBoard</title>
 	</head>
 
 	<body>
