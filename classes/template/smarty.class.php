@@ -212,7 +212,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	}
 
 	private function formatMessage($message) {
-		if ($message->hasHTMLBody()) {
+		if ((!$message->hasTextBody() || trim($message->getTextBody()) == "") && $message->hasHTMLBody()) {
 			return strip_tags($message->getHTMLBody(), "<b><i><u><a><tt><br><br/>");
 		}
 
