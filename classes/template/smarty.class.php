@@ -270,7 +270,6 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$quotetext = $quotes[$qid];
 				$q = "";
 				if (count(explode("\n", $quotetext)) <= 7) {
-					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat verstecken</a>";
 					$q .= "<blockquote class=\"quote\" id=\"quote{$qid}\">";
 				} else {
 					$q .= "<a class=\"quotetoggle\" style=\"display:block;\" href=\"javascript:toggleQuote('{$qid}')\" id=\"quotelink{$qid}\">Zitat anzeigen</a>";
