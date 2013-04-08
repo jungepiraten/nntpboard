@@ -42,7 +42,7 @@
 		<link rel="icon" type="image/png" href="https://static.junge-piraten.de/favicon.png" />
 		<link href="https://static.junge-piraten.de/bootstrap-jupis-2.css" rel="stylesheet" />
 
-		<title>Junge Piraten &bull; {$title|escape:html}</title>
+		<title>{$title|escape:html} – Junge Piraten Forum</title>
 	</head>
 
 	<body>
