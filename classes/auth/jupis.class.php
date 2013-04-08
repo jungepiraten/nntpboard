@@ -48,7 +48,7 @@ if (!function_exists("mkdir_parents")) {
 }
 
 class JuPisAuth extends JuPisAnonAuth {
-	protected static $MODERATORS = array("prauscher", "viirus", "gheed", "yuri", "smrqdt", "lutoma");
+	protected static $MODERATORS = array("prauscher", "smrqdt", "lutoma", "c-lia");
 
 	public static function authenticate($config, $user, $pass) {
 		$auth = new JuPisAuth($config, $user, $pass);
