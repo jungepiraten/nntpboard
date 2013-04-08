@@ -13,8 +13,13 @@ h1
 .message>.head img.author
 	{float:right; margin-left:8px; margin-bottom:4px;}
 
-.message>.body
-	{padding:8px;}
+.message>.body {
+	padding: 8px;
+}
+
+.quotetoggle {
+	margin: 0 0 15px 0;
+}
 
 .message>.controls
 	{background:#f9f9f9; padding:8px; border-top:1px solid #ddd;}
