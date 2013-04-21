@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)."/../connection.class.php");
+require_once(dirname(__FILE__)."/../boardindexer.class.php");
 require_once(dirname(__FILE__)."/../group/static.class.php");
 /* Die Klassen müssen vor dem unserialize eingebunden sein, da PHP sonst
  * incomplete Objekte erstellt.
@@ -22,12 +23,12 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	 **/
 	private $uplink;
 
-	private $auth;
+	private $boardindexer;
 
 	private $cacheSentPosts;
 
 	public function __construct($uplink, $cacheSentPosts = true) {
-		parent::__construct();
+		parent::__construct($uplink->getBoardIndexer());
 		$this->uplink = $uplink;
 		$this->cacheSentPosts = $cacheSentPosts;
 	}

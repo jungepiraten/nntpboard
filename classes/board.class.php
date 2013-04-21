@@ -8,31 +8,21 @@ class Board {
 	private $parent;
 	private $name = "";
 	private $desc = "";
+	private $indexer;
 	private $subboards = array();
 	private $readAuthManager;
 	private $writeAuthManager;
 	private $isModerated = false;
 
-	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager = null, $writeAuthManager = null, $isModerated = false) {
+	public function __construct($boardid, $parentid, $name, $desc, $indexer = null, $readAuthManager = null, $writeAuthManager = null, $isModerated = false) {
 		$this->boardid = $boardid;
 		$this->parentid = $parentid;
 		$this->name = $name;
 		$this->desc = $desc;
+		$this->indexer = $indexer;
 		$this->readAuthManager = $readAuthManager;
 		$this->writeAuthManager = $writeAuthManager;
 		$this->isModerated = $isModerated;
-	}
-
-	public function getName() {
-		return $this->name;
-	}
-
-	public function setName($name) {
-		$this->name = $name;
-	}
-
-	public function getDesc() {
-		return $this->desc;
 	}
 
 	public function getBoardID() {
@@ -53,6 +43,22 @@ class Board {
 
 	public function getParentID() {
 		return $this->parentid;
+	}
+
+	public function getName() {
+		return $this->name;
+	}
+
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	public function getDesc() {
+		return $this->desc;
+	}
+
+	protected function getBoardIndexer() {
+		return new BoardIndexer($this->getBoardID(), $this->indexer);
 	}
 
 	public function addSubBoard($board) {

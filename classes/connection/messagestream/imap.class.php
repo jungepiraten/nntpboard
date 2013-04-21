@@ -19,8 +19,8 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 
 	private $imapclient;
 
-	public function __construct(Host $host, $loginusername, $loginpassword, $folder) {
-		parent::__construct();
+	public function __construct(Host $host, $loginusername, $loginpassword, $folder, $boardindexer) {
+		parent::__construct($boardindexer);
 
 		$this->host = $host;
 		$this->loginusername = $loginusername;

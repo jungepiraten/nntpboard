@@ -28,9 +28,11 @@ interface Group {
 
 abstract class AbstractGroup implements Group {
 	private $groupid;
+	private $boardindexer;
 
-	public function __construct($groupid) {
+	public function __construct($groupid, $boardindexer) {
 		$this->groupid = $groupid;
+		$this->boardindexer = $boardindexer;
 	}
 
 	public function getGroupID() {
@@ -105,9 +107,10 @@ abstract class AbstractGroup implements Group {
 			} else {
 				$thread = Thread::getByMessage($message);
 			}
-			
+
 			$thread->addMessage($message);
 			$this->addThread($thread);
+			$this->boardindexer->addMessage($message);
 		}
 		if ($message instanceof Acknowledge) {
 			$this->addAcknowledge($message);
@@ -148,6 +151,7 @@ abstract class AbstractGroup implements Group {
 				}
 			}
 
+			$this->boardindexer->removeMessage($message);
 			// LastThread muss jede Group selbst können *hoff*
 		}
 		if ($message instanceof Acknowledge) {

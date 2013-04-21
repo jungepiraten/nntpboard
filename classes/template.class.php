@@ -17,6 +17,9 @@ interface Template {
 	public function viewcancelsuccess($board, $thread, $message, $cancel);
 	public function viewcancelmoderated($board, $thread, $message, $cancel);
 
+	public function viewsearchresults($page, $pages, $term, $results);
+	public function viewsearchform();
+
 	public function viewloginform();
 	public function viewloginfailed();
 	public function viewloginsuccess($auth);

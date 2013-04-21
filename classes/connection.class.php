@@ -21,7 +21,14 @@ interface Connection {
 }
 
 abstract class AbstractConnection implements Connection {
-	public function __construct() {
+	private $boardindexer;
+
+	public function __construct($boardindexer) {
+		$this->boardindexer = $boardindexer;
+	}
+
+	public function getBoardIndexer() {
+		return $this->boardindexer;
 	}
 
 	abstract protected function getGroupID();

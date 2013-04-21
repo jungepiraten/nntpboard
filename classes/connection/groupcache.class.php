@@ -8,17 +8,17 @@ abstract class AbstractGroupCacheConnection extends AbstractCacheConnection {
 	private $grouphash;
 	private $lastthread;
 
-	public function __construct($uplink = null) {
+	public function __construct($uplink) {
 		parent::__construct($uplink);
 	}
-	
+
 	abstract protected function loadGroup();
 	abstract protected function saveGroup($group);
 	abstract protected function loadGroupHash();
 	abstract protected function saveGroupHash($hash);
 	abstract protected function loadLastThread();
 	abstract protected function saveLastThread($thread);
-	
+
 	public function open($auth) {
 		parent::open($auth);
 		$this->grouphash = $this->loadGroupHash();

@@ -459,6 +459,29 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->display("postmoderated.html.tpl");
 	}
 
+	public function viewsearchresults($page, $pages, $term, $_results) {
+		$results = array();
+		foreach ($_results as $result) {
+			$results[] = array(
+				"board" => $this->parseBoard($result["board"]),
+				"message" => $this->parseMessage(null, $result["message"])
+			);
+		}
+
+		$this->smarty->assign("page", $page);
+		$this->smarty->assign("pages", $pages);
+
+		$this->smarty->assign("term", $term);
+		$this->smarty->assign("results", $results);
+		$this->sendHeaders();
+		$this->smarty->display("searchresults.html.tpl");
+	}
+
+	public function viewsearchform() {
+		$this->sendHeaders();
+		$this->smarty->display("searchform.html.tpl");
+	}
+
 	public function viewloginform() {
 		$this->smarty->assign("referer", isset($_REQUEST["referer"]) ? $_REQUEST["referer"] : (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : "index.php"));
 		$this->sendHeaders();
