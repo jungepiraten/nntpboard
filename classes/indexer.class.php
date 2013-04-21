@@ -12,7 +12,6 @@ abstract class AbstractIndexer implements Indexer {
 	}
 
 	public function getResults($term) {
-		$term = $this->formatToken($term);
 		$tokens = array(); $quotes = array(); $tokenParts = array(); $currentTokenPart = "";
 		for ($i = 0; $i < strlen($term); $i++) {
 			$char = substr($term, $i, 1);
@@ -27,7 +26,7 @@ abstract class AbstractIndexer implements Indexer {
 				$currentTokenPart = "";
 			} else if (in_array($char, array(" ", "\t")) && count($quotes) == 0) {
 				if ($currentTokenPart != "") {
-					$tokenParts[] = $currentTokenPart;
+					$tokenParts = array_merge($tokenParts, preg_split('/\\s+/', $this->formatToken($currentTokenPart)));
 					$currentTokenPart = "";
 				}
 				if (!empty($tokenParts)) {
@@ -39,7 +38,7 @@ abstract class AbstractIndexer implements Indexer {
 			}
 		}
 		if ($currentTokenPart != "") {
-			$tokenParts[] = $currentTokenPart;
+			$tokenParts = array_merge($tokenParts, preg_split('/\\s+/', $this->formatToken($currentTokenPart)));
 		}
 		if (!empty($tokenParts)) {
 			$tokens[] = $tokenParts;
