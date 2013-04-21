@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__)."/classes/host.class.php");
 require_once(dirname(__FILE__)."/classes/memcachehost.class.php");
 require_once(dirname(__FILE__)."/classes/redishost.class.php");
+require_once(dirname(__FILE__)."/classes/indexer/mysql.class.php");
 require_once(dirname(__FILE__)."/classes/config.class.php");
 require_once(dirname(__FILE__)."/classes/board.class.php");
 require_once(dirname(__FILE__)."/classes/board/filecachednntp.class.php");
@@ -19,23 +20,28 @@ class TestConfig extends DefaultConfig {
 
 	public function __construct($secretkey) {
 		parent::__construct();
-		$this->addBoard(new Board(null, null, "Testboards", "", new StaticAuthManager(true)));
+		$this->addBoard(new Board(null, null, "Testboards", "", null, new StaticAuthManager(true)));
 
 		$host = new Host("localhost");
 		$memcache = new MemcacheHost("localhost", 11211, "nntpboard999");
+		$indexer = $this->getIndexer();
 
 		$this->addBoard(new Board(900, null, "Boards", "Unterforen", new StaticAuthManager(true), new StaticAuthManager(true)));
-		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A",
+		$this->addBoard(new FileCachedNNTPBoard(998, 900, "eins", "A", $indexer,
 				new StaticAuthManager(true), new StaticAuthManager(true), true, $host, "test.a"));
-		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B",
+		$this->addBoard(new MemCachedNNTPBoard(999, 900, "zwei", "B", $indexer,
 				new StaticAuthManager(true), new StaticAuthManager(true), false, $memcache, $host, "test.b"));
 
-		$this->addBoard(new MemCachedIMAPBoard(1000, 900, "imap", "Z",
+		$this->addBoard(new MemCachedIMAPBoard(1000, 900, "imap", "Z", $indexer,
 				new StaticAuthManager(true), new StaticAuthManager(true), false, new MemCacheHost("localhost", 11211, "nntpboard1000"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
-		$this->addBoard(new RedisCachedIMAPBoard(1001, 900, "imap2", "Y",
+		$this->addBoard(new RedisCachedIMAPBoard(1001, 900, "imap2", "Y", $indexer,
 				new StaticAuthManager(true), new StaticAuthManager(false), false, new RedisHost("localhost", 6379, "nntpboard1001"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
 
 		$this->secretkey = $secretkey;
+	}
+
+	public function getIndexer() {
+		return new MySqlIndexer("localhost", "root", "anything92", "nntpboard");
 	}
 
 	public function getTemplate($auth) {

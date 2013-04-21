@@ -16,8 +16,8 @@ class StaticGroup extends AbstractGroup {
 	// MessageID => Acknowledge[]
 	private $acknowledges = array();
 
-	public function __construct($groupid, $grouphash) {
-		parent::__construct($groupid);
+	public function __construct($groupid, $boardindexer, $grouphash) {
+		parent::__construct($groupid, $boardindexer);
 		$this->grouphash = $grouphash;
 	}
 

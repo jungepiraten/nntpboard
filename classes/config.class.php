@@ -39,6 +39,8 @@ abstract class DefaultConfig {
 	/**
 	 * Optionen
 	 **/
+	public abstract function getIndexer();
+
 	public function getThreadsPerPage() {
 		return 20;
 	}

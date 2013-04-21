@@ -23,8 +23,8 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 
 	private $nntpclient;
 
-	public function __construct(Host $host, $group, Auth $auth = null) {
-		parent::__construct();
+	public function __construct(Host $host, $group, $boardindexer = null) {
+		parent::__construct($boardindexer);
 
 		$this->host = $host;
 		$this->group = $group;

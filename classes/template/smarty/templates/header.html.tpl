@@ -92,6 +92,7 @@
 						<ul class="nav nav-list">
 							<li class="nav-header">Navigation</li>
 							<li><a href="index.php"><i class="icon-home"></i> Forenübersicht</a></li>
+							<li><a href="search.php"><i class="icon-search"></i> Suchen</a></li>
 							{if $ISANONYMOUS}
 								<li><a href="login.php"><i class="icon-user"></i> Anmelden</a></li>
 								<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>

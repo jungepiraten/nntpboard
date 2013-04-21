@@ -19,7 +19,7 @@ class FileGroupCacheConnection extends AbstractGroupCacheConnection {
 
 	private $meta = null;
 
-	public function __construct($dir, $uplink = null) {
+	public function __construct($dir, $uplink) {
 		parent::__construct($uplink);
 		$this->dir = $dir;
 	}

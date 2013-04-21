@@ -70,6 +70,10 @@ class JuPiConfig extends DefaultConfig {
 		return "pirates.youth.{$name}";
 	}
 
+	private function getIndexer() {
+		return new MySqlIndexer("storage", "nntpboard", "", "nntpboard");
+	}
+
 	private function addCategoryBoard($id, $parentid, $name, $desc) {
 		$this->addBoard(new Board($id, $parentid, $name, $desc, new StaticAuthManager(true)));
 	}

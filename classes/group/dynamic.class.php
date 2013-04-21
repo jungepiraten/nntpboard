@@ -8,11 +8,11 @@ class DynamicGroup extends AbstractGroup {
 	private $threads = array();
 	private $threadslastpost = array();
 	private $acknowledges = array();
-	
+
 	private $connection;
-	
+
 	public function __construct(AbstractItemCacheConnection $connection) {
-		parent::__construct($connection->getGroupID());
+		parent::__construct($connection->getGroupID(), $connection->getBoardIndexer());
 		$this->connection = $connection;
 		$messageids = $this->sanitizeMessageIDs($connection->loadMessageIDs());
 		if (count($messageids) > 0) {

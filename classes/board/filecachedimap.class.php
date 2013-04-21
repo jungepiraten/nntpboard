@@ -4,8 +4,8 @@ require_once(dirname(__FILE__) . "/cachedimap.class.php");
 require_once(dirname(__FILE__) . "/../connection/itemcache/file.class.php");
 
 class FileCachedIMAPBoard extends CachedIMAPBoard {
-	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
-		parent::__construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder);
+	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
+		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder);
 	}
 
 	public function getConnection() {

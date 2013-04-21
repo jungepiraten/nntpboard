@@ -9,8 +9,8 @@ class IMAPBoard extends Board {
 	private $loginpassword;
 	private $folder;
 
-	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
-		parent::__construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated);
+	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
+		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated);
 		$this->host = $host;
 		$this->loginusername = $loginusername;
 		$this->loginpassword = $loginpassword;
@@ -22,7 +22,7 @@ class IMAPBoard extends Board {
 	}
 
 	public function getConnection() {
-		return new IMAPConnection($this->host, $this->loginusername, $this->loginpassword, $this->folder);
+		return new IMAPConnection($this->host, $this->loginusername, $this->loginpassword, $this->folder, $this->getBoardIndexer());
 	}
 }
 

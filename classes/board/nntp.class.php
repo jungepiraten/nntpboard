@@ -7,8 +7,8 @@ class NNTPBoard extends Board {
 	private $host;
 	private $group;
 
-	public function __construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated, $host, $group) {
-		parent::__construct($boardid, $parentid, $name, $desc, $readAuthManager, $writeAuthManager, $isModerated);
+	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $group) {
+		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated);
 		$this->host = $host;
 		$this->group = $group;
 	}
@@ -18,7 +18,7 @@ class NNTPBoard extends Board {
 	}
 
 	public function getConnection() {
-		return new NNTPConnection($this->host, $this->group);
+		return new NNTPConnection($this->host, $this->group, $this->getBoardIndexer());
 	}
 }
 
