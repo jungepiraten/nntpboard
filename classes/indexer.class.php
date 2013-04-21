@@ -12,7 +12,7 @@ abstract class AbstractIndexer implements Indexer {
 	}
 
 	public function getResults($term) {
-		$tokens = array(); $quotes = array(); $tokenParts = array(); $currentTokenPart = "";
+		$tokens = array(); $quotes = array(); $currentPrefix = null; $currentToken = "";
 		for ($i = 0; $i < strlen($term); $i++) {
 			$char = substr($term, $i, 1);
 			if (in_array($char, array("'", '"'))) {
@@ -21,20 +21,18 @@ abstract class AbstractIndexer implements Indexer {
 				} else {
 					array_unshift($quotes, $char);
 				}
-			} else if (in_array($char, array(":")) && count($quotes) == 0 && count($tokenParts) == 0) {
-				$tokenParts[] = $currentTokenPart;
-				$currentTokenPart = "";
+			} else if (in_array($char, array(":")) && count($quotes) == 0 && $currentPrefix === null) {
+				$currentPrefix = $currentToken;
+				$currentToken = "";
 			} else if (in_array($char, array(" ", "\t")) && count($quotes) == 0) {
-				if ($currentTokenPart != "") {
-					$tokenParts = array_merge($tokenParts, preg_split('/\\s+/', $this->formatToken($currentTokenPart)));
-					$currentTokenPart = "";
+				foreach (explode(" ", $this->formatToken($currentTokenPart)) as $tokenPart) {
+					if ($tokenPart != "") {
+						$tokens[] = ($currentPrefix != null ? array($currentPrefix, $tokenPart) : array($tokenPart));
+					}
 				}
-				if (!empty($tokenParts)) {
-					$tokens[] = $tokenParts;
-					$tokenParts = array();
-				}
+				$currentPrefix = null; $currentToken = "";
 			} else {
-				$currentTokenPart .= $char;
+				$currentToken .= $char;
 			}
 		}
 		if ($currentTokenPart != "") {
