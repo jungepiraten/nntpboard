@@ -70,20 +70,20 @@ class JuPiConfig extends DefaultConfig {
 		return "pirates.youth.{$name}";
 	}
 
-	private function getIndexer() {
+	public function getIndexer() {
 		return new MySqlIndexer("storage", "nntpboard", "", "nntpboard");
 	}
 
 	private function addCategoryBoard($id, $parentid, $name, $desc) {
-		$this->addBoard(new Board($id, $parentid, $name, $desc, new StaticAuthManager(true)));
+		$this->addBoard(new Board($id, $parentid, $name, $desc, $this->getIndexer(), new StaticAuthManager(true)));
 	}
 
 	private function addGenericBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
+		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("de." . $group, $mlname, $wiki) . $desc, $this->getIndexer(), new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("de." . $group)));
 	}
 
 	private function addInternationalBoard($id, $parentid, $group, $mlname, $wiki, $name, $desc) {
-		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
+		$this->addBoard(new RedisCachedNNTPBoard($id, $parentid, $name, $this->getNNTP_UCPLinks("int." . $group, $mlname, $wiki) . $desc, $this->getIndexer(), new StaticAuthManager(true), new AllowAuthedAuthManager(), false, $this->getRedisHost($id), $this->getNNTPHost(), $this->getNNTPGroup("int." . $group)));
 	}
 
 	private function addOrgaStruktur($id, $parentid) {
