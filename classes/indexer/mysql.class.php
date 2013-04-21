@@ -17,9 +17,9 @@ class MySqlIndexer extends AbstractIndexer {
 		$cond = array();
 		foreach ($term as $t) {
 			if (count($t) == 1) {
-				$cond[] = "(`term` = '" . $this->mysql->real_escape_string($t[0]) . "')";
+				$cond[] = "(`term` LIKE '%" . $this->mysql->real_escape_string($t[0]) . "%')";
 			} else if (count($t) == 2) {
-				$cond[] = "(`field` = '" . $this->mysql->real_escape_string($t[0]) . "' and `term` = '" . $this->mysql->real_escape_string($t[1]) . "')";
+				$cond[] = "(`field` = '" . $this->mysql->real_escape_string($t[0]) . "' and `term` LIKE '%" . $this->mysql->real_escape_string($t[1]) . "%')";
 			} else {
 				// Tokenizer failed
 				throw new Exception("Tokenizer Failed");
