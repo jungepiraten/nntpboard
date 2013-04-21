@@ -33,11 +33,10 @@ abstract class AbstractIndexer implements Indexer {
 				$currentToken .= $char;
 			}
 		}
-		if ($currentTokenPart != "") {
-			$tokenParts = array_merge($tokenParts, preg_split('/\\s+/', $this->formatToken($currentTokenPart)));
-		}
-		if (!empty($tokenParts)) {
-			$tokens[] = $tokenParts;
+		foreach (explode(" ", $this->formatToken($currentToken)) as $tokenPart) {
+			if ($tokenPart != "") {
+				$tokens[] = ($currentPrefix != null ? array($currentPrefix, $tokenPart) : array($tokenPart));
+			}
 		}
 
 		return $this->search($tokens);
