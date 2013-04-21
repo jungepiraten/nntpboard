@@ -8,10 +8,11 @@ interface Indexer {
 
 abstract class AbstractIndexer implements Indexer {
 	private function formatToken($value) {
-		return preg_replace('/[^a-zA-Z0-9]/', ' ', $value);
+		return preg_replace('/[^a-zA-Z0-9]/', ' ', strtolower($value));
 	}
 
 	public function getResults($term) {
+		$term = $this->formatToken($term);
 		$tokens = array(); $quotes = array(); $tokenParts = array(); $currentTokenPart = "";
 		for ($i = 0; $i < strlen($term); $i++) {
 			$char = substr($term, $i, 1);
@@ -25,16 +26,24 @@ abstract class AbstractIndexer implements Indexer {
 				$tokenParts[] = $currentTokenPart;
 				$currentTokenPart = "";
 			} else if (in_array($char, array(" ", "\t")) && count($quotes) == 0) {
-				$tokenParts[] = $this->formatToken($currentTokenPart);
-				$currentTokenPart = "";
-				$tokens[] = $tokenParts;
-				$tokenParts = array();
+				if ($currentTokenPart != "") {
+					$tokenParts[] = $currentTokenPart;
+					$currentTokenPart = "";
+				}
+				if (!empty($tokenParts)) {
+					$tokens[] = $tokenParts;
+					$tokenParts = array();
+				}
 			} else {
 				$currentTokenPart .= $char;
 			}
 		}
-		$tokenParts[] = $this->formatToken($currentTokenPart);
-		$tokens[] = $tokenParts;
+		if ($currentTokenPart != "") {
+			$tokenParts[] = $currentTokenPart;
+		}
+		if (!empty($tokenParts)) {
+			$tokens[] = $tokenParts;
+		}
 
 		return $this->search($tokens);
 	}
