@@ -15,17 +15,15 @@ abstract class AbstractIndexer implements Indexer {
 		$tokens = array(); $quotes = array(); $currentPrefix = null; $currentToken = "";
 		for ($i = 0; $i < strlen($term); $i++) {
 			$char = substr($term, $i, 1);
-			if (in_array($char, array("'", '"'))) {
-				if (count($quotes) > 0 && $quotes[0] == $char) {
-					array_shift($quotes);
-				} else {
-					array_unshift($quotes, $char);
-				}
+			if (count($quotes) > 0 && $quotes[0] == $char) {
+				array_shift($quotes);
+			} else if (in_array($char, array("'", '"'))) {
+				array_unshift($quotes, $char);
 			} else if (in_array($char, array(":")) && count($quotes) == 0 && $currentPrefix === null) {
 				$currentPrefix = $currentToken;
 				$currentToken = "";
 			} else if (in_array($char, array(" ", "\t")) && count($quotes) == 0) {
-				foreach (explode(" ", $this->formatToken($currentTokenPart)) as $tokenPart) {
+				foreach (explode(" ", $this->formatToken($currentToken)) as $tokenPart) {
 					if ($tokenPart != "") {
 						$tokens[] = ($currentPrefix != null ? array($currentPrefix, $tokenPart) : array($tokenPart));
 					}
