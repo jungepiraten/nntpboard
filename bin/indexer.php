@@ -13,7 +13,7 @@ foreach ($config->getBoardIDs() as $boardid) {
 
 		$group = $cache->getGroup();
 		foreach ($group->getMessageIDs() as $messageid) {
-			$message = $group->getMessage();
+			$message = $group->getMessage($messageid);
 			$indexer->addMessage($boardid, $message);
 		}
 
