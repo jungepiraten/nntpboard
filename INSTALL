@@ -9,5 +9,7 @@ Installation:
 01. Entpacken der Ordnerstruktur
 02. Anpassen der Ordnerberechtigung fuer templates_c und data
     (Webuser muss schreiben koennen)
-03. Anpassen der config.inc.php
-04. Eintragen des Cronjobs "cron.php"
+03. Im Webserver Zugriff auf bin/, cache/, avatarcache/, libs/,
+    classes/auth/ sperren
+04. Anpassen der config.inc.php
+05. Eintragen des Cronjobs "bin/cron.php"
