@@ -110,7 +110,9 @@ abstract class AbstractGroup implements Group {
 
 			$thread->addMessage($message);
 			$this->addThread($thread);
-			$this->boardindexer->addMessage($message);
+			if ($this->boardindexer != null) {
+				$this->boardindexer->addMessage($message);
+			}
 		}
 		if ($message instanceof Acknowledge) {
 			$this->addAcknowledge($message);
@@ -151,7 +153,9 @@ abstract class AbstractGroup implements Group {
 				}
 			}
 
-			$this->boardindexer->removeMessage($message);
+			if ($this->boardindexer != null) {
+				$this->boardindexer->removeMessage($message);
+			}
 			// LastThread muss jede Group selbst können *hoff*
 		}
 		if ($message instanceof Acknowledge) {

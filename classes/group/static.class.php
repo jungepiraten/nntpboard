@@ -33,6 +33,9 @@ class StaticGroup extends AbstractGroup {
 		return array_keys($this->messages);
 	}
 	public function getMessage($msgid) {
+		if (!($this->messages[$msgid] instanceof Message)) {
+			throw new Exception("Loading of Message " . $msgid . " failed: Returnvalue not instanceof Message");
+		}
 		return $this->messages[$msgid];
 	}
 
@@ -44,11 +47,14 @@ class StaticGroup extends AbstractGroup {
 		return  isset($this->messagethreads[$threadid]) and $this->hasThread($this->messagethreads[$threadid]);
 	}
 	public function getThread($threadid) {
-		if (isset($this->threads[$threadid])) {
-			return $this->threads[$threadid];
-		}
 		if (isset($this->messagethreads[$threadid])) {
-			return $this->getThread($this->messagethreads[$threadid]);
+			$threadid = $this->messagethreads[$threadid];
+		}
+		if (isset($this->threads[$threadid])) {
+			if (!($this->threads[$threadid] instanceof Thread)) {
+				throw new Exception("Loading of Thread " . $threadid . " failed: Returnvalue not instanceof Thread");
+			}
+			return $this->threads[$threadid];
 		}
 	}
 
@@ -75,7 +81,7 @@ class StaticGroup extends AbstractGroup {
 		}
 
 		unset($this->messages[$messageid]);
-		unset($this->messagethreads[$messageid]); 
+		unset($this->messagethreads[$messageid]);
 	}
 
 	/** Threads **/

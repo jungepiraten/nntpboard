@@ -68,6 +68,9 @@ class DynamicGroup extends AbstractGroup {
 	public function getMessage($messageid) {
 		if (!isset($this->messages[$messageid])) {
 			$this->messages[$messageid] = $this->sanitizeMessage($this->connection->loadMessage($messageid));
+			if (!($this->messages[$messageid] instanceof Message)) {
+				throw new Exception("Loading of Message " . $messageid . " failed: Returnvalue not instanceof Message");
+			}
 		}
 		return $this->messages[$messageid];
 	}
@@ -85,6 +88,9 @@ class DynamicGroup extends AbstractGroup {
 		}
 		if (!isset($this->threads[$threadid])) {
 			$this->threads[$threadid] = $this->sanitizeThread($this->connection->loadThread($threadid));
+			if (!($this->threads[$threadid] instanceof Thread)) {
+				throw new Exception("Loading of Thread " . $threadid . " failed: Returnvalue not instanceof Thread");
+			}
 		}
 		return $this->threads[$threadid];
 	}
