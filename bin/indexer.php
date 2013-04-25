@@ -14,7 +14,10 @@ foreach ($config->getBoardIDs() as $boardid) {
 		$group = $cache->getGroup();
 		foreach ($group->getMessageIDs() as $messageid) {
 			$message = $group->getMessage($messageid);
-			$indexer->addMessage($boardid, $message);
+			// FIlter out Acknowledges
+			if ($message instanceof Message) {
+				$indexer->addMessage($boardid, $message);
+			}
 		}
 
 		$cache->close();
