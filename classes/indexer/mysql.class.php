@@ -42,7 +42,7 @@ class MySqlIndexer extends AbstractIndexer {
 	}
 
 	public function removeMessage($boardid, Message $message) {
-		$this->mysql->query("DELETE FROM `indexer` WHERE `boardid` = '" . $this->mysql->real_escape_string($boardid) . "' and `messageid` = '" . $this->real_escape_string($message->getMessageID()) . "'");
+		$this->mysql->query("DELETE FROM `indexer` WHERE `boardid` = '" . $this->mysql->real_escape_string($boardid) . "' and `messageid` = '" . $this->mysql->real_escape_string($message->getMessageID()) . "'");
 	}
 }
 

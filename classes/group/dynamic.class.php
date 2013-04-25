@@ -68,6 +68,9 @@ class DynamicGroup extends AbstractGroup {
 	public function getMessage($messageid) {
 		if (!isset($this->messages[$messageid])) {
 			$this->messages[$messageid] = $this->sanitizeMessage($this->connection->loadMessage($messageid));
+			if (!($this->messages[$messageid] instanceof Message)) {
+				throw new Exception("Loading of Message " . $messageid . " failed: Returnvalue not instanceof Message");
+			}
 		}
 		return $this->messages[$messageid];
 	}
@@ -85,16 +88,25 @@ class DynamicGroup extends AbstractGroup {
 		}
 		if (!isset($this->threads[$threadid])) {
 			$this->threads[$threadid] = $this->sanitizeThread($this->connection->loadThread($threadid));
+			if (!($this->threads[$threadid] instanceof Thread)) {
+				throw new Exception("Loading of Thread " . $threadid . " failed: Returnvalue not instanceof Thread");
+			}
 		}
 		return $this->threads[$threadid];
 	}
 
 	/** Last Thread **/
 	public function hasLastThread() {
-		return $this->getLastThread() != null;
+		return $this->getLastThreadID() != null && $this->getLastThread() != null;
+	}
+	private function getLastThreadID() {
+		if (count($this->threadslastpost) == 0) {
+			return null;
+		}
+		return array_pop(array_keys($this->threadslastpost));
 	}
 	public function getLastThread() {
-		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
+		return $this->getThread($this->getLastThreadID());
 	}
 
 	/** Nachrichten **/
