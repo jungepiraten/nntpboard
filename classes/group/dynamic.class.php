@@ -68,8 +68,8 @@ class DynamicGroup extends AbstractGroup {
 	public function getMessage($messageid) {
 		if (!isset($this->messages[$messageid])) {
 			$this->messages[$messageid] = $this->sanitizeMessage($this->connection->loadMessage($messageid));
-			if (!($this->messages[$messageid] instanceof Message)) {
-				throw new Exception("Loading of Message " . $messageid . " failed: Returnvalue not instanceof Message");
+			if (!($this->messages[$messageid] instanceof Message) && !($this->messages[$messageid] instanceof Acknowledge)) {
+				throw new Exception("Loading of Message " . $messageid . " failed: Returnvalue neither instanceof Message or Acknowledge");
 			}
 		}
 		return $this->messages[$messageid];

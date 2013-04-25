@@ -33,8 +33,8 @@ class StaticGroup extends AbstractGroup {
 		return array_keys($this->messages);
 	}
 	public function getMessage($msgid) {
-		if (!($this->messages[$msgid] instanceof Message)) {
-			throw new Exception("Loading of Message " . $msgid . " failed: Returnvalue not instanceof Message");
+		if (!($this->messages[$msgid] instanceof Message) && !($this->messages[$msgid] instanceof Acknowledge)) {
+			throw new Exception("Loading of Message " . $msgid . " failed: Returnvalue neither instanceof Message or Acknowledge");
 		}
 		return $this->messages[$msgid];
 	}
