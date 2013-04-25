@@ -60,10 +60,16 @@ class StaticGroup extends AbstractGroup {
 
 	/** Last Thread **/
 	public function hasLastThread() {
-		return $this->getLastThread() != null;
+		return $this->getLastThreadID() != null && $this->getLastThread() != null;
+	}
+	private function getLastThreadID() {
+		if (count($this->threadslastpost) == 0) {
+			return null;
+		}
+		return array_pop(array_keys($this->threadslastpost));
 	}
 	public function getLastThread() {
-		return $this->getThread(array_pop(array_keys($this->threadslastpost)));
+		return $this->getThread($this->getLastThreadID());
 	}
 
 	/** Nachrichten **/
