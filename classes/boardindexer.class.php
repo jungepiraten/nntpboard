@@ -10,10 +10,14 @@ class BoardIndexer {
 	}
 
 	public function addMessage(Message $message) {
-		$this->indexer->addMessage($this->boardid, $message);
+		if ($this->indexer != null) {
+			$this->indexer->addMessage($this->boardid, $message);
+		}
 	}
 
 	public function removeMessage(Message $message) {
-		$this->indexer->removeMessage($this->boardid, $message);
+		if ($this->indexer != null) {
+			$this->indexer->removeMessage($this->boardid, $message);
+		}
 	}
 }
