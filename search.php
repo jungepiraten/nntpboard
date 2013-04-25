@@ -5,6 +5,10 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
+if ($config->getIndexer() == null) {
+	die("Search not available: No indexer used.");
+}
+
 if (isset($_REQUEST["term"])) {
 	$term = stripslashes($_REQUEST["term"]);
 	$_results = $config->getIndexer()->getResults($term);
