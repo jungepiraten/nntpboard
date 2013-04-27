@@ -65,12 +65,12 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 	}
 
-	protected function setMessageQueue($queueid, $queue) {
+	public function setMessageQueue($queueid, $queue) {
 		$this->loadIndex();
 		$this->index['messagequeue'][$queueid] = $queue;
 		$this->saveIndex();
 	}
-	protected function getMessageQueue($queueid) {
+	public function getMessageQueue($queueid) {
 		$this->loadIndex();
 		if (isset($this->index['messagequeue'][$queueid])) {
 			return $this->index['messagequeue'][$queueid];
@@ -84,7 +84,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return array();
 	}
-	protected function saveMessageIDs($messageids) {
+	public function saveMessageIDs($messageids) {
 		$this->loadIndex();
 		$this->index['messageids'] = $messageids;
 		$this->saveIndex();
@@ -97,7 +97,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return array();
 	}
-	protected function saveMessageThreads($messagethreads) {
+	public function saveMessageThreads($messagethreads) {
 		$this->loadIndex();
 		$this->index['messagethreads'] = $messagethreads;
 		$this->saveIndex();
@@ -110,7 +110,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return array();
 	}
-	protected function saveThreadsLastPost($threadslastpost) {
+	public function saveThreadsLastPost($threadslastpost) {
 		$this->loadIndex();
 		$this->index['threadslastpost'] = $threadslastpost;
 		$this->saveIndex();
@@ -123,7 +123,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return unserialize(file_get_contents($filename));
 	}
-	protected function saveMessage($messageid, $message) {
+	public function saveMessage($messageid, $message) {
 		$filename = $this->getMessageFilename($messageid);
 		mkdir_parents(dirname($filename));
 		if (file_exists($filename) && !is_writable($filename)) {
@@ -146,7 +146,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return unserialize(file_get_contents($filename));
 	}
-	protected function saveAcknowledges($messageid, $acks) {
+	public function saveAcknowledges($messageid, $acks) {
 		$filename = $this->getAcknowledgesFilename($messageid);
 		mkdir_parents(dirname($filename));
 		if (file_exists($filename) && !is_writable($filename)) {
@@ -162,7 +162,7 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return unserialize(file_get_contents($filename));
 	}
-	protected function saveThread($threadid, $thread) {
+	public function saveThread($threadid, $thread) {
 		$filename = $this->getThreadFilename($threadid);
 		mkdir_parents(dirname($filename));
 		if (file_exists($filename) && !is_writable($filename)) {
@@ -178,14 +178,14 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		unlink($filename);
 	}
 
-	protected function loadGroupHash() {
+	public function loadGroupHash() {
 		$filename = $this->getGroupHashFilename();
 		if (!file_exists($filename)) {
 			return;
 		}
 		return file_get_contents($filename);
 	}
-	protected function saveGroupHash($hash) {
+	public function saveGroupHash($hash) {
 		$filename = $this->getGroupHashFilename();
 		mkdir_parents(dirname($filename));
 		if (file_exists($filename) && !is_writable($filename)) {
@@ -194,14 +194,14 @@ class FileItemCacheConnection extends AbstractItemCacheConnection {
 		file_put_contents($filename, $hash);
 	}
 
-	protected function loadLastThread() {
+	public function loadLastThread() {
 		$filename = $this->getLastThreadFilename();
 		if (!file_exists($filename)) {
 			return;
 		}
 		return unserialize(file_get_contents($filename));
 	}
-	protected function saveLastThread($thread) {
+	public function saveLastThread($thread) {
 		$filename = $this->getLastThreadFilename();
 		mkdir_parents(dirname($filename));
 		if (file_exists($filename) && !is_writable($filename)) {

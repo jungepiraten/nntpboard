@@ -15,23 +15,25 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 		parent::__construct($uplink);
 	}
 
+	/** All need to be public to allow things like MixedItemCacheConnection **/
 	abstract public function loadMessageIDs();
-	abstract protected function saveMessageIDs($messageids);
+	abstract public function saveMessageIDs($messageids);
 	abstract public function loadMessageThreads();
-	abstract protected function saveMessageThreads($messagethreads);
+	abstract public function saveMessageThreads($messagethreads);
 	abstract public function loadThreadsLastPost();
-	abstract protected function saveThreadsLastPost($messageids);
+	abstract public function saveThreadsLastPost($messageids);
 	abstract public function loadMessage($messageid);
-	abstract protected function saveMessage($messageid, $message);
+	abstract public function saveMessage($messageid, $message);
 	abstract public function removeMessage($messageid);
 	abstract public function loadThread($threadid);
-	abstract protected function saveThread($threadid, $thread);
+	abstract public function saveThread($threadid, $thread);
 	abstract public function removeThread($threadid);
 	abstract public function loadAcknowledges($messageid);
-	abstract protected function loadGroupHash();
-	abstract protected function saveGroupHash($hash);
-	abstract protected function loadLastThread();
-	abstract protected function saveLastThread($thread);
+	abstract public function saveAcknowledges($messageid, $acks);
+	abstract public function loadGroupHash();
+	abstract public function saveGroupHash($hash);
+	abstract public function loadLastThread();
+	abstract public function saveLastThread($thread);
 
 	public function open($auth) {
 		parent::open($auth);

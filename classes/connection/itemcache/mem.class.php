@@ -20,7 +20,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->link;
 	}
 
-	protected function getMessageQueue($queueid) {
+	public function getMessageQueue($queueid) {
 		$link = $this->getLink();
 		$queue = $link->get($this->memcache->getKeyName("messagequeue-" . $queueid));
 		if ($queue != null) {
@@ -28,7 +28,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		}
 		return array();
 	}
-	protected function setMessageQueue($queueid, $queue) {
+	public function setMessageQueue($queueid, $queue) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("messagequeue-" . $queueid), $queue);
 	}
@@ -37,7 +37,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("messageid"));
 	}
-	protected function saveMessageIDs($messageid) {
+	public function saveMessageIDs($messageid) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("messageid"), $messageid);
 	}
@@ -46,7 +46,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("messagethreads"));
 	}
-	protected function saveMessageThreads($messagethreads) {
+	public function saveMessageThreads($messagethreads) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("messagethreads"), $messagethreads);
 	}
@@ -55,7 +55,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("message" . md5($messageid)));
 	}
-	protected function saveMessage($messageid, $message) {
+	public function saveMessage($messageid, $message) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("message" . md5($messageid)), $message);
 	}
@@ -68,7 +68,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("threadslastpost"));
 	}
-	protected function saveThreadsLastPost($threadids) {
+	public function saveThreadsLastPost($threadids) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("threadslastpost"), $threadids);
 	}
@@ -77,7 +77,7 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("thread" . md5($threadid)));
 	}
-	protected function saveThread($threadid, $thread) {
+	public function saveThread($threadid, $thread) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("thread" . md5($threadid)), $thread);
 	}
@@ -90,25 +90,25 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("acks" . md5($messageid)));
 	}
-	protected function saveAcknowledges($messageid, $acks) {
+	public function saveAcknowledges($messageid, $acks) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("acks" . md5($messageid)), $acks);
 	}
 
-	protected function loadGroupHash() {
+	public function loadGroupHash() {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("grouphash"));
 	}
-	protected function saveGroupHash($hash) {
+	public function saveGroupHash($hash) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("grouphash"), $hash);
 	}
 
-	protected function loadLastThread() {
+	public function loadLastThread() {
 		$link = $this->getLink();
 		return $link->get($this->memcache->getKeyName("lastthread"));
 	}
-	protected function saveLastThread($thread) {
+	public function saveLastThread($thread) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("lastthread"), $thread);
 	}
