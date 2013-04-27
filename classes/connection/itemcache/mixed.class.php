@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . "/../itemcache.class.php");
 
 class MixedItemCacheConnection extends AbstractItemCacheConnection {
-	$upstreams = array();
+	private $upstreams = array();
 
 	public function __construct($upstreams) {
 		parent::__construct();
