@@ -22,6 +22,7 @@ class RedisIndexedFileCachedIMAPBoard extends CachedIMAPBoard {
 		           "default" => new FileItemCacheConnection(
 		               dirname(__FILE__) . "/../../cache/".$this->getBoardID()."/",
 		               parent::getConnection()
+		           )
 		       ));
 	}
 }

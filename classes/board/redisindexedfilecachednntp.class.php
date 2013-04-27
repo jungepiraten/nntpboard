@@ -22,6 +22,7 @@ class RedisIndexedFileCachedNNTPBoard extends CachedNNTPBoard {
 		           "default" => new FileItemCacheConnection(
 		               dirname(__FILE__) . "/../../cache/".$this->getBoardID()."/",
 		               parent::getConnection()
+		           )
 		       ));
 	}
 }
