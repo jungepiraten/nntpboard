@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . "/../itemcache.class.php");
 
 class MixedItemCacheConnection extends AbstractItemCacheConnection {
-	$upstreams = array();
+	private $upstreams = array();
 
 	public function __construct($upstreams) {
 		parent::__construct();
@@ -25,6 +25,13 @@ class MixedItemCacheConnection extends AbstractItemCacheConnection {
 		foreach ($this->upstreams as $upstream) {
 			call_user_func_array(array($upstream, $command), $args);
 		}
+	}
+
+	public function getMessageQueue($queueid) {
+		return $this->getConnection(array("queue"))->getMessageQueue($queueid);
+	}
+	public function setMessageQueue($queueid, $queue) {
+		return $this->getConnection(array("queue"))->setMessageQueue($queueid, $queue);
 	}
 
 	public function loadMessageIDs() {
