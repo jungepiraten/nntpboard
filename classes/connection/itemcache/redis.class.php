@@ -32,14 +32,14 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		$this->getLink()->Del($this->rediscache->getKeyName($key));
 	}
 
-	protected function getMessageQueue($queueid) {
+	public function getMessageQueue($queueid) {
 		$queue = $this->get("messagequeue-" . $queueid);
 		if ($queue != null) {
 			return $queue;
 		}
 		return array();
 	}
-	protected function setMessageQueue($queueid, $queue) {
+	public function setMessageQueue($queueid, $queue) {
 		$this->set("messagequeue-" . $queueid, $queue);
 	}
 
@@ -47,7 +47,7 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("messageid");
 	}
 
-	protected function saveMessageIDs($messageid) {
+	public function saveMessageIDs($messageid) {
 		$this->set("messageid", $messageid);
 	}
 
@@ -55,7 +55,7 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("messagethreads");
 	}
 
-	protected function saveMessageThreads($messagethreads) {
+	public function saveMessageThreads($messagethreads) {
 		$this->set("messagethreads", $messagethreads);
 	}
 
@@ -63,7 +63,7 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("message" . md5($messageid));
 	}
 
-	protected function saveMessage($messageid, $message) {
+	public function saveMessage($messageid, $message) {
 		$this->set("message" . md5($messageid), $message);
 	}
 
@@ -75,7 +75,7 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("threadslastpost");
 	}
 
-	protected function saveThreadsLastPost($threadids) {
+	public function saveThreadsLastPost($threadids) {
 		$this->set("threadslastpost", $threadids);
 	}
 
@@ -83,7 +83,7 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("thread" . md5($threadid));
 	}
 
-	protected function saveThread($threadid, $thread) {
+	public function saveThread($threadid, $thread) {
 		$this->set("thread" . md5($threadid), $thread);
 	}
 
@@ -95,23 +95,23 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 		return $this->get("acks" . md5($messageid));
 	}
 
-	protected function saveAcknowledges($messageid, $acks) {
+	public function saveAcknowledges($messageid, $acks) {
 		$this->set("acks" . md5($messageid), $acks);
 	}
 
-	protected function loadGroupHash() {
+	public function loadGroupHash() {
 		return $this->get("grouphash");
 	}
 
-	protected function saveGroupHash($hash) {
+	public function saveGroupHash($hash) {
 		$this->set("grouphash", $hash);
 	}
 
-	protected function loadLastThread() {
+	public function loadLastThread() {
 		return $this->get("lastthread");
 	}
 
-	protected function saveLastThread($thread) {
+	public function saveLastThread($thread) {
 		$this->set("lastthread", $thread);
 	}
 }
