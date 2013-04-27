@@ -89,11 +89,11 @@ class FileGroupCacheConnection extends AbstractGroupCacheConnection {
 		}
 	}
 
-	protected function getMessageQueue($queueid) {
+	public function getMessageQueue($queueid) {
 		$this->loadMessageQueue();
 		return $this->messagequeue[$queueid];
 	}
-	protected function setMessageQueue($queueid, $queue) {
+	public function setMessageQueue($queueid, $queue) {
 		$this->loadMessageQueue();
 		$this->messagequeue[$queueid] = $queue;
 		$this->saveMessageQueue();

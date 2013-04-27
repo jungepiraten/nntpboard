@@ -27,6 +27,13 @@ class MixedItemCacheConnection extends AbstractItemCacheConnection {
 		}
 	}
 
+	public function getMessageQueue($queueid) {
+		return $this->getConnection(array("queue"))->getMessageQueue($queueid);
+	}
+	public function setMessageQueue($queueid, $queue) {
+		return $this->getConnection(array("queue"))->setMessageQueue($queueid, $queue);
+	}
+
 	public function loadMessageIDs() {
 		return $this->getConnection(array("messageids","index"))->loadMessageIDs();
 	}

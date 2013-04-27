@@ -56,8 +56,9 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		$this->setMessageQueue($queueid, $queue);
 	}
 
-	abstract protected function getMessageQueue($queueid);
-	abstract protected function setMessageQueue($queueid, $queue);
+	/** public for MixedItemCacheConnection **/
+	abstract public function getMessageQueue($queueid);
+	abstract public function setMessageQueue($queueid, $queue);
 
 	abstract protected function setGroupHash($hash);
 

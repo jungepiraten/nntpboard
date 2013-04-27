@@ -43,7 +43,7 @@ class MemGroupCacheConnection extends AbstractGroupCacheConnection {
 	/**
 	 * 
 	 **/
-	protected function getMessageQueue($queueid) {
+	public function getMessageQueue($queueid) {
 		$link = $this->getLink();
 		$queue = $link->get($this->prefix . "_messagequeue-" . $queueid);
 		if ($queue != null) {
@@ -52,7 +52,7 @@ class MemGroupCacheConnection extends AbstractGroupCacheConnection {
 		return array();
 	}
 
-	protected function setMessageQueue($queueid, $queue) {
+	public function setMessageQueue($queueid, $queue) {
 		$link = $this->getLink();
 		$link->set($this->prefix . "_messagequeue-" . $queueid, $queue);
 	}
