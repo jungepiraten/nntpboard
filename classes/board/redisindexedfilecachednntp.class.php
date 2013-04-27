@@ -14,7 +14,9 @@ class RedisIndexedFileCachedNNTPBoard extends CachedNNTPBoard {
 	}
 
 	public function getConnection() {
-		return new MixedItemCacheConnection(array(
+		return new MixedItemCacheConnection(
+		       parent::getConnection(),
+		       array(
 		           "index" => new RedisItemCacheConnection(
 		               $this->rediscache,
 		               parent::getConnection()
