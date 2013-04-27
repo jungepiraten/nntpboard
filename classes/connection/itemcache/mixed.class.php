@@ -5,8 +5,8 @@ require_once(dirname(__FILE__) . "/../itemcache.class.php");
 class MixedItemCacheConnection extends AbstractItemCacheConnection {
 	private $upstreams = array();
 
-	public function __construct($upstreams) {
-		parent::__construct();
+	public function __construct($uplink, $upstreams) {
+		parent::__construct($uplink);
 		$this->upstreams = $upstreams;
 	}
 
