@@ -8,6 +8,7 @@
 
 		<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,700|Viga:400' />
 		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
+
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
 		<link href="classes/template/smarty/style.css" rel="stylesheet" />
 
@@ -45,7 +46,7 @@
 		<title>{$title|escape:html} – Junge Piraten Forum</title>
 	</head>
 
-	<body>
+	<body class="palette palette-night">
 		<div class="visible-desktop spacer-top">&nbsp;</div>
 
 		<div class="navbar navbar-fixed-top navbar-inverse">
