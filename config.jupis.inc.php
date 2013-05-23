@@ -18,6 +18,7 @@ require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
 class JuPiConfig extends DefaultConfig {
+	private $indexer;
 	private $secretkey;
 	private $memcachelink;
 	private $ldappass;
@@ -25,6 +26,8 @@ class JuPiConfig extends DefaultConfig {
 
 	public function __construct($secretkey, $ldappass) {
 		parent::__construct();
+		$this->indexer = new MySqlIndexer("storage", "nntpboard", "", "nntpboard");
+
 		$this->addCategoryBoard(null, null, "Junge Piraten", "");
 
 		$this->addGenericBoard(4, null, "announce", "announce", null, "Ankündigungen", "Ankündigungen & PMs");
@@ -73,7 +76,7 @@ class JuPiConfig extends DefaultConfig {
 	}
 
 	public function getIndexer() {
-		return new MySqlIndexer("storage", "nntpboard", "", "nntpboard");
+		return $this->indexer;
 	}
 
 	private function addCategoryBoard($id, $parentid, $name, $desc) {
