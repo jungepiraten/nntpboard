@@ -97,7 +97,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	public function updateGroup() {
 		parent::updateGroup();
-		$this->setLastThread($this->getGroup()->getLastThread());
+		$this->setLastThread($this->getGroup()->hasLastThread() ? $this->getGroup()->getLastThread() : null);
 	}
 }
 
