@@ -28,7 +28,7 @@ foreach ($config->getBoardIDs() as $boardid) {
 
 		$cache->close();
 	} catch (Exception $e) {
-		echo "<pre>".$e->getMessage()."</pre>\n";
+		echo "<pre>".$e->getMessage()."\n" . $e->getTraceAsString() . "</pre>\n";
 	}
 }
 
