@@ -137,8 +137,8 @@ class RFC5322Message {
 			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
 		}
 		// Workaround fuer Mailman und andere Clients
-		if ($signature == null && preg_match('~\r?\n[-_]{2,}\r?\n~m', $textbody) > 0) {
-			list($textbody, $signature) = preg_split('~\r?\n[-_]{2,}\r?\n~m', $textbody, 2);
+		if ($signature == null && preg_match('~^[-_]{2,}\r?$~m', $textbody) > 0) {
+			list($textbody, $signature) = preg_split('~^[-_]{2,}\r?$~m', $textbody, 2);
 		}
 
 		$htmlbody = $this->body->getBodyPart("text/html");
