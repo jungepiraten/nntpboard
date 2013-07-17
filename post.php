@@ -133,7 +133,7 @@ if (isset($_REQUEST["post"])) {
 		$thread = $group->getThread($message->getMessageID());
 		$connection->close();
 
-		if ($resp == "m") {
+		if ($resp === "m") {
 			$template->viewpostmoderated($board, $thread, $message);
 		} else {
 			$template->viewpostsuccess($board, $thread, $message);

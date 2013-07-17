@@ -50,7 +50,7 @@ $connection->open($session->getAuth());
 $resp = $connection->postCancel($cancel, $message);
 $connection->close();
 
-if ($resp == "m") {
+if ($resp === "m") {
 	$template->viewcancelmoderated($board, $thread, $message, $cancel);
 } else {
 	$template->viewcancelsuccess($board, $thread, $message, $cancel);

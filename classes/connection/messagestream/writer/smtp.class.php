@@ -22,5 +22,7 @@ class SMTPMessageStreamWriter extends AbstractMessageStreamWriter {
 		$conn->rcptTo($this->recipient);
 		$conn->data($message->getPlain());
 		$conn->disconnect();
+
+		return true;
 	}
 }
