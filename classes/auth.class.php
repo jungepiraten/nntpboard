@@ -25,25 +25,10 @@ abstract class AbstractAuth implements Auth {
 	private $readthreads = array();
 	private $readgroups = array();
 
-	public function __construct($username, $password) {
-		$this->username = $username;
-		$this->password = $password;
-
+	public function __construct() {
 		$this->readdate = $this->loadReadDate();
 		$this->readthreads = $this->loadReadThreads();
 		$this->readgroups = $this->loadReadGroups();
-	}
-
-	public function isAnonymous() {
-		return $this->getAddress() == null;
-	}
-
-	public function getUsername() {
-		return $this->username;
-	}
-
-	public function getPassword() {
-		return $this->password;
 	}
 
 	public function saveRead() {
