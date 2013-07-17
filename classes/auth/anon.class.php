@@ -3,6 +3,10 @@
 require_once(dirname(__FILE__)."/../auth.class.php");
 
 class AnonAuth extends AbstractAuth {
+	public function isAnonymous() {
+		return true;
+	}
+
         public function getUsername() {
                 return null;
         }

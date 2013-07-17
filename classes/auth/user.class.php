@@ -18,6 +18,10 @@ abstract class AbstractUserAuth extends AbstractAuth {
 		$this->nntppassword = $nntppassword;
 	}
 
+	public function isAnonymous() {
+		return true;
+	}
+
 	public function getUsername() {
 		return $this->username;
 	}
