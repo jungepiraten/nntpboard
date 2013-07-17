@@ -18,7 +18,7 @@ abstract class Host {
 	}
 
 	public function __toString() {
-		return $this->getHost() . ":" . $this->getPort());
+		return $this->getHost() . ":" . $this->getPort();
 	}
 }
 
