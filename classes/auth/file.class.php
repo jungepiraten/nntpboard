@@ -14,15 +14,12 @@ if (!function_exists("mkdir_parents")) {
 }
 
 abstract class AbstractFileAuth extends AbstractUserAuth {
-	private $address;
-
 	private $data;
 
-	public function __construct($username, $password, $nntpusername, $nntppassword) {
+	public function __construct($username, $password, $address, $nntpusername, $nntppassword) {
 		/* Konstruktor nicht andersherum eintragen, da sonst getFilename()
 		 * ohne $this->username aufgerufen wird => ungut */
-		parent::__construct($username, $password, $nntpusername, $nntppassword);
-		$this->address = $address;
+		parent::__construct($username, $password, $address, $nntpusername, $nntppassword);
 		$this->loadData();
 	}
 

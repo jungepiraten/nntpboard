@@ -13,7 +13,7 @@ class JuPisAuth extends AbstractFileAuth {
 	protected static $MODERATORS = array("prauscher", "smrqdt", "lutoma", "c-lia");
 
 	public function __construct($config, $username, $password) {
-		parent::__construct($username, $password, str_replace(" ", "_", $username), $config->getNNTPPassword());
+		parent::__construct($username, $password, new Address($username, str_replace(" ", "_", $username) . "@community.junge-piraten.de"), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
 
 	public function mayCancel($message) {

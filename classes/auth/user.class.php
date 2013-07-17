@@ -7,11 +7,13 @@ abstract class AbstractUserAuth extends AbstractAuth {
 	private $password;
 	private $nntpusername;
 	private $nntppassword;
+	private $address;
 
-	public function __construct($username, $password, $nntpusername, $nntppassword) {
+	public function __construct($username, $password, $address, $nntpusername, $nntppassword) {
 		parent::__construct();
 		$this->username = $username;
 		$this->password = $password;
+		$this->address = $address;
 		$this->nntpusername = $nntpusername;
 		$this->nntppassword = $nntppassword;
 	}
@@ -22,6 +24,10 @@ abstract class AbstractUserAuth extends AbstractAuth {
 
 	public function getPassword() {
 		return $this->password;
+	}
+
+	public function getAddress() {
+		return $this->address;
 	}
 
 	public function getNNTPUsername() {
