@@ -158,7 +158,7 @@ class NNTPConnection extends AbstractRFC5322Connection {
 		// u.a. um zu bemerken, dass wir einen neuen GroupCache haben
 		$this->refreshCache();
 		// Gebe "m" zurueck, falls die Gruppe moderiert ist
-		return ($this->mode == "y");
+		return ($this->mode == "m" ? "m" : ($this->mode == "y"));
 	}
 }
 

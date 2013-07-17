@@ -46,7 +46,7 @@ $ack = new Acknowledge($ackid, $messageid, time(), $autor, $wertung);
 $connection->open($session->getAuth());
 $resp = $connection->postAcknowledge($ack, $message);
 $connection->close();
-if ($resp == "m") {
+if ($resp === "m") {
 	$template->viewacknowledgemoderated($board, $thread, $message, $ack);
 } else {
 	$template->viewacknowledgesuccess($board, $thread, $message, $ack);
