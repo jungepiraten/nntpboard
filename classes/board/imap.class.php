@@ -8,13 +8,15 @@ class IMAPBoard extends Board {
 	private $loginusername;
 	private $loginpassword;
 	private $folder;
+	private $writer;
 
-	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder) {
+	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $loginusername, $loginpassword, $folder, $writer) {
 		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated);
 		$this->host = $host;
 		$this->loginusername = $loginusername;
 		$this->loginpassword = $loginpassword;
 		$this->folder = $folder;
+		$this->writer = $writer;
 	}
 
 	public function hasThreads() {
@@ -22,7 +24,7 @@ class IMAPBoard extends Board {
 	}
 
 	public function getConnection() {
-		return new IMAPConnection($this->host, $this->loginusername, $this->loginpassword, $this->folder, $this->getBoardIndexer());
+		return new IMAPConnection($this->host, $this->loginusername, $this->loginpassword, $this->folder, $this->getBoardIndexer(), $this->writer);
 	}
 }
 
