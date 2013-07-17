@@ -112,21 +112,14 @@ class NNTPConnection extends AbstractRFC5322Connection {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
 			return RFC5322Message::parsePlain(implode("\r\n", $article));
-			$message = $rfcmessage->getObject($this);
-			// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
-			if ($rfcmessage->getHeader()->has("Sender")
-			  && (strtolower($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
-				$message->setAuthor(RFC5322Address::parsePlain($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8"))->getObject());
-			}
-
-			return $message;
 		}
 		// Diese Nachricht gibt es offensichtlich nicht mehr ;)
 		throw new NotFoundMessageException($msgid, $this->group);
 	}
 
 	public function getMessage($msgid) {
-		$message = parent::getMessage($msgid);
+		$rfcmessage = $this->getRFC5322Message($msgid);
+		$message = $rfcmessage->getObject();
 		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
 		if ($rfcmessage->getHeader()->has("Sender")
 		  && (strtolower($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
