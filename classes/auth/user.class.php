@@ -34,6 +34,10 @@ abstract class AbstractUserAuth extends AbstractAuth {
 		return $this->address;
 	}
 
+	public function mayCancel($message) {
+		return $message->getAuthor()->getAddress() == $this->getAddress()->getAddress();
+	}
+
 	public function getNNTPUsername() {
 		return $this->nntpusername;
 	}

@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 
 class JuPisAnonAuth extends AnonAuth {}
 
-class JuPisAuth extends AbstractFileAuth {
+class JuPisAuth extends FileUserAuth {
 	protected static $MODERATORS = array("prauscher", "smrqdt", "lutoma", "c-lia");
 
 	public function __construct($config, $username, $password) {
@@ -17,7 +17,7 @@ class JuPisAuth extends AbstractFileAuth {
 	}
 
 	public function mayCancel($message) {
-		return in_array(strtolower($this->getUsername()), self::$MODERATORS) or $message->getAuthor()->getAddress() == $this->getAddress()->getAddress();
+		return parent::mayCancel($message) or in_array(strtolower($this->getUsername()), self::$MODERATORS);
 	}
 }
 
