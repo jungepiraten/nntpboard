@@ -90,11 +90,11 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		if ($this->cacheSentPosts) {
 			$this->addMessageQueue("message", array($this->auth, $message));
 			$this->handleMessage($message);
-			return "y";
+			return true;
 		}
 		$resp = $this->postCacheMessage($this->auth, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == "y") {
+		if ($resp == true) {
 			$this->handleMessage($message);
 		}
 		return $resp;
@@ -103,11 +103,11 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		if ($this->cacheSentPosts) {
 			$this->addMessageQueue("acknowledge", array($this->auth, $ack, $message));
 			$this->handleMessage($ack);
-			return "y";
+			return true;
 		}
 		$resp = $this->postCacheAcknowledge($this->auth, $ack, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == "y") {
+		if ($resp == true) {
 			$this->handleMessage($cancel);
 		}
 		return $resp;
@@ -116,11 +116,11 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		if ($this->cacheSentPosts) {
 			$this->addMessageQueue("cancel", array($this->auth, $cancel, $message));
 			$this->handleMessage($cancel);
-			return "y";
+			return true;
 		}
 		$resp = $this->postCacheCancel($this->auth, $cancel, $message);
 		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == "y") {
+		if ($resp == true) {
 			$this->handleMessage($cancel);
 		}
 		return $resp;
