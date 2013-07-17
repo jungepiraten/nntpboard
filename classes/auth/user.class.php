@@ -19,7 +19,7 @@ abstract class AbstractUserAuth extends AbstractAuth {
 	}
 
 	public function isAnonymous() {
-		return true;
+		return false;
 	}
 
 	public function getUsername() {
