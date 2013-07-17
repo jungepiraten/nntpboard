@@ -2,6 +2,8 @@
 
 // http://pear.php.net/package/Net_IMAP
 include_once('Net/IMAP.php');
+// http://pear.php.net/package/Net_SMTP
+include_once('Net/SMTP.php');
 
 require_once(dirname(__FILE__)."/rfc5322.class.php");
 require_once(dirname(__FILE__)."/../../exceptions/message.exception.php");
@@ -11,19 +13,21 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	private $loginusername;
 	private $loginpassword;
 	private $folder;
+	private $writer;
 
 	// MessageIDs
 	private $messageids = null;
 
 	private $imapclient;
 
-	public function __construct(Host $host, $loginusername, $loginpassword, $folder, $boardindexer) {
+	public function __construct(Host $host, $loginusername, $loginpassword, $folder, $boardindexer, $writer = false) {
 		parent::__construct($boardindexer);
 
 		$this->host = $host;
 		$this->loginusername = $loginusername;
 		$this->loginpassword = $loginpassword;
 		$this->folder = $folder;
+		$this->writer = $writer;
 	}
 
 	public function getGroupID() {
@@ -108,6 +112,9 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	 **/
 
 	public function post($message) {
+		if ($this->writer != false) {
+			return $this->writer->post($message);
+		}
 		return false;
 	}
 }
