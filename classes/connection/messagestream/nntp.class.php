@@ -3,12 +3,10 @@
 // http://pear.php.net/package/Net_NNTP
 require_once("Net/NNTP/Client.php");
 
-require_once(dirname(__FILE__)."/../messagestream.class.php");
-require_once(dirname(__FILE__)."/rfc5322/header.class.php");
-require_once(dirname(__FILE__)."/rfc5322/message.class.php");
+require_once(dirname(__FILE__)."/rfc5322.class.php");
 require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
 
-class NNTPConnection extends AbstractMessageStreamConnection {
+class NNTPConnection extends AbstractRFC5322Connection {
 	private $host;
 	private $group;
 
@@ -106,14 +104,14 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		return in_array($msgid, $this->getMessageIDs());
 	}
 
-	public function getMessage($msgid) {
+	protected function getRFC5322Message($msgid) {
 		if ($this->hasMessage($msgid)) {
 			// Lade die Nachricht und Parse sie
 			$article = $this->nntpclient->getArticle($msgid);
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->group);
 			}
-			$rfcmessage = RFC5322Message::parsePlain(implode("\r\n", $article));
+			return RFC5322Message::parsePlain(implode("\r\n", $article));
 			$message = $rfcmessage->getObject($this);
 			// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
 			if ($rfcmessage->getHeader()->has("Sender")
@@ -127,23 +125,21 @@ class NNTPConnection extends AbstractMessageStreamConnection {
 		throw new NotFoundMessageException($msgid, $this->group);
 	}
 
+	public function getMessage($msgid) {
+		$message = parent::getMessage($msgid);
+		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
+		if ($rfcmessage->getHeader()->has("Sender")
+		  && (strtolower($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
+			$message->setAuthor(RFC5322Address::parsePlain($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8"))->getObject());
+		}
+		return $message;
+	}
+
 	/**
 	 * Schreibe eine Nachricht
 	 **/
 
-	public function postMessage($message) {
-		return $this->post( RFC5322Message::parseObject($this, $message) );
-	}
-
-	public function postAcknowledge($ack, $message) {
-		return $this->post( RFC5322Message::parseAcknowledgeObject($this, $ack, $message) );
-	}
-
-	public function postCancel($cancel, $message) {
-		return $this->post( RFC5322Message::parseCancelObject($this, $cancel, $message) );
-	}
-
-	private function post($nntpmsg) {
+	protected function post($nntpmsg) {
 		$nntpmsg->getHeader()->setValue("Newsgroups", $this->group);
 
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {

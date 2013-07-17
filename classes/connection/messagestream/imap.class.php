@@ -3,12 +3,10 @@
 // http://pear.php.net/package/Net_IMAP
 include_once('Net/IMAP.php');
 
-require_once(dirname(__FILE__)."/../messagestream.class.php");
-require_once(dirname(__FILE__)."/rfc5322/header.class.php");
-require_once(dirname(__FILE__)."/rfc5322/message.class.php");
+require_once(dirname(__FILE__)."/rfc5322.class.php");
 require_once(dirname(__FILE__)."/../../exceptions/message.exception.php");
 
-class IMAPConnection extends AbstractMessageStreamConnection {
+class IMAPConnection extends AbstractRFC5322Connection {
 	private $host;
 	private $loginusername;
 	private $loginpassword;
@@ -92,17 +90,14 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 		return in_array($msgid, $this->getMessageIDs());
 	}
 
-	public function getMessage($msgid) {
+	protected function getRFC5322Message($msgid) {
 		// Lade die Nachricht und Parse sie
 		if ($this->hasMessage($msgid)) {
 			$article = $this->imapclient->getMessages($this->getArticleNr($msgid));
 			if (PEAR::isError($article)) {
 				throw new NotFoundMessageException($msgid, $this->folder);
 			}
-			$message = RFC5322Message::parsePlain(array_shift($article));
-			$message = $message->getObject($this);
-
-			return $message;
+			return RFC5322Message::parsePlain(array_shift($article));
 		}
 		// Diese Nachricht gibt es offensichtlich nicht mehr ;)
 		throw new NotFoundMessageException($msgid, $this->folder);
@@ -111,13 +106,8 @@ class IMAPConnection extends AbstractMessageStreamConnection {
 	/**
 	 * Schreibe eine Nachricht
 	 **/
-	public function postMessage($message) {
-		return false;
-	}
-	public function postAcknowledge($ack, $message) {
-		return false;
-	}
-	public function postCancel($cancel, $message) {
+
+	public function post($message) {
 		return false;
 	}
 }
