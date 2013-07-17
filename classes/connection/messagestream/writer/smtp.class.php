@@ -14,7 +14,7 @@ class SMTPMessageStreamWriter extends AbstractMessageStreamWriter {
 	}
 
 	public function post(RFC5322Message $message) {
-		$nntpmsg->getHeader()->setValue("To", $this->recipient);
+		$message->getHeader()->setValue("To", $this->recipient);
 
 		$conn = new Net_SMTP($this->host->getHost(), $this->host->getPort());
 		$conn->connect();
