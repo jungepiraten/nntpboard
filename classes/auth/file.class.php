@@ -13,7 +13,7 @@ if (!function_exists("mkdir_parents")) {
 	}
 }
 
-abstract class AbstractFileAuth extends AbstractUserAuth {
+class FileUserAuth extends AbstractUserAuth {
 	private $data;
 
 	public function __construct($username, $password, $address, $nntpusername, $nntppassword) {
