@@ -35,7 +35,7 @@ class TestConfig extends DefaultConfig {
 		$this->addBoard(new MemCachedIMAPBoard(1000, 900, "imap", "Z", $indexer,
 				new StaticAuthManager(true), new StaticAuthManager(true), false, new MemCacheHost("localhost", 11211, "nntpboard1000"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
 		$this->addBoard(new RedisCachedIMAPBoard(1001, 900, "imap2", "Y", $indexer,
-				new StaticAuthManager(true), new StaticAuthManager(false), false, new RedisHost("localhost", 6379, "nntpboard1001"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
+				new StaticAuthManager(true), new StaticAuthManager(true), false, new RedisHost("localhost", 6379, "nntpboard1001"), new Host("localhost", 143), "prauscher@example.net", "", "INBOX"));
 
 		$this->secretkey = $secretkey;
 	}
@@ -49,8 +49,7 @@ class TestConfig extends DefaultConfig {
 	}
 
 	public function getAuth($user, $pass) {
-		return new JuPisAuth($user, $pass);
-		return JuPisAuth::authenticate($user, $pass);
+		return new JuPisAuth($this, $user, $pass);
 	}
 
 	public function getAnonymousAuth() {
