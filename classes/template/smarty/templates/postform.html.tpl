@@ -50,12 +50,12 @@ function addAttachmentField() {
 
 		<div class="control-group">
  			{if isset($address)}
-				<label class="control-label" for="user">Benutzer</label>
+				<label class="control-label" for="user">Benutzer*in</label>
 				<p class="controls">
 					<input type="text" name="user" id="user" value="{$address.text|escape:html}" readonly />
 				</p>
 			{else}
-				<label class="control-label" for="user">Benutzer</label>
+				<label class="control-label" for="user">Benutzer*in</label>
 				<p class="controls">
 					<input type="text" name="user" id="user" value="{if isset($smarty.request.user)}{$smarty.request.user|stripslashes|escape:html}{else}{$user|escape:html}{/if}" />
 				</p>
