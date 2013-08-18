@@ -183,25 +183,34 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 	public function updateGroup() {
 		$cachegroup = $this->getGroup();
 
-		$uplinkmessageids = $this->uplink->getMessageIDs();
-		$cachemessageids  = $cachegroup->getMessageIDs();
+		try {
+			$uplinkmessageids = $this->uplink->getMessageIDs();
+			$cachemessageids  = $cachegroup->getMessageIDs();
 
-		// Liste mit neuen Nachrichten aufstellen
-		$newmessages = array_diff($uplinkmessageids, $cachemessageids);
-		foreach ($newmessages as $messageid) {
-			$message = $this->uplink->getMessage($messageid);
-			$cachegroup->addMessage($message);
+			// Liste mit neuen Nachrichten aufstellen
+			$newmessages = array_diff($uplinkmessageids, $cachemessageids);
+			foreach ($newmessages as $messageid) {
+				$message = $this->uplink->getMessage($messageid);
+				$cachegroup->addMessage($message);
+			}
+
+			// Veraltete Nachrichten ausstreichen (z.b. Cancel)
+			$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
+			foreach ($oldmessages as $messageid) {
+				$cachegroup->removeMessage($messageid);
+			}
+
+			$grouphash = $this->uplink->getGroupHash();
+			$this->setGroupHash($grouphash);
+			$cachegroup->setGroupHash($grouphash);
+		} catch (Exception $e) {
+			// Not throw an exception here: close() needs to be called
+			print($this->getGroupID() . ": " . $e->getMessage() . "\n");
+
+			// Damit enforcen wir, dass die Daten in den Cache geschrieben werden und beim naechsten
+			// update auch gepusht werden (s. postMessageCache())
+			$this->setGroupHash(__CLASS__ . '$' . md5(microtime(true) . rand(100,999)));
 		}
-
-		// Veraltete Nachrichten ausstreichen (z.b. Cancel)
-		$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
-		foreach ($oldmessages as $messageid) {
-			$cachegroup->removeMessage($messageid);
-		}
-
-		$grouphash = $this->uplink->getGroupHash();
-		$this->setGroupHash($grouphash);
-		$cachegroup->setGroupHash($grouphash);
 	}
 
 	private function postCache() {
