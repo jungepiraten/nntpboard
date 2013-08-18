@@ -97,7 +97,16 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 	}
 	public function updateGroup() {
 		parent::updateGroup();
-		$this->setLastThread($this->getGroup()->hasLastThread() ? $this->getGroup()->getLastThread() : null);
+		try {
+			$this->setLastThread($this->getGroup()->hasLastThread() ? $this->getGroup()->getLastThread() : null);
+		} catch (Exception $e) {
+			// Not throw an exception here: close() needs to be called
+			print($this->getGroupID() . ": " . $e->getMessage() . "\n");
+
+			// Damit enforcen wir, dass die Daten in den Cache geschrieben werden und beim naechsten
+			// update auch gepusht werden (s. postMessageCache())
+			$this->setGroupHash(__CLASS__ . '$' . md5(microtime(true) . rand(100,999)));
+		}
 	}
 }
 
