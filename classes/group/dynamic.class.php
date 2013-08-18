@@ -68,8 +68,13 @@ class DynamicGroup extends AbstractGroup {
 	public function getMessage($messageid) {
 		if (!isset($this->messages[$messageid])) {
 			$this->messages[$messageid] = $this->sanitizeMessage($this->connection->loadMessage($messageid));
-			if (!($this->messages[$messageid] instanceof Message) && !($this->messages[$messageid] instanceof Acknowledge)) {
-				throw new Exception("Loading of Message " . $messageid . " failed: Returnvalue neither instanceof Message or Acknowledge");
+			if ($this->messages[$messageid] == null) {
+				unset($this->messages[$messageid]);
+				unset($this->messagethreads[$messageid]);
+				if ($this->hasThread($messageid)) {
+					$this->getThread($messageid)->removeMessage($messageid);
+			        }
+			        throw new Exception("Error at Message " . $messageid . " - tried to fix it automatically");
 			}
 		}
 		return $this->messages[$messageid];
@@ -88,8 +93,10 @@ class DynamicGroup extends AbstractGroup {
 		}
 		if (!isset($this->threads[$threadid])) {
 			$this->threads[$threadid] = $this->sanitizeThread($this->connection->loadThread($threadid));
-			if (!($this->threads[$threadid] instanceof Thread)) {
-				throw new Exception("Loading of Thread " . $threadid . " failed: Returnvalue not instanceof Thread");
+			if ($this->threads[$threadid] == null) {
+				unset($this->threads[$threadid]);
+				unset($this->threadslastpost[$threadid]);
+				throw new Exception("Error at Thread " . $threadid . " - tried to fix it automatically");
 			}
 		}
 		return $this->threads[$threadid];
