@@ -10,14 +10,22 @@ require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 class JuPisAnonAuth extends AnonAuth {}
 
 class JuPisAuth extends FileUserAuth {
-	protected static $MODERATORS = array("prauscher", "smrqdt", "lutoma", "c-lia");
+	private $groups:
 
 	public function __construct($config, $username, $password) {
-		parent::__construct($username, $password, new Address($username, str_replace(" ", "_", $username) . "@community.junge-piraten.de"), str_replace(" ", "_", $username), $config->getNNTPPassword());
+		$dn = "uid=".$username.",ou=People,o=Junge Piraten,c=DE";
+		$ldap = Net_LDAP2::connect(array("binddn" => $dn, "bindpw" => $password, "basedn" => "o=junge piraten,c=de", "host" => "storage"));
+		$mail = array_shift($ldap->search($dn, "(objectClass=*)", array("attributes" => array("mail")))->entries())->getValue("mail","single");
+		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(member=".$dn.")", array("attributes" => array("cn"))) as $dn => $entry) {
+			$this->groups[] = $entry->getValue("cn","single");
+		}
+		var_dump($this->groups);
+
+		parent::__construct($username, $password, new Address($username, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
 
 	public function mayCancel($message) {
-		return parent::mayCancel($message) or in_array(strtolower($this->getUsername()), self::$MODERATORS);
+		return parent::mayCancel($message) or in_array("moderators", $this->groups);
 	}
 }
 
