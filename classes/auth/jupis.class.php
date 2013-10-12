@@ -10,7 +10,7 @@ require_once(dirname(__FILE__)."/../exceptions/auth.exception.php");
 class JuPisAnonAuth extends AnonAuth {}
 
 class JuPisAuth extends FileUserAuth {
-	private $groups:
+	private $groups;
 
 	public function __construct($config, $username, $password) {
 		$dn = "uid=".$username.",ou=People,o=Junge Piraten,c=DE";
@@ -19,7 +19,6 @@ class JuPisAuth extends FileUserAuth {
 		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(member=".$dn.")", array("attributes" => array("cn"))) as $dn => $entry) {
 			$this->groups[] = $entry->getValue("cn","single");
 		}
-		var_dump($this->groups);
 
 		parent::__construct($username, $password, new Address($username, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
