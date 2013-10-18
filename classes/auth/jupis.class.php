@@ -18,7 +18,7 @@ class JuPisAuth extends FileUserAuth {
 		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(member=".$dn.")", array("attributes" => array("cn"))) as $dn => $entry) {
 			$this->groups[] = $entry->getValue("cn","single");
 		}
-		$user = array_shift($ldap->search($dn, "(objectClass=*)", array("attributes" => array("mail","uid")))->entries())
+		$user = array_shift($ldap->search($dn, "(objectClass=*)", array("attributes" => array("mail","uid")))->entries());
 		$mail = $user->getValue("mail","single");
 		if (empty($mail)) {
 			$mail = $user->getValue("uid","single")."@community.junge-piraten.de";
