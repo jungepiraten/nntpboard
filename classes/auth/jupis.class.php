@@ -18,12 +18,13 @@ class JuPisAuth extends FileUserAuth {
 		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(member=".$dn.")", array("attributes" => array("cn"))) as $dn => $entry) {
 			$this->groups[] = $entry->getValue("cn","single");
 		}
-		$user = array_shift($ldap->search($dn, "(objectClass=*)", array("attributes" => array("mail","uid")))->entries());
+		$user = array_shift($ldap->search($dn, "(objectClass=*)", array("attributes" => array("mail","uid","cn")))->entries());
+		$displayName = $user->getValue("cn","single");
 		$mail = $user->getValue("mail","single");
 		if (empty($mail)) {
 			$mail = $user->getValue("uid","single")."@community.junge-piraten.de";
 		}
-		parent::__construct($username, $password, new Address($username, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
+		parent::__construct($username, $password, new Address($displayName, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
 
 	public function mayCancel($message) {
