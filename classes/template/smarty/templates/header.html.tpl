@@ -79,7 +79,7 @@
 							<li><a href="search.php"><i class="icon-search"></i> Suchen</a></li>
 							{if $ISANONYMOUS}
 								<li><a href="login.php"><i class="icon-user"></i> Anmelden</a></li>
-								<li><a href="https://ucp.junge-piraten.de/index.php?module=register"><i class="icon-cog"></i> Registrieren</a></li>
+								<li><a href="https://ucp.junge-piraten.de/register"><i class="icon-cog"></i> Registrieren</a></li>
 							{else}
 								<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>							
 							{/if}
