@@ -15,7 +15,7 @@ class JuPisAuth extends FileUserAuth {
 	public function __construct($config, $username, $password) {
 		$dn = "uid=".$username.",ou=People,o=Junge Piraten,c=DE";
 		$ldap = Net_LDAP2::connect(array("binddn" => $dn, "bindpw" => $password, "basedn" => "o=junge piraten,c=de", "host" => "storage"));
-		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(member=".$dn.")", array("attributes" => array("cn"))) as $group_dn => $entry) {
+		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(uniqueMember=".$dn.")", array("attributes" => array("cn"))) as $group_dn => $entry) {
 			$this->groups[] = $entry->getValue("cn","single");
 		}
 		$user = $ldap->getEntry($dn, array("mail","uid","cn"));
