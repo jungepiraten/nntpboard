@@ -119,7 +119,7 @@ function generateMessage($config, $session, $board, $reference) {
 
 $preview = null;
 if (isset($_REQUEST["preview"])) {
-	$preview = generateMessage($config, $session, $reference);
+	$preview = generateMessage($config, $session, $board, $reference);
 }
 
 if (isset($_REQUEST["post"])) {
