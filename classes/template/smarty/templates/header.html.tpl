@@ -5,10 +5,13 @@
 
 		<script src="libs/jquery-1.8.2.min.js"></script>
 		<script src="libs/bootstrap-2.1.1/js/bootstrap.min.js"></script>
+		<script src="libs/stylesheet.js"></script>
 
 		<link href="libs/bootstrap-2.1.1/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="libs/font-awesome/css/font-awesome.css" rel="stylesheet" />
 		<link href="classes/template/smarty/style.css" rel="stylesheet" />
+		<link href="css/additional.css" rel="stylesheet" />
+		<link href="css/jupis.css" rel="alternate stylesheet" title="JuPi-Theme" />
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -48,7 +51,7 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="brand" href="index.php">
-						NNTPBoard
+						<span>NNTP</span>Board
 					</a>
 					<ul class="nav">
 						<li class="active hidden-phone"><a href="index.php">Forenübersicht</a></li>
