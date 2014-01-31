@@ -69,6 +69,9 @@ a.thumbnail:hover{border-color:#242424;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 .container-fluid .btn{border:1px solid #046D8B;}
 .form-actions {border:none;background-color:#046D8B;}
 .btn:focus {outline: none;}
+.controls .btn-group>.btn {border-color:#f3f3f3;}
+.modal-footer .btn+.btn {border-color:#000000;}
+.modal-footer .btn+.btn:hover{color:#FFFFFF;border-color:#DE2355;}
 
 .message
 	{border-radius:0px !important; border:1px solid #FFF; margin-bottom:15px;}
