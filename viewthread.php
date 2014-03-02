@@ -76,8 +76,8 @@ try {
 	$session->getAuth()->markReadThread($thread, $message["message"]);
 } catch (Exception $e) {
 	$template->viewexception($e);
-} finally {
-	$connection->close();
 }
+
+$connection->close();
 
 ?>
