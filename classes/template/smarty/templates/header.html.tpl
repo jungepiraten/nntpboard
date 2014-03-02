@@ -84,7 +84,7 @@
 								<li><a href="login.php"><i class="icon-user"></i> Anmelden</a></li>
 								<li><a href="https://ucp.junge-piraten.de/register"><i class="icon-cog"></i> Registrieren</a></li>
 							{else}
-								<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>							
+								<li><a href="logout.php"><i class="icon-off"></i> Abmelden</a></li>
 							{/if}
 							<li><a href="unread.php?markread="><i class="icon-flag"></i> Alle als gelesen markieren</a></li>
 {php}
@@ -106,5 +106,7 @@ function isSubBoard($destBoard, $curBoard) {
 				</div>
 
 			        <div class="span9">
-					<h1>{$title|escape:html}</h1>
+					<h1>{$title|escape:html}
+						<span class="stylesheet"><form action="dummy" method="post"><select name="choice" onchange="setActiveStyleSheet(this.form.choice.options[this.form.choice.selectedIndex].value)"><option value="">Blau-Wei&szlig;</option><option value="JuPi-Theme">Schwarz-Cyan</option></select></form></span>
+					</h1>
 
