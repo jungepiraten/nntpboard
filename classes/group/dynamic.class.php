@@ -189,7 +189,7 @@ class DynamicGroup extends AbstractGroup {
 		return $this->threadslastpost;
 	}
 	public function getNewMessagesIDs() {
-		return array_keys(array_filter($this->messages, create_function('$x', '$x != null')));
+		return array_keys(array_filter($this->messages, create_function('$x', 'return $x != null;')));
 	}
 	public function getNewThreadIDs() {
 		return array_keys($this->threads);
