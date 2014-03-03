@@ -9,10 +9,12 @@ $board = $config->getBoard($boardid);
 
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
+	exit;
 }
 
 if (!$board->mayRead($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();

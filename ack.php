@@ -12,15 +12,18 @@ $wertung = isset($_REQUEST["wertung"]) ? intval($_REQUEST["wertung"]) : +1;
 $board = $config->getBoard($boardid);
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
+	exit;
 }
 
 if (!$board->mayAcknowledge($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
+	exit;
 }
 
 /* Thread laden */
@@ -33,6 +36,7 @@ $message = $group->getMessage($messageid);
 $thread = $group->getThread($messageid);
 if (!($message instanceof Message)) {
 	$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
+	exit;
 }
 
 // TODO mehrfache zustimmungen?

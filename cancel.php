@@ -11,11 +11,13 @@ $messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslash
 $board = $config->getBoard($boardid);
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
+	exit;
 }
 
 $connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
+	exit;
 }
 
 /* Thread laden */
@@ -29,10 +31,12 @@ $thread = $group->getThread($messageid);
 
 if (!($message instanceof Message)) {
 	$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
+	exit;
 }
 
 if (!$session->getAuth()->mayCancel($message)) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 // TODO Zustimmungs-Posts canceln?
