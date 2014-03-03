@@ -68,7 +68,7 @@ try {
 	// $message will now contain the last message on that page
 
 	if (!is_array($messages) || count($messages) < 1) {
-		$template->viewexception(new Exception("Thread ungueltig!"));
+		throw new Exception("Thread ungueltig!");
 	}
 
 	// order is important: the template will check if the message is unread

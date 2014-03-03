@@ -27,15 +27,18 @@ $board = $config->getBoard($boardid);
 
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
+	exit;
 }
 
 if (!$board->mayPost($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
+	exit;
 }
 
 if ($reference !== null) {
@@ -141,10 +144,9 @@ if (isset($_REQUEST["post"])) {
 
 		// Alte Attachments loeschen - werden ja nur fuers Preview gespeichert
 		$session->clearAttachments();
-	} catch (PostingException $e) {
-		$template->viewexception($e);
 	} catch (Exception $e) {
 		$template->viewexception($e);
+		exit;
 	}
 }
 

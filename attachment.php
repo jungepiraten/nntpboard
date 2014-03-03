@@ -14,6 +14,7 @@ if ($board === null) {
 
 if (!$board->mayRead($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();
