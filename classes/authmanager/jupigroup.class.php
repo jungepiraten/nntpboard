@@ -10,7 +10,7 @@ class AllowJuPiGroupAuthManager implements AuthManager {
 	}
 
 	public function isAllowed(Auth $auth) {
-		if (!($auth instanceof JuPiAuth)) {
+		if (!($auth instanceof JuPisAuth)) {
 			return false;
 		}
 		return $auth->isInGroup($this->group);
