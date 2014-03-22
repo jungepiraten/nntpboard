@@ -28,8 +28,12 @@ class JuPisAuth extends FileUserAuth {
 		parent::__construct($username, $password, new Address($displayName, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
 
+	public function isInGroup($group) {
+		return in_array($group, $this->groups);
+	}
+
 	public function mayCancel($message) {
-		return parent::mayCancel($message) or in_array("moderators", $this->groups);
+		return parent::mayCancel($message) or $this->isInGroup("moderators");
 	}
 }
 
