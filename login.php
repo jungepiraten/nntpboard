@@ -5,8 +5,8 @@ $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
 if (isset($_REQUEST["login"])) {
-	$user = isset($_REQUEST["username"]) ? stripslashes($_REQUEST["username"]) : null;
-	$pass = isset($_REQUEST["password"]) ? stripslashes($_REQUEST["password"]) : null;
+	$user = isset($_REQUEST["username"]) ? $_REQUEST["username"] : null;
+	$pass = isset($_REQUEST["password"]) ? $_REQUEST["password"] : null;
 	$permanent = isset($_REQUEST["permanent"]);
 
 	try {

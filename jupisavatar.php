@@ -24,7 +24,7 @@ function getImage($page) {
 }
 
 if (isset($_REQUEST["name"])) {
-	$name = stripslashes($_REQUEST["name"]);
+	$name = $_REQUEST["name"];
 	$cachename = "avatarcache/" . md5($name);
 
 	// Wenn unser Cachebild nicht zu alt ist, benutze es

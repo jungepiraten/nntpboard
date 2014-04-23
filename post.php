@@ -6,20 +6,20 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-$boardid = stripslashes($_REQUEST["boardid"]);
+$boardid = $_REQUEST["boardid"];
 $reference = null;
 $referencemessages = null;
 
 if (!empty($_REQUEST["quote"])) {
-	$reference = $config->decodeMessageID(stripslashes($_REQUEST["quote"]));
+	$reference = $config->decodeMessageID($_REQUEST["quote"]);
 }
 
 if (!empty($_REQUEST["reply"])) {
-	$reference = $config->decodeMessageID(stripslashes($_REQUEST["reply"]));
+	$reference = $config->decodeMessageID($_REQUEST["reply"]);
 }
 
 if (!empty($_REQUEST["reference"])) {
-	$reference = $config->decodeMessageID(stripslashes($_REQUEST["reference"]));
+	$reference = $config->decodeMessageID($_REQUEST["reference"]);
 }
 
 $quote = isset($_REQUEST["quote"]);
@@ -57,10 +57,10 @@ if ($reference !== null) {
 
 function generateMessage($config, $session, $board, $reference) {
 	$messageid = $config->generateMessageID();
-	$subject = (!empty($_REQUEST["subject"]) ? trim(stripslashes($_REQUEST["subject"])) : "");
+	$subject = (!empty($_REQUEST["subject"]) ? trim($_REQUEST["subject"]) : "");
 
 	if($session->getAuth()->isAnonymous()) {
-		$author = new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])));
+		$author = new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]));
 	} else {
 		$author = $session->getAuth()->getAddress();
 	}
@@ -82,7 +82,7 @@ function generateMessage($config, $session, $board, $reference) {
 		throw new Exception("Body empty");
 	}
 
-	$textbody = stripslashes($_REQUEST["body"]);
+	$textbody = $_REQUEST["body"];
 	$message = new Message($messageid, time(), $author, $subject, $parentid, $textbody);
 
 	// Speichere alte Attachments und fuege aus allen die Message zusammen

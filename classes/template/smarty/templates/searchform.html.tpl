@@ -5,7 +5,7 @@
 		<div class="control-group">
 			<label for="term" class="control-label">Suchen:</label>
 			<p class="controls">
-				<input type="text" class="term" name="term" value="{if isset($smarty.request.term)}{$smarty.request.term|stripslashes|escape:html}{/if}" />
+				<input type="text" class="term" name="term" value="{if isset($smarty.request.term)}{$smarty.request.term|escape:html}{/if}" />
 			</p>
 		</div>
 		

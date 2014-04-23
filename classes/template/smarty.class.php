@@ -498,9 +498,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("auth", $auth);
 
 		if (!empty($_REQUEST["redirect"])) {
-			header("Location: " . stripslashes($_REQUEST["redirect"]));
+			header("Location: " . $_REQUEST["redirect"]);
 		} elseif (!empty($_SERVER["HTTP_REFERER"])) {
-			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
+			header("Location: " . $_SERVER["HTTP_REFERER"]);
 		} else {
 			header("Location: index.php");
 		}
@@ -512,9 +512,9 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		$this->smarty->assign("auth", null);
 
 		if (!empty($_REQUEST["redirect"])) {
-			header("Location: " . stripslashes($_REQUEST["redirect"]));
+			header("Location: " . $_REQUEST["redirect"]);
 		} elseif (!empty($_SERVER["HTTP_REFERER"])) {
-			header("Location: " . stripslashes($_SERVER["HTTP_REFERER"]));
+			header("Location: " . $_SERVER["HTTP_REFERER"]);
 		} else {
 			header("Location: index.php");
 		}
