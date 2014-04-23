@@ -10,7 +10,7 @@ if ($config->getIndexer() == null) {
 }
 
 if (isset($_REQUEST["term"])) {
-	$term = stripslashes($_REQUEST["term"]);
+	$term = $_REQUEST["term"];
 	$_results = $config->getIndexer()->getResults($term);
 
 	// Erzwinge mindestens eine Seite

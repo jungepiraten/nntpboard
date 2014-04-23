@@ -4,9 +4,9 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-$boardid = stripslashes($_REQUEST["boardid"]);
-$threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["threadid"])) : null;
-$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
+$boardid = $_REQUEST["boardid"];
+$threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID($_REQUEST["threadid"]) : null;
+$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 
 try {
 	$board = $config->getBoard($boardid);

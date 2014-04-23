@@ -5,8 +5,8 @@ require_once(dirname(__FILE__)."/classes/cancel.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-$boardid = stripslashes($_REQUEST["boardid"]);
-$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
+$boardid = $_REQUEST["boardid"];
+$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
@@ -44,7 +44,7 @@ $cancelid = $config->generateMessageID();
 // TODO autor-input?
 
 if ($session->getAuth()->isAnonymous()) {
-	$author = new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])));
+	$author = new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]));
 } else {
 	$author = $session->getAuth()->getAddress();
 }
