@@ -45,19 +45,17 @@ class IMAPConnection extends AbstractRFC5322Connection {
 		}
 
 		// Mailbox auswaehlen
-		$this->imapclient->selectMailbox($this->folder);
-
-		$this->refreshCache();
+		if (Net_IMAP::isError($this->imapclient->selectMailbox($this->folder))) {
+			$this->messageids = array();
+			$this->articles = array();
+		} else {
+			$this->messageids = null;
+			$this->articles = null;
+		}
 	}
 
 	public function close() {
 		$this->imapclient->disconnect();
-	}
-
-	// Interne Caches leeren, damit wir merken, dass sich etwas geaendert hat
-	protected function refreshCache() {
-		$this->messageids = null;
-		$this->articles = null;
 	}
 
 	private function getArticleNr($msgid) {
@@ -87,6 +85,9 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	}
 
 	public function getMessageCount() {
+		if (isset($this->messageids)) {
+			return count($this->messageids);
+		}
 		return $this->imapclient->getNumberOfMessages();
 	}
 
