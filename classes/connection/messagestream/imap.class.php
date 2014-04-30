@@ -45,7 +45,7 @@ class IMAPConnection extends AbstractRFC5322Connection {
 		}
 
 		// Mailbox auswaehlen
-		if (Net_IMAP::isError($this->imapclient->selectMailbox($this->folder))) {
+		if (PEAR::isError($this->imapclient->selectMailbox($this->folder))) {
 			$this->messageids = array();
 			$this->articles = array();
 		} else {
