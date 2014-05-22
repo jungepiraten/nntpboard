@@ -78,7 +78,7 @@ class IMAPConnection extends AbstractRFC5322Connection {
 				foreach ($articles AS $article) {
 					$msgid = $article["EXT"]["ENVELOPE"]["MESSAGE_ID"];
 					if ($msgid == "NIL") {
-						$msgid = "<envelope-" . md5(serialize($article["EXT"]["ENVELOPE"])) . "@generated.local>":
+						$msgid = "<envelope-" . md5(serialize($article["EXT"]["ENVELOPE"])) . "@generated.local>";
 					}
 					$this->articles[$msgid] = $article["NRO"];
 					$this->messageids[$article["NRO"]] = $msgid;
