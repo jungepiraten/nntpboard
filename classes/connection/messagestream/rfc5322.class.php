@@ -7,7 +7,7 @@ require_once(dirname(__FILE__)."/rfc5322/message.class.php");
 abstract class AbstractRFC5322Connection extends AbstractMessageStreamConnection {
 	public function getMessage($msgid) {
 		$rfcmessage = $this->getRFC5322Message($msgid);
-		return $rfcmessage->getObject($this);
+		return $rfcmessage->getObject($msgid, $this);
 	}
 
 	abstract protected function getRFC5322Message($msgid);
