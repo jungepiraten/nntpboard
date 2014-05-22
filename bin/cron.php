@@ -7,6 +7,9 @@ if ($config->isCronRunning()) {
 }
 $config->markCronRunning();
 
+$useFork = function_exists("pcntl_fork") && function_exists("pcntl_wait");
+$childPids = array();
+
 /**
  * Fuehre hier den Cache-Tausch durch
  *  - Nachrichten in den Cache herunterladen
@@ -19,6 +22,14 @@ foreach ($config->getBoardIDs() as $boardid) {
 		continue;
 	}
 
+	if ($useFork) {
+		$pid = pcntl_fork();
+		if ($pid > 0) {
+			$childPids[$pid] = true;
+			continue;
+		}
+	}
+
 	try {
 		// Benutze keine Authentifikation
 		$cache->open(NULL);
@@ -29,6 +40,17 @@ foreach ($config->getBoardIDs() as $boardid) {
 		$cache->close();
 	} catch (Exception $e) {
 		echo "<pre>".$e->getMessage()."\n" . $e->getTraceAsString() . "</pre>\n";
+	}
+
+	if ($useFork) {
+		exit;
+	}
+}
+
+if ($useFork) {
+	while (!empty($childPids)) {
+		$childPid = pcntl_wait($status);
+		unset($childPids[$childPid]);
 	}
 }
 
