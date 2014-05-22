@@ -120,6 +120,7 @@ class NNTPConnection extends AbstractRFC5322Connection {
 	public function getMessage($msgid) {
 		$message = parent::getMessage($msgid);
 		// Bei "Mailman" benutzen wir lieber die Mailadresse, weil Mailingliste
+		$rfcmessage = $this->getRFC5322Message($msgid);
 		if ($rfcmessage->getHeader()->has("Sender")
 		  && (strtolower($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8")) != "mailman@community.junge-piraten.de")) {
 			$message->setAuthor(RFC5322Address::parsePlain($rfcmessage->getHeader()->get("Sender")->getValue("UTF-8"))->getObject());
