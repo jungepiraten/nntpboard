@@ -55,7 +55,8 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	}
 
 	public function close() {
-		$this->imapclient->disconnect();
+		// Expunge on disconnect
+		$this->imapclient->disconnect(true);
 	}
 
 	private function getArticleNr($msgid) {
@@ -115,6 +116,11 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	/**
 	 * Schreibe eine Nachricht
 	 **/
+
+	public function postCancel($cancel, $message) {
+		// Nachricht wird zum löschen markiert. Löschen erst bei Disconnect (sonst muss die Nummerierung geändert werden)
+		$this->imapclient->deleteMessages($this->getArticleNr($message->getMessageID()));
+	}
 
 	public function post($message) {
 		if ($this->writer != false) {
