@@ -60,6 +60,10 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	}
 
 	private function getArticleNr($msgid) {
+		// Lade zuordnung falls nicht bereits geschehen
+		if ($this->articles == null) {
+			$this->getMessageIDs();
+		}
 		return $this->articles[$msgid];
 	}
 
