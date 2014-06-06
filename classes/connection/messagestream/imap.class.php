@@ -74,16 +74,18 @@ class IMAPConnection extends AbstractRFC5322Connection {
 				return array();
 			}
 			// Hole eine Uebersicht ueber alle verfuegbaren Posts
-			$ret = $this->imapclient->cmdFetch("1:" . $messageCount, "envelope");
+			$ret = $this->imapclient->cmdFetch("1:" . $messageCount, "BODY[HEADER.FIELDS (MESSAGE-ID)]");
 			if ($ret["RESPONSE"]["CODE"] != "OK") {
 				throw new Exception($ret["RESPONSE"]["STR_CODE"]);
 			} else {
 				$articles = $ret["PARSED"];
 				$this->messageids = array();
 				foreach ($articles AS $article) {
-					$msgid = $article["EXT"]["ENVELOPE"]["MESSAGE_ID"];
-					if ($msgid == "NIL") {
+					$msgids = explode(":", $article["EXT"]["BODY[HEADER.FIELDS (MESSAGE-ID)]"]["CONTENT"], 2);
+					if (count($msgids) != 2) {
 						$msgid = "<envelope-" . md5(serialize($article["EXT"]["ENVELOPE"])) . "@generated.local>";
+					} else {
+						$msgid = trim($msgids[1]);
 					}
 					$this->articles[$msgid] = $article["NRO"];
 					$this->messageids[$article["NRO"]] = $msgid;
