@@ -11,7 +11,7 @@
 		<div class="control-group">
 			<label for="username" class="control-label">Benutzername:</label>
 			<p class="controls">
-				<input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|stripslashes|escape:html}{/if}" />
+				<input type="text" class="username" name="username" value="{if isset($smarty.request.username)}{$smarty.request.username|escape:html}{/if}" />
 			</p>
 		</div>
 		

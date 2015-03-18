@@ -4,9 +4,9 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
-$boardid = stripslashes($_REQUEST["boardid"]);
-$threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["threadid"])) : null;
-$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
+$boardid = $_REQUEST["boardid"];
+$threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID($_REQUEST["threadid"]) : null;
+$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 
 try {
 	$board = $config->getBoard($boardid);
@@ -67,9 +67,8 @@ try {
 	}
 	// $message will now contain the last message on that page
 
-	$connection->close();
 	if (!is_array($messages) || count($messages) < 1) {
-		$template->viewexception(new Exception("Thread ungueltig!"));
+		throw new Exception("Thread ungueltig!");
 	}
 
 	// order is important: the template will check if the message is unread
@@ -78,5 +77,7 @@ try {
 } catch (Exception $e) {
 	$template->viewexception($e);
 }
+
+$connection->close();
 
 ?>

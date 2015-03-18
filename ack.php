@@ -5,22 +5,25 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
-$boardid = stripslashes($_REQUEST["boardid"]);
-$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID(stripslashes($_REQUEST["messageid"])) : null;
+$boardid = $_REQUEST["boardid"];
+$messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 $wertung = isset($_REQUEST["wertung"]) ? intval($_REQUEST["wertung"]) : +1;
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
 	$template->viewexception(new Exception("Board nicht gefunden!"));
+	exit;
 }
 
 if (!$board->mayAcknowledge($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();
 if ($connection === null) {
 	$template->viewexception(new Exception("Board enthaelt keine Group!"));
+	exit;
 }
 
 /* Thread laden */
@@ -33,13 +36,14 @@ $message = $group->getMessage($messageid);
 $thread = $group->getThread($messageid);
 if (!($message instanceof Message)) {
 	$template->viewexception(new Exception("Message konnte nicht zugeordnet werden."));
+	exit;
 }
 
 // TODO mehrfache zustimmungen?
 $ackid = $config->generateMessageID();
 // TODO autor-input?
 $autor = $session->getAuth()->isAnonymous()
-	? new Address(trim(stripslashes($_REQUEST["user"])), trim(stripslashes($_REQUEST["email"])))
+	? new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]))
 	: $session->getAuth()->getAddress();
 $ack = new Acknowledge($ackid, $messageid, time(), $autor, $wertung);
 

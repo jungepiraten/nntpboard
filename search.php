@@ -10,7 +10,7 @@ if ($config->getIndexer() == null) {
 }
 
 if (isset($_REQUEST["term"])) {
-	$term = stripslashes($_REQUEST["term"]);
+	$term = $_REQUEST["term"];
 	$_results = $config->getIndexer()->getResults($term);
 
 	// Erzwinge mindestens eine Seite
@@ -49,6 +49,7 @@ if (isset($_REQUEST["term"])) {
 
 		$message = $group->getMessage($result->getMessageID());
 		if (!($message instanceof Message)) {
+			// TODO remove messageid from index
 			continue;
 		}
 

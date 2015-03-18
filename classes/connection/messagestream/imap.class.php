@@ -45,22 +45,25 @@ class IMAPConnection extends AbstractRFC5322Connection {
 		}
 
 		// Mailbox auswaehlen
-		$this->imapclient->selectMailbox($this->folder);
-
-		$this->refreshCache();
+		if (PEAR::isError($this->imapclient->selectMailbox($this->folder))) {
+			$this->messageids = array();
+			$this->articles = array();
+		} else {
+			$this->messageids = null;
+			$this->articles = null;
+		}
 	}
 
 	public function close() {
-		$this->imapclient->disconnect();
-	}
-
-	// Interne Caches leeren, damit wir merken, dass sich etwas geaendert hat
-	protected function refreshCache() {
-		$this->messageids = null;
-		$this->articles = null;
+		// Expunge on disconnect
+		$this->imapclient->disconnect(true);
 	}
 
 	private function getArticleNr($msgid) {
+		// Lade zuordnung falls nicht bereits geschehen
+		if ($this->articles == null) {
+			$this->getMessageIDs();
+		}
 		return $this->articles[$msgid];
 	}
 
@@ -71,15 +74,21 @@ class IMAPConnection extends AbstractRFC5322Connection {
 				return array();
 			}
 			// Hole eine Uebersicht ueber alle verfuegbaren Posts
-			$ret = $this->imapclient->cmdFetch("1:" . $messageCount, "envelope");
+			$ret = $this->imapclient->cmdFetch("1:" . $messageCount, "BODY[HEADER.FIELDS (MESSAGE-ID)]");
 			if ($ret["RESPONSE"]["CODE"] != "OK") {
 				throw new Exception($ret["RESPONSE"]["STR_CODE"]);
 			} else {
 				$articles = $ret["PARSED"];
 				$this->messageids = array();
 				foreach ($articles AS $article) {
-					$this->articles[$article["EXT"]["ENVELOPE"]["MESSAGE_ID"]] = $article["NRO"];
-					$this->messageids[$article["NRO"]] = $article["EXT"]["ENVELOPE"]["MESSAGE_ID"];
+					$msgids = explode(":", $article["EXT"]["BODY[HEADER.FIELDS (MESSAGE-ID)]"]["CONTENT"], 2);
+					if (count($msgids) != 2) {
+						$msgid = "<envelope-" . md5(serialize($article["EXT"]["ENVELOPE"])) . "@generated.local>";
+					} else {
+						$msgid = trim($msgids[1]);
+					}
+					$this->articles[$msgid] = $article["NRO"];
+					$this->messageids[$article["NRO"]] = $msgid;
 				}
 			}
 		}
@@ -87,6 +96,9 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	}
 
 	public function getMessageCount() {
+		if (isset($this->messageids)) {
+			return count($this->messageids);
+		}
 		return $this->imapclient->getNumberOfMessages();
 	}
 
@@ -110,6 +122,11 @@ class IMAPConnection extends AbstractRFC5322Connection {
 	/**
 	 * Schreibe eine Nachricht
 	 **/
+
+	public function postCancel($cancel, $message) {
+		// Nachricht wird zum löschen markiert. Löschen erst bei Disconnect (sonst muss die Nummerierung geändert werden)
+		$this->imapclient->deleteMessages($this->getArticleNr($message->getMessageID()));
+	}
 
 	public function post($message) {
 		if ($this->writer != false) {

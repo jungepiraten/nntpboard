@@ -3,9 +3,9 @@ require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
-$boardid = stripslashes($_REQUEST["boardid"]);
-$messageid = $config->decodeMessageID(stripslashes($_REQUEST["messageid"]));
-$partid = stripslashes($_REQUEST["partid"]);
+$boardid = $_REQUEST["boardid"];
+$messageid = $config->decodeMessageID($_REQUEST["messageid"]);
+$partid = $_REQUEST["partid"];
 
 $board = $config->getBoard($boardid);
 if ($board === null) {
@@ -14,6 +14,7 @@ if ($board === null) {
 
 if (!$board->mayRead($session->getAuth())) {
 	$template->viewexception(new Exception("Keine Berechtigung!"));
+	exit;
 }
 
 $connection = $board->getConnection();

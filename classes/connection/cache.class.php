@@ -205,7 +205,7 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 			$cachegroup->setGroupHash($grouphash);
 		} catch (Exception $e) {
 			// Not throw an exception here: close() needs to be called
-			print($this->getGroupID() . ": " . $e->getMessage() . "\n");
+			print($this->getGroupID() . ": " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
 
 			// Damit enforcen wir, dass die Daten in den Cache geschrieben werden und beim naechsten
 			// update auch gepusht werden (s. postMessageCache())

@@ -93,15 +93,13 @@ class RFC5322Message {
 		return $text;
 	}
 
-	public function getObject($connection) {
+	public function getObject($messageid, $connection) {
 		// Header interpretieren
-		$messageid =	$this->getHeader()->has("Message-ID")	? $this->getHeader()->get("Message-ID")->getValue() : uniqid() . "@generated.local";
 		$subject =	$this->getHeader()->has("Subject")	? $this->getHeader()->get("Subject")->getValue() : "";
 		$date =		$this->getHeader()->has("Date")		? strtotime($this->getHeader()->get("Date")->getValue()) : time();
 		// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
 		$author =	RFC5322Address::parsePlain(
 					$this->getHeader()->has("From") ? array_shift(explode(",", $this->getHeader()->get("From")->getValue())) : "unknown" )->getObject();
-
 		// References (per Default als neuer Thread)
 		$parentid = null;
 		if ($this->getHeader()->has("References") && trim($this->getHeader()->get("References")->getValue()) != "") {

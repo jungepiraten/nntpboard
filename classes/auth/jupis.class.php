@@ -13,6 +13,7 @@ class JuPisAuth extends FileUserAuth {
 	private $groups;
 
 	public function __construct($config, $username, $password) {
+		$this->groups = array();
 		$dn = "uid=".$username.",ou=People,o=Junge Piraten,c=DE";
 		$ldap = Net_LDAP2::connect(array("binddn" => $dn, "bindpw" => $password, "basedn" => "o=junge piraten,c=de", "host" => "storage"));
 		foreach ($ldap->search("ou=Groups,o=Junge Piraten,c=DE", "(uniqueMember=".$dn.")", array("attributes" => array("cn"))) as $group_dn => $entry) {
@@ -27,8 +28,12 @@ class JuPisAuth extends FileUserAuth {
 		parent::__construct($username, $password, new Address($displayName, $mail), str_replace(" ", "_", $username), $config->getNNTPPassword());
 	}
 
+	public function isInGroup($group) {
+		return in_array($group, $this->groups);
+	}
+
 	public function mayCancel($message) {
-		return parent::mayCancel($message) or in_array("moderators", $this->groups);
+		return parent::mayCancel($message) or $this->isInGroup("moderators");
 	}
 }
 

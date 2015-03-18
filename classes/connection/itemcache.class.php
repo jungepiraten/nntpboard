@@ -101,7 +101,7 @@ abstract class AbstractItemCacheConnection extends AbstractCacheConnection {
 			$this->setLastThread($this->getGroup()->hasLastThread() ? $this->getGroup()->getLastThread() : null);
 		} catch (Exception $e) {
 			// Not throw an exception here: close() needs to be called
-			print($this->getGroupID() . ": " . $e->getMessage() . "\n");
+			print($this->getGroupID() . ": " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
 
 			// Damit enforcen wir, dass die Daten in den Cache geschrieben werden und beim naechsten
 			// update auch gepusht werden (s. postMessageCache())
