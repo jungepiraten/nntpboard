@@ -36,7 +36,7 @@ class IMAPConnection extends AbstractRFC5322Connection {
 
 	public function open($auth) {
 		// Verbindung oeffnen
-		$this->imapclient = new Net_IMAP($this->host->getHost(), $this->host->getPort(), true, "UTF-8");
+		$this->imapclient = new Net_IMAP($this->host->getHost(), $this->host->getPort(), $this->host->useStartTLS(), "UTF-8");
 
 		// Authentifieren
 		$ret = $this->imapclient->login($this->loginusername, $this->loginpassword);
