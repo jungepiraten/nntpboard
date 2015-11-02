@@ -86,7 +86,7 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 		return $this->uplink->getGroupID();
 	}
 
-	private function getGroupHash() {
+	public function getGroupHash() {
 		return $this->grouphash;
 	}
 	private function setGroupHash($hash) {
