@@ -11,7 +11,7 @@ class DynamicGroup extends AbstractGroup {
 
 	private $connection;
 
-	public function __construct(AbstractItemCacheConnection $connection) {
+	public function __construct(AbstractCacheConnection $connection) {
 		parent::__construct($connection->getGroupID(), $connection->getBoardIndexer());
 		$this->connection = $connection;
 		$messageids = $this->sanitizeMessageIDs($connection->loadMessageIDs());
