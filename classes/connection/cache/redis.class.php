@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../itemcache.class.php");
+require_once(dirname(__FILE__) . "/../cache.class.php");
 require_once(dirname(__FILE__) . "/redis/RedisServer.php");
 
-class RedisItemCacheConnection extends AbstractItemCacheConnection {
+class RedisCacheConnection extends AbstractCacheConnection {
 	private $rediscache;
 	private $link;
 
@@ -105,14 +105,6 @@ class RedisItemCacheConnection extends AbstractItemCacheConnection {
 
 	public function saveGroupHash($hash) {
 		$this->set("grouphash", $hash);
-	}
-
-	public function loadLastThread() {
-		return $this->get("lastthread");
-	}
-
-	public function saveLastThread($thread) {
-		$this->set("lastthread", $thread);
 	}
 }
 

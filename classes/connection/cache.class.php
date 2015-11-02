@@ -17,58 +17,110 @@ require_once(dirname(__FILE__)."/../exceptions/thread.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/message.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/datadir.exception.php");
 
-abstract class AbstractCacheConnection extends AbstractConnection {
+interface CacheConnection {
+	protected function getMessageQueue($queueid);
+	protected function setMessageQueue($queueid, $queue);
+	protected function loadMessageIDs();
+	protected function saveMessageIDs($messageids);
+	protected function loadMessageThreads();
+	protected function saveMessageThreads($messagethreads);
+	protected function loadThreadsLastPost();
+	protected function saveThreadsLastPost($messageids);
+	protected function loadMessage($messageid);
+	protected function saveMessage($messageid, $message);
+	protected function removeMessage($messageid);
+	protected function loadThread($threadid);
+	protected function saveThread($threadid, $thread);
+	protected function removeThread($threadid);
+	protected function loadAcknowledges($messageid);
+	protected function saveAcknowledges($messageid, $acks);
+	protected function loadGroupHash();
+	protected function saveGroupHash($hash);
+}
+
+abstract class AbstractCacheConnection extends AbstractConnection implements CacheConnection {
 	/**
 	 * $uplink - Die Verbindung, mit der Nachrichten synchronisiert werden
 	 **/
 	private $uplink;
 
-	private $boardindexer;
+	private $group;
 
-	private $cacheSentPosts;
+	/* Anhand von $grouphash != $oldgrouphash koennen wir feststellen, ob wir
+	 * komplex speichern muessen oder einfach fertig sind (siehe hasChanged) */
+	private $grouphash;
+	private $oldgrouphash;
 
-	public function __construct($uplink, $cacheSentPosts = true) {
+	public function __construct(Messagestream $uplink) {
 		parent::__construct($uplink->getBoardIndexer());
 		$this->uplink = $uplink;
-		$this->cacheSentPosts = $cacheSentPosts;
 	}
 
 	public function open($auth) {
 		$this->auth = $auth;
+		$this->oldgrouphash = $this->grouphash = $this->loadGroupHash();
 	}
 
 	public function close() {
 		$this->auth = null;
+		if ($this->hasChanged()) {
+			$this->saveGroupHash($this->grouphash);
+			if ($this->group !== null) {
+				$this->saveMessageIDs($this->group->getMessageIDs());
+				$this->saveMessageThreads($this->group->getMessageThreads());
+				$this->saveThreadsLastPost($this->group->getThreadsLastPost());
+				foreach ($this->group->getNewMessagesIDs() as $messageid) {
+					$this->saveMessage($messageid, $this->group->getMessage($messageid));
+				}
+				foreach ($this->group->getNewThreadIDs() as $threadid) {
+					$this->saveThread($threadid, $this->group->getThread($threadid));
+				}
+				foreach ($this->group->getAcknowledgeIDs() as $messageid) {
+					$this->saveAcknowledges($messageid, $this->group->getAcknowledgeMessageIDs($messageid));
+				}
+			}
+		}
 	}
 
 	public function getGroupID() {
 		return $this->uplink->getGroupID();
 	}
 
-	protected function addMessageQueue($queueid, $message) {
+	private function getGroupHash() {
+		return $this->grouphash;
+	}
+	private function setGroupHash($hash) {
+		$this->grouphash = $hash;
+	}
+	private function hasChanged() {
+		return $this->grouphash !== $this->oldgrouphash;
+	}
+
+	public function getGroup() {
+		if ($this->group === null) {
+			$this->group = new DynamicGroup($this);
+		}
+		return $this->group;
+	}
+
+	private function addMessageQueue($queueid, $message) {
 		$queue = $this->getMessageQueue($queueid);
 		$queue[] = $message;
 		$this->setMessageQueue($queueid, $queue);
 	}
-	protected function delMessageQueue($queueid, $msgid) {
+	private function delMessageQueue($queueid, $msgid) {
 		$queue = $this->getMessageQueue($queueid);
 		unset($queue[$msgid]);
 		$this->setMessageQueue($queueid, $queue);
 	}
 
-	/** public for MixedItemCacheConnection **/
-	abstract public function getMessageQueue($queueid);
-	abstract public function setMessageQueue($queueid, $queue);
-
-	abstract protected function setGroupHash($hash);
-
 	/**
 	 * Poste eine Nachricht
 	 * Dafuer nutzen wir eine Queue, die beim naechsten sync (cron.php) mittels
-	 * sendMessages() abgearbeitet wird.
+	 * postLocalMessages() abgearbeitet wird.
 	 * Solange ist die Nachricht nur im Forum sichtbar.
 	 **/
-	private function handleMessage($message) {
+	private function handleLocalMessage($message) {
 		if ($message instanceof Message) {
 			$this->getGroup()->addMessage($message);
 		}
@@ -82,105 +134,24 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		// update auch gepusht werden (s. postMessageCache())
 		$this->setGroupHash(__CLASS__ . '$' . md5(microtime(true) . rand(100,999)));
 	}
-	private function hasLocalMessages() {
-		return (substr($this->getGroupHash(),0,strlen(__CLASS__)) == __CLASS__);
-	}
 
 	public function postMessage($message) {
-		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("message", array($this->auth, $message));
-			$this->handleMessage($message);
-			return true;
-		}
-		$resp = $this->postCacheMessage($this->auth, $message);
-		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == true) {
-			$this->handleMessage($message);
-		}
-		return $resp;
+		$this->addMessageQueue("message", array($this->auth, $message));
+		$this->handleLocalMessage($message);
+		return true;
 	}
 	public function postAcknowledge($ack, $message) {
-		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("acknowledge", array($this->auth, $ack, $message));
-			$this->handleMessage($ack);
-			return true;
-		}
-		$resp = $this->postCacheAcknowledge($this->auth, $ack, $message);
-		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == true) {
-			$this->handleMessage($cancel);
-		}
-		return $resp;
+		$this->addMessageQueue("acknowledge", array($this->auth, $ack, $message));
+		$this->handleLocalMessage($ack);
+		return true;
 	}
 	public function postCancel($cancel, $message) {
-		if ($this->cacheSentPosts) {
-			$this->addMessageQueue("cancel", array($this->auth, $cancel, $message));
-			$this->handleMessage($cancel);
-			return true;
-		}
-		$resp = $this->postCacheCancel($this->auth, $cancel, $message);
-		// Wenn der Uplink die Nachricht genommen hat, koennen wir sie direkt korrekt eintragen
-		if ($resp == true) {
-			$this->handleMessage($cancel);
-		}
-		return $resp;
+		$this->addMessageQueue("cancel", array($this->auth, $cancel, $message));
+		$this->handleLocalMessage($cancel);
+		return true;
 	}
 
-	private function postCacheMessage($auth, $message) {
-		// Die Berechtigungen prueft der Uplink selbst
-		$this->uplink->open($auth);
-		$resp = $this->uplink->postMessage($message);
-		$this->uplink->close();
-		return $resp;
-	}
-	private function postCacheAcknowledge($auth, $ack, $message) {
-		// Die Berechtigungen prueft der Uplink selbst
-		$this->uplink->open($auth);
-		$resp = $this->uplink->postAcknowledge($ack, $message);
-		$this->uplink->close();
-		return $resp;
-	}
-	private function postCacheCancel($auth, $cancel, $message) {
-		// Die Berechtigungen prueft der Uplink selbst
-		$this->uplink->open($auth);
-		$resp = $this->uplink->postCancel($cancel, $message);
-		$this->uplink->close();
-		return $resp;
-	}
-
-	public function getGroup() {
-		return new StaticGroup($this->getGroupID(), $this->getGroupHash());
-	}
-
-	public function setGroup($group) {
-		$cachegroup = $this->getGroup();
-
-		if ($this->hasLocalMessages()) {
-			$this->postMessageCache();
-		}
-
-		$uplinkmessageids = $group->getMessageIDs();
-		$cachemessageids  = $cachegroup->getMessageIDs();
-
-		// Liste mit neuen Nachrichten aufstellen
-		$newmessages = array_diff($uplinkmessageids, $cachemessageids);
-		foreach ($newmessages as $messageid) {
-			$message = $group->getMessage($messageid);
-			$cachegroup->addMessage($message);
-		}
-
-		// Veraltete Nachrichten ausstreichen (z.b. Cancel)
-		$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
-		foreach ($oldmessages as $messageid) {
-			$cachegroup->removeMessage($messageid);
-		}
-
-		$grouphash = $group->getGroupHash();
-		$this->setGroupHash($grouphash);
-		$cachegroup->setGroupHash($grouphash);
-	}
-
-	public function updateGroup() {
+	private function updateLocal() {
 		$cachegroup = $this->getGroup();
 
 		try {
@@ -213,42 +184,42 @@ abstract class AbstractCacheConnection extends AbstractConnection {
 		}
 	}
 
-	private function postCache() {
+	private function postLocalMessages() {
 		foreach ($this->getMessageQueue("message") as $msgid => $msg) {
 			list($auth, $message) = $msg;
-			$this->postCacheMessage($auth, $message);
+			// Die Berechtigungen prueft der Uplink selbst
+			$this->uplink->open($auth);
+			$this->uplink->postMessage($message);
+			$this->uplink->close();
 			$this->delMessageQueue("message", $msgid);
 		}
 		foreach ($this->getMessageQueue("acknowledge") as $msgid => $msg) {
 			list($auth, $ack, $message) = $msg;
-			$this->postCacheAcknowledge($auth, $ack, $message);
+			// Die Berechtigungen prueft der Uplink selbst
+			$this->uplink->open($auth);
+			$this->uplink->postAcknowledge($ack, $message);
+			$this->uplink->close();
 			$this->delMessageQueue("acknowledge", $msgid);
 		}
 		foreach ($this->getMessageQueue("cancel") as $msgid => $msg) {
 			list($auth, $cancel, $message) = $msg;
-			$this->postCacheCancel($auth, $cancel, $message);
+			// Die Berechtigungen prueft der Uplink selbst
+			$this->uplink->open($auth);
+			$this->uplink->postAcknowledge($cancel, $message);
+			$this->uplink->close();
 			$this->delMessageQueue("cancel", $msgid);
 		}
 	}
 
 	/**
-	 * Hole neue Daten vom Uplink / Cache-Update
+	 * Hole neue Daten vom Uplink / Cache-Update. Einsprungspunkt für bin/cron.php
 	 **/
 	public function updateCache() {
-		if ($this->hasLocalMessages()) {
-			$this->postCache();
-		}
+		$this->postLocalMessages();
 
 		$this->uplink->open($this->auth);
-		// Gruppenhashes vergleichen (Schnellste Moeglichkeit)
 		if ($this->uplink->getGroupHash() != $this->getGroupHash()) {
-			/* Wenn unser Uplink uns die Nachrichten auch direkt geben kann,
-			 * muessen wir nicht erst die komplette Gruppe laden */
-			if ($this->uplink instanceof MessageStream) {
-				$this->updateGroup();
-			} else {
-				$this->setGroup($this->uplink->getGroup());
-			}
+			$this->updateLocal();
 		}
 		$this->uplink->close();
 	}
