@@ -18,24 +18,24 @@ require_once(dirname(__FILE__)."/../exceptions/message.exception.php");
 require_once(dirname(__FILE__)."/../exceptions/datadir.exception.php");
 
 interface CacheConnection {
-	protected function getMessageQueue($queueid);
-	protected function setMessageQueue($queueid, $queue);
-	protected function loadMessageIDs();
-	protected function saveMessageIDs($messageids);
-	protected function loadMessageThreads();
-	protected function saveMessageThreads($messagethreads);
-	protected function loadThreadsLastPost();
-	protected function saveThreadsLastPost($messageids);
-	protected function loadMessage($messageid);
-	protected function saveMessage($messageid, $message);
-	protected function removeMessage($messageid);
-	protected function loadThread($threadid);
-	protected function saveThread($threadid, $thread);
-	protected function removeThread($threadid);
-	protected function loadAcknowledges($messageid);
-	protected function saveAcknowledges($messageid, $acks);
-	protected function loadGroupHash();
-	protected function saveGroupHash($hash);
+	public function getMessageQueue($queueid);
+	public function setMessageQueue($queueid, $queue);
+	public function loadMessageIDs();
+	public function saveMessageIDs($messageids);
+	public function loadMessageThreads();
+	public function saveMessageThreads($messagethreads);
+	public function loadThreadsLastPost();
+	public function saveThreadsLastPost($messageids);
+	public function loadMessage($messageid);
+	public function saveMessage($messageid, $message);
+	public function removeMessage($messageid);
+	public function loadThread($threadid);
+	public function saveThread($threadid, $thread);
+	public function removeThread($threadid);
+	public function loadAcknowledges($messageid);
+	public function saveAcknowledges($messageid, $acks);
+	public function loadGroupHash();
+	public function saveGroupHash($hash);
 }
 
 abstract class AbstractCacheConnection extends AbstractConnection implements CacheConnection {
