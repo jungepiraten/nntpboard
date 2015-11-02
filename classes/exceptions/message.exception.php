@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__) . "/group.exception.php");
-
-class MessageException extends GroupException {
+class MessageException extends Exception {
 	private $msg;
+	private $group;
 
 	public function __construct($msg, $group, $message = null) {
-		parent::__construct($group, $message);
+		parent::__construct($message);
+		$this->group = $group;
 		$this->msg = $msg;
 	}
 }
