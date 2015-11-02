@@ -15,3 +15,4 @@ Installation:
 03. Im Webserver Zugriff auf bin/, libs/, classes/auth/ sperren
 04. Anpassen der config.inc.php
 05. Eintragen des Cronjobs "bin/cron.php"
+06. ggf. Eintragen des Cronjobs "bin/indexer.php"
