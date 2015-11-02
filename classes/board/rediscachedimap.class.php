@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/cachedimap.class.php");
-require_once(dirname(__FILE__) . "/../connection/itemcache/redis.class.php");
+require_once(dirname(__FILE__) . "/../connection/cache/redis.class.php");
 
 class RedisCachedIMAPBoard extends CachedIMAPBoard {
 	private $rediscache;
@@ -12,7 +12,7 @@ class RedisCachedIMAPBoard extends CachedIMAPBoard {
 	}
 
 	public function getConnection() {
-		return new RedisItemCacheConnection(
+		return new RedisCacheConnection(
 		           $this->rediscache,
 		           parent::getConnection()
 		       );

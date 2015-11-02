@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/cachedimap.class.php");
-require_once(dirname(__FILE__) . "/../connection/itemcache/mem.class.php");
+require_once(dirname(__FILE__) . "/../connection/cache/mem.class.php");
 
 class MemCachedIMAPBoard extends CachedIMAPBoard {
 	private $memcache;
@@ -12,7 +12,7 @@ class MemCachedIMAPBoard extends CachedIMAPBoard {
 	}
 
 	public function getConnection() {
-		return new MemItemCacheConnection(
+		return new MemCacheConnection(
 		           $this->memcache,
 		           parent::getConnection()
 		       );
