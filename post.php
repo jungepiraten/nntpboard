@@ -1,4 +1,5 @@
 <?php
+
 require_once(dirname(__FILE__)."/classes/address.class.php");
 require_once(dirname(__FILE__)."/classes/message.class.php");
 require_once(dirname(__FILE__)."/config.inc.php");
@@ -6,127 +7,121 @@ require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
+
 $boardid = $_REQUEST["boardid"];
 $reference = null;
 $referencemessages = null;
 
-if (!empty($_REQUEST["quote"])) {
-	$reference = $config->decodeMessageID($_REQUEST["quote"]);
-}
-
-if (!empty($_REQUEST["reply"])) {
-	$reference = $config->decodeMessageID($_REQUEST["reply"]);
-}
-
-if (!empty($_REQUEST["reference"])) {
-	$reference = $config->decodeMessageID($_REQUEST["reference"]);
-}
-
-$quote = isset($_REQUEST["quote"]);
-$board = $config->getBoard($boardid);
-
-if ($board === null) {
-	$template->viewexception(new Exception("Board nicht gefunden!"));
-	exit;
-}
-
-if (!$board->mayPost($session->getAuth())) {
-	$template->viewexception(new Exception("Keine Berechtigung!"));
-	exit;
-}
-
-$connection = $board->getConnection();
-if ($connection === null) {
-	$template->viewexception(new Exception("Board enthaelt keine Group!"));
-	exit;
-}
-
-if ($reference !== null) {
-	$connection->open($session->getAuth());
-	$group = $connection->getGroup();
-	$referencemessages = array();
-
-	foreach (array_slice(array_reverse($group->getThread($reference)->getMessageIDs()),0,5) as $messageid) {
-		$referencemessages[] = $group->getMessage($messageid);
+try {
+	if (!empty($_REQUEST["quote"])) {
+		$reference = $config->decodeMessageID($_REQUEST["quote"]);
 	}
 
-	$group->getThread($reference);
-	$reference = $group->getMessage($reference);
-	$connection->close();
-}
-
-function generateMessage($config, $session, $board, $reference) {
-	$messageid = $config->generateMessageID();
-	$subject = (!empty($_REQUEST["subject"]) ? trim($_REQUEST["subject"]) : "");
-
-	if($session->getAuth()->isAnonymous()) {
-		$author = new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]));
-	} else {
-		$author = $session->getAuth()->getAddress();
+	if (!empty($_REQUEST["reply"])) {
+		$reference = $config->decodeMessageID($_REQUEST["reply"]);
 	}
 
-	$storedattachments = isset($_REQUEST["storedattachment"]) && is_array($_REQUEST["storedattachment"]) ? $_REQUEST["storedattachment"] : array();
-	$attachment = $_FILES["attachment"];
+	if (!empty($_REQUEST["reference"])) {
+		$reference = $config->decodeMessageID($_REQUEST["reference"]);
+	}
+
+	$quote = isset($_REQUEST["quote"]);
+	$board = $config->getBoard($boardid);
+
+	if (!$board->mayPost($session->getAuth())) {
+		throw new Exception("Keine Berechtigung!");
+	}
+
+	$connection = $board->getConnection();
+	if ($connection === null) {
+		throw new Exception("Board enthaelt keine Group!");
+	}
 
 	if ($reference !== null) {
-		$parentid = $reference->getMessageID();
-	} else {
-		$parentid = null;
+		$connection->open($session->getAuth());
+		$group = $connection->getGroup();
+		$referencemessages = array();
+
+		foreach (array_slice(array_reverse($group->getThread($reference)->getMessageIDs()),0,5) as $messageid) {
+			$referencemessages[] = $group->getMessage($messageid);
+		}
+
+		$group->getThread($reference);
+		$reference = $group->getMessage($reference);
+		$connection->close();
 	}
 
-	if (empty($_REQUEST["subject"])) {
-		throw new Exception("Subject empty");
-	}
+	function generateMessage($config, $session, $board, $reference) {
+		$messageid = $config->generateMessageID();
+		$subject = (!empty($_REQUEST["subject"]) ? trim($_REQUEST["subject"]) : "");
 
-	if (empty($_REQUEST["body"])) {
-		throw new Exception("Body empty");
-	}
+		if($session->getAuth()->isAnonymous()) {
+			$author = new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]));
+		} else {
+			$author = $session->getAuth()->getAddress();
+		}
 
-	$textbody = $_REQUEST["body"];
-	$message = new Message($messageid, time(), $author, $subject, $parentid, $textbody);
+		$storedattachments = isset($_REQUEST["storedattachment"]) && is_array($_REQUEST["storedattachment"]) ? $_REQUEST["storedattachment"] : array();
+		$attachment = $_FILES["attachment"];
 
-	// Speichere alte Attachments und fuege aus allen die Message zusammen
-	$as = array();
-	foreach ($storedattachments as $partid) {
-		$as[] = $session->getAttachment($partid);
-	}
+		if ($reference !== null) {
+			$parentid = $reference->getMessageID();
+		} else {
+			$parentid = null;
+		}
 
-	$session->clearAttachments();
-	foreach ($as as $a) {
-		$message->addAttachment($a);
-		$session->addAttachment($a);
-	}
+		if (empty($_REQUEST["subject"])) {
+			throw new Exception("Subject empty");
+		}
 
-	// Fuege neue Attachments ein
-	if ($attachment !== null) {
-		for ($i = 0; $i < count($attachment["name"]); $i++) {
+		if (empty($_REQUEST["body"])) {
+			throw new Exception("Body empty");
+		}
 
-			// TODO Fehlerbehandlung
-			if ($attachment["error"][$i] != 0) {
-				continue;
-			}
+		$textbody = $_REQUEST["body"];
+		$message = new Message($messageid, time(), $author, $subject, $parentid, $textbody);
 
-			$a = new Attachment("attachment", $attachment["type"][$i], file_get_contents($attachment["tmp_name"][$i]), basename($attachment["name"][$i]));
-			// TODO Attachment-Whitelist
-			if (!$config->isAttachmentAllowed($board, $m, $a)) {
-				continue;
-			}
+		// Speichere alte Attachments und fuege aus allen die Message zusammen
+		$as = array();
+		foreach ($storedattachments as $partid) {
+			$as[] = $session->getAttachment($partid);
+		}
 
+		$session->clearAttachments();
+		foreach ($as as $a) {
 			$message->addAttachment($a);
 			$session->addAttachment($a);
 		}
+
+		// Fuege neue Attachments ein
+		if ($attachment !== null) {
+			for ($i = 0; $i < count($attachment["name"]); $i++) {
+
+				// TODO Fehlerbehandlung
+				if ($attachment["error"][$i] != 0) {
+					continue;
+				}
+
+				$a = new Attachment("attachment", $attachment["type"][$i], file_get_contents($attachment["tmp_name"][$i]), basename($attachment["name"][$i]));
+				// TODO Attachment-Whitelist
+				if (!$config->isAttachmentAllowed($board, $m, $a)) {
+					continue;
+				}
+
+				$message->addAttachment($a);
+				$session->addAttachment($a);
+			}
+		}
+
+		return $message;
 	}
 
-	return $message;
-}
+	$preview = null;
+	if (isset($_REQUEST["preview"])) {
+		$preview = generateMessage($config, $session, $board, $reference);
+	}
 
-$preview = null;
-if (isset($_REQUEST["preview"])) {
-	$preview = generateMessage($config, $session, $board, $reference);
-}
-
-if (isset($_REQUEST["post"])) {
-	try {
+	if (isset($_REQUEST["post"])) {
 		// TODO Sperre gegen F5
 		$message = generateMessage($config, $session, $board, $reference);
 
@@ -144,11 +139,11 @@ if (isset($_REQUEST["post"])) {
 
 		// Alte Attachments loeschen - werden ja nur fuers Preview gespeichert
 		$session->clearAttachments();
-	} catch (Exception $e) {
-		$template->viewexception($e);
-		exit;
 	}
+
+	$template->viewpostform($board, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
+} catch (Exception $e) {
+	$template->viewexception($e);
 }
 
-$template->viewpostform($board, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
 ?>

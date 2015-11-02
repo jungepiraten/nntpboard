@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
 require_once(dirname(__FILE__)."/classes/cancel.class.php");
+
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
 
