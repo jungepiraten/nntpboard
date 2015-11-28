@@ -12,9 +12,8 @@ class Board {
 	private $subboards = array();
 	private $readAuthManager;
 	private $writeAuthManager;
-	private $isModerated = false;
 
-	public function __construct($boardid, $parentid, $name, $desc, $indexer = null, $readAuthManager = null, $writeAuthManager = null, $isModerated = false) {
+	public function __construct($boardid, $parentid, $name, $desc, $indexer = null, $readAuthManager = null, $writeAuthManager = null) {
 		$this->boardid = $boardid;
 		$this->parentid = $parentid;
 		$this->name = $name;
@@ -22,7 +21,6 @@ class Board {
 		$this->indexer = $indexer;
 		$this->readAuthManager = $readAuthManager;
 		$this->writeAuthManager = $writeAuthManager;
-		$this->isModerated = $isModerated;
 	}
 
 	public function getBoardID() {
@@ -93,10 +91,6 @@ class Board {
 
 	public function mayAcknowledge($auth) {
 		return $this->mayPost($auth);
-	}
-
-	public function isModerated() {
-		return $this->isModerated;
 	}
 
 	// Per Default nutzen wir keine Verbindung - Unterklassen sollten eine Zurueckgeben

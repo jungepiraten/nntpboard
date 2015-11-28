@@ -11,7 +11,7 @@ class DynamicGroup extends AbstractGroup {
 
 	private $connection;
 
-	public function __construct(AbstractItemCacheConnection $connection) {
+	public function __construct(AbstractCacheConnection $connection) {
 		parent::__construct($connection->getGroupID(), $connection->getBoardIndexer());
 		$this->connection = $connection;
 		$messageids = $this->sanitizeMessageIDs($connection->loadMessageIDs());
@@ -140,9 +140,6 @@ class DynamicGroup extends AbstractGroup {
 		$this->threads[$thread->getThreadID()] = $thread;
 		$this->threadslastpost[$thread->getThreadID()] = $thread->getLastPostDate();
 		asort($this->threadslastpost);
-		if ($thread->getLastPostDate() > $this->getLastPostDate()) {
-			$this->connection->setLastThread($thread);
-		}
 		foreach ($thread->getMessageIDs() as $messageid) {
 			$this->messagethreads[$messageid] = $thread->getThreadID();
 		}
@@ -155,8 +152,6 @@ class DynamicGroup extends AbstractGroup {
 		unset($this->threads[$threadid]);
 		unset($this->threadslastpost[$threadid]);
 		$this->connection->removeThread($threadid);
-		// Last post updaten
-		$this->connection->setLastThread($this->getLastThread());
 	}
 
 	/** Acknowledges **/
@@ -180,7 +175,7 @@ class DynamicGroup extends AbstractGroup {
 	}
 
 	/**
-	 * Gebe die IDs durch, die sich geaendert haben (effizientes Speichern)
+	 * Gebe die IDs durch, die sich geaendert haben (effizientes Speichern, siehe AbstractCacheConnection::close)
 	 **/
 	public function getMessageThreads() {
 		return $this->messagethreads;

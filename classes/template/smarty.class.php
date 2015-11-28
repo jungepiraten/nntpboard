@@ -327,7 +327,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 
 
 	public function viewexception($exception) {
-		$this->smarty->assign("message", $exception->getMessage());
+		$this->smarty->assign("message", strval($exception));
 		$this->sendHeaders();
 		$this->smarty->display("exception.html.tpl");
 	}

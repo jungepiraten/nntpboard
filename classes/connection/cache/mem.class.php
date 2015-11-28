@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../itemcache.class.php");
+require_once(dirname(__FILE__) . "/../cache.class.php");
 
-class MemItemCacheConnection extends AbstractItemCacheConnection {
+class MemCacheConnection extends AbstractCacheConnection {
 	private $memcache;
 
 	private $link;
-	
+
 	public function __construct($memcache, $uplink) {
 		parent::__construct($uplink);
 		$this->memcache = $memcache;
@@ -102,15 +102,6 @@ class MemItemCacheConnection extends AbstractItemCacheConnection {
 	public function saveGroupHash($hash) {
 		$link = $this->getLink();
 		$link->set($this->memcache->getKeyName("grouphash"), $hash);
-	}
-
-	public function loadLastThread() {
-		$link = $this->getLink();
-		return $link->get($this->memcache->getKeyName("lastthread"));
-	}
-	public function saveLastThread($thread) {
-		$link = $this->getLink();
-		$link->set($this->memcache->getKeyName("lastthread"), $thread);
 	}
 }
 

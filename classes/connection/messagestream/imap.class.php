@@ -36,7 +36,7 @@ class IMAPConnection extends AbstractRFC5322Connection {
 
 	public function open($auth) {
 		// Verbindung oeffnen
-		$this->imapclient = new Net_IMAP($this->host->getHost(), $this->host->getPort(), true, "UTF-8");
+		$this->imapclient = new Net_IMAP($this->host->getHost(), $this->host->getPort(), $this->host->useStartTLS(), "UTF-8");
 
 		// Authentifieren
 		$ret = $this->imapclient->login($this->loginusername, $this->loginpassword);
@@ -45,13 +45,14 @@ class IMAPConnection extends AbstractRFC5322Connection {
 		}
 
 		// Mailbox auswaehlen
-		if (PEAR::isError($this->imapclient->selectMailbox($this->folder))) {
-			$this->messageids = array();
-			$this->articles = array();
-		} else {
-			$this->messageids = null;
-			$this->articles = null;
+		$ret = $this->imapclient->selectMailbox($this->folder);
+		if (PEAR::isError($ret)) {
+			throw new Exception($ret);
 		}
+
+		// Mark connection as unused (no data received so far)
+		$this->messageids = null;
+		$this->articles = null;
 	}
 
 	public function close() {

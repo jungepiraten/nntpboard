@@ -1,18 +1,17 @@
 <?php
+
 require_once(dirname(__FILE__)."/config.inc.php");
 require_once(dirname(__FILE__)."/classes/session.class.php");
 
 $session = new Session($config);
 $template = $config->getTemplate($session->getAuth());
+
 $boardid = $_REQUEST["boardid"];
 $threadid = isset($_REQUEST["threadid"]) ? $config->decodeMessageID($_REQUEST["threadid"]) : null;
 $messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 
 try {
 	$board = $config->getBoard($boardid);
-	if ($board === null) {
-		throw new Exception("Board nicht gefunden!");
-	}
 
 	if (!$board->mayRead($session->getAuth())) {
 		throw new Exception("Keine Berechtigung!");
@@ -78,6 +77,7 @@ try {
 	$template->viewexception($e);
 }
 
-$connection->close();
+// Not sure if needed, as connection gets closed in try-block
+//$connection->close();
 
 ?>

@@ -7,8 +7,8 @@ class NNTPBoard extends Board {
 	private $host;
 	private $group;
 
-	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated, $host, $group) {
-		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $isModerated);
+	public function __construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager, $host, $group) {
+		parent::__construct($boardid, $parentid, $name, $desc, $indexer, $readAuthManager, $writeAuthManager);
 		$this->host = $host;
 		$this->group = $group;
 	}
