@@ -4,7 +4,7 @@
 require_once("Net/NNTP/Client.php");
 
 require_once(dirname(__FILE__)."/rfc5322.class.php");
-require_once(dirname(__FILE__)."/../../exceptions/group.exception.php");
+require_once(dirname(__FILE__)."/../../exceptions/message.exception.php");
 
 class NNTPConnection extends AbstractRFC5322Connection {
 	private $host;
@@ -125,17 +125,9 @@ class NNTPConnection extends AbstractRFC5322Connection {
 		$nntpmsg->getHeader()->setValue("Newsgroups", $this->group);
 
 		if (($ret = $this->nntpclient->post($nntpmsg->getPlain())) instanceof PEAR_Error) {
-			$errstring = "#" . $ret->getCode() . ": " . $ret->getUserInfo() . " on Message\n" . $nntpmsg->getPlain();
-			/* Bekannte Fehler */
-			switch ($ret->getCode()) {
-			case 440:
-				throw new PostingNotAllowedException($this->group, $errstring);
-			case 441:
-				// Nachricht Syntaktisch inkorrekt
-				throw new PostingFailedException($this->group, $errstring);
-			}
-			// Ein unerwarteter Fehler - wie spannend *g*
-			throw new PostingException($this->group, $errstring);
+			$errstring = $this->group . ": #" . $ret->getCode() . ": " . $ret->getUserInfo() . " on Message\n" . $nntpmsg->getPlain();
+			// $ret->getCode(): 440 invalid mail, 441 invalid messageformat
+			throw new Exception($errstring);
 		}
 		// u.a. um zu bemerken, dass wir einen neuen GroupCache haben
 		$this->refreshCache();
