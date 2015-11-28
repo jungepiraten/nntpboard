@@ -12,7 +12,8 @@ require_once(dirname(__FILE__)."/classes/board/memcachedimap.class.php");
 require_once(dirname(__FILE__)."/classes/board/rediscachedimap.class.php");
 
 require_once(dirname(__FILE__)."/classes/authmanager/static.class.php");
-require_once(dirname(__FILE__)."/classes/auth/jupis.class.php");
+require_once(dirname(__FILE__)."/classes/auth/anon.class.php");
+require_once(dirname(__FILE__)."/classes/auth/file.class.php");
 require_once(dirname(__FILE__)."/classes/template/smarty.class.php");
 
 class TestConfig extends DefaultConfig {
@@ -49,11 +50,11 @@ class TestConfig extends DefaultConfig {
 	}
 
 	public function getAuth($user, $pass) {
-		return new JuPisAuth($this, $user, $pass);
+		return new FileAuth($user, $pass, $user . "@unread", $user, $pass);
 	}
 
 	public function getAnonymousAuth() {
-		return new JuPisAnonAuth();
+		return new AnonAuth();
 	}
 
 	public function getAddressText($address) {
