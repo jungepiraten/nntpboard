@@ -10,6 +10,7 @@ $config->markCronRunning();
 
 $useFork = function_exists("pcntl_fork") && function_exists("pcntl_wait");
 $childPids = array();
+$maxChilds = 5;
 
 /**
  * Fuehre hier den Cache-Tausch durch
@@ -24,6 +25,11 @@ foreach ($config->getBoardIDs() as $boardid) {
 	}
 
 	if ($useFork) {
+		if ($maxChilds > 0 && count($childPids) >= $maxChilds) {
+			$oldPid = pcntl_wait($status);
+			unset($childPids[$oldPid]);
+		}
+
 		$pid = pcntl_fork();
 		if ($pid > 0) {
 			$childPids[$pid] = true;
@@ -48,11 +54,9 @@ foreach ($config->getBoardIDs() as $boardid) {
 	}
 }
 
-if ($useFork) {
-	while (!empty($childPids)) {
-		$childPid = pcntl_wait($status);
-		unset($childPids[$childPid]);
-	}
+while (!empty($childPids)) {
+	$childPid = pcntl_wait($status);
+	unset($childPids[$childPid]);
 }
 
 $config->markCronFinished();
