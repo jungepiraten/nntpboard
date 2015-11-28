@@ -63,10 +63,12 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 		header("Content-Type: text/html; Charset=UTF-8");
 	}
 
-	private function parseBoard($board, $parseParent = true) {
+	private function parseBoard($board, $parent = null) {
 		$row = array();
 		$row["boardid"]		= $board->getBoardID();
-		if ($board->hasParent() && $parseParent == true) {
+		if ($parent != null) {
+			$row["parent"] = $parent;
+		} elseif ($board->hasParent()) {
 			$row["parent"]	= $this->parseBoard($board->getParent());
 		}
 		$row["name"]			= $board->getName();
@@ -100,8 +102,7 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 				$subboard = $board->getSubBoard($childid);
 				if ($subboard->mayRead($this->getAuth())) {
 					// Kleiner Hack, um eine Endlosschleife zu vermeiden
-					$child = $this->parseBoard($subboard, false);
-					$child["parent"] = &$row;
+					$child = $this->parseBoard($subboard, &$row);
 					$row["childs"][] = $child;
 					// Markiere auch obere Hierarchien ungelesen
 					if ($child["unread"] == true) {
