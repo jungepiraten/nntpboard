@@ -10,9 +10,15 @@ class RFC5322MixedMimeBody extends RFC5322MimeBody {
 		$text = "";
 		foreach ($this->getParts() as $part) {
 			if ($part instanceof RFC5322MimeBody) {
-				$text .= $part->getBodyPart($mimetype, $charset);
+				$append = $part->getBodyPart($mimetype, $charset);
 			} else if (in_array($part->getMimeType(), $mimetype)) {
-				$text .= $part->getBody($charset);
+				$append = $part->getBody($charset);
+			}
+			if ($append != "") {
+				if ($text != "") {
+					$text .= "\n";
+				}
+				$text .= $append;
 			}
 		}
 		return $text;
