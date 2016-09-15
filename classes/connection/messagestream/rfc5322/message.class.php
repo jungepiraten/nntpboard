@@ -131,8 +131,11 @@ class RFC5322Message {
 		// Nachrichteninhalt
 		$signature = null;
 		$textbody = $this->body->getBodyPart("text/plain");
-		if (strpos($textbody, "\n-- ") !== false) {
-			list($textbody, $signature) = explode("\n-- ", $textbody, 2);
+		if (strpos($textbody, "-- \n") === 0) {
+			$textbody = "";
+			$signature = substr($textbody, 4);
+		} else if (strpos($textbody, "\n-- \n") !== false) {
+			list($textbody, $signature) = explode("\n-- \n", $textbody, 2);
 		}
 		// Workaround fuer Mailman und andere Clients
 		if ($signature == null && preg_match('~^[-_]{2,}\r?$~m', $textbody) > 0) {
