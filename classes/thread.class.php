@@ -77,7 +77,8 @@ class Thread {
 	}
 
 	public function getLastPostMessageID() {
-		return array_pop(array_keys($this->messages));
+		$messageids = array_keys($this->messages);
+		return array_pop($messageids);
 	}
 
 	public function getLastPostDate() {
