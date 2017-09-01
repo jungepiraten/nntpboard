@@ -139,9 +139,9 @@ try {
 
 		// Alte Attachments loeschen - werden ja nur fuers Preview gespeichert
 		$session->clearAttachments();
+	} else {
+		$template->viewpostform($board, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
 	}
-
-	$template->viewpostform($board, $referencemessages, $reference, $quote, $preview, $session->getAttachments());
 } catch (Exception $e) {
 	$template->viewexception($e);
 }
