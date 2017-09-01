@@ -4,7 +4,8 @@ require_once(dirname(__FILE__) . "/../mimebody.class.php");
 
 class RFC5322SignedMimeBody extends RFC5322MimeBody {
 	private function getContentPart() {
-		return array_shift(array_slice($this->getParts(),0,1));
+		$parts = $this->getParts();
+		return reset($parts);
 	}
 
 	public function getBodyPart($mimetype, $charset = "UTF-8") {

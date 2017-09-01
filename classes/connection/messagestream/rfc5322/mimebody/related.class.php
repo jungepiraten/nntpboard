@@ -16,7 +16,8 @@ class RFC5322RelatedMimeBody extends RFC5322MimeBody {
 				}
 			}
 		}
-		return array_shift(array_slice($this->getParts(),0,1));
+		$parts = $this->getParts();
+		return reset($parts);
 	}
 
 	public function getBodyPart($mimetype, $charset = "UTF-8") {
