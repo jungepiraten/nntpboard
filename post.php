@@ -87,6 +87,7 @@ try {
 			$as[] = $session->getAttachment($partid);
 		}
 
+		// Take care of de-selected checkboxes (aka removed attachments)
 		$session->clearAttachments();
 		foreach ($as as $a) {
 			$message->addAttachment($a);
