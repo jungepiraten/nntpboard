@@ -99,7 +99,7 @@ class RFC5322Message {
 		$date =	$this->getHeader()->has("Date") ? strtotime($this->getHeader()->get("Date")->getValue()) : time();
 		// TODO was machen bei mehreren From-Adressen (per RFC erlaubt!)
 		$from_addresses = explode(",", $this->getHeader()->has("From") ? $this->getHeader()->get("From")->getValue() : "unknown");
-		$author = RFC5322Address::parsePlain(array_shift($from_addresses)->getObject();
+		$author = RFC5322Address::parsePlain(array_shift($from_addresses))->getObject();
 
 		// References (per Default als neuer Thread)
 		$parentid = null;
