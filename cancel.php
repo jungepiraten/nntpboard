@@ -11,6 +11,10 @@ $boardid = $_REQUEST["boardid"];
 $messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST["messageid"]) : null;
 
 try {
+	if ($session->getAuth()->isAnonymous()) {
+		throw new Exception("Diese Funktion steht anonymen Benutzern nicht zur Verfügung");
+	}
+
 	$board = $config->getBoard($boardid);
 
 	$connection = $board->getConnection();
@@ -37,13 +41,7 @@ try {
 
 	// TODO Zustimmungs-Posts canceln?
 	$cancelid = $config->generateMessageID();
-	// TODO autor-input?
-
-	if ($session->getAuth()->isAnonymous()) {
-		$author = new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]));
-	} else {
-		$author = $session->getAuth()->getAddress();
-	}
+	$author = $session->getAuth()->getAddress();
 
 	$cancel = new Cancel($cancelid, $messageid, time(), $author, $wertung);
 	$connection->open($session->getAuth());

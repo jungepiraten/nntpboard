@@ -11,6 +11,10 @@ $messageid = isset($_REQUEST["messageid"]) ? $config->decodeMessageID($_REQUEST[
 $wertung = isset($_REQUEST["wertung"]) ? intval($_REQUEST["wertung"]) : +1;
 
 try {
+	if ($session->getAuth()->isAnonymous()) {
+		throw new Exception("Diese Funktion steht anonymen Benutzern nicht zur Verfügung");
+	}
+
 	$board = $config->getBoard($boardid);
 
 	if (!$board->mayAcknowledge($session->getAuth())) {
@@ -38,10 +42,7 @@ try {
 
 	// TODO mehrfache zustimmungen?
 	$ackid = $config->generateMessageID();
-	// TODO autor-input?
-	$autor = $session->getAuth()->isAnonymous()
-		? new Address(trim($_REQUEST["user"]), trim($_REQUEST["email"]))
-		: $session->getAuth()->getAddress();
+	$autor = $session->getAuth()->getAddress();
 	$ack = new Acknowledge($ackid, $messageid, time(), $autor, $wertung);
 
 	$connection->open($session->getAuth());
