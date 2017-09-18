@@ -6,13 +6,13 @@ require_once(dirname(__FILE__) . "/redis/RedisServer.php");
  * incomplete Objekte erstellt.
  * vgl. http://mrfoo.de/archiv/120-The-script-tried-to-execute-a-method-or-access-a-property-of-an-incomplete-object.html
  **/
-require_once(dirname(__FILE__)."/../address.class.php");
-require_once(dirname(__FILE__)."/../thread.class.php");
-require_once(dirname(__FILE__)."/../message.class.php");
-require_once(dirname(__FILE__)."/../acknowledge.class.php");
-require_once(dirname(__FILE__)."/../cancel.class.php");
-require_once(dirname(__FILE__)."/../exceptions/thread.exception.php");
-require_once(dirname(__FILE__)."/../exceptions/message.exception.php");
+require_once(dirname(__FILE__)."/../../address.class.php");
+require_once(dirname(__FILE__)."/../../thread.class.php");
+require_once(dirname(__FILE__)."/../../message.class.php");
+require_once(dirname(__FILE__)."/../../acknowledge.class.php");
+require_once(dirname(__FILE__)."/../../cancel.class.php");
+require_once(dirname(__FILE__)."/../../exceptions/thread.exception.php");
+require_once(dirname(__FILE__)."/../../exceptions/message.exception.php");
 
 class RedisCacheConnection extends KeyValueCacheConnection {
 	private $rediscache;
