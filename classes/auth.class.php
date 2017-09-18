@@ -54,7 +54,7 @@ abstract class AbstractAuth implements Auth {
 			$this->readdate = min($this->getReadDate(), $auth->getReadDate());
 			// Fasse $readthreads zusammen
 			foreach ($auth->getReadThreads() as $threadid => $lastpostdate) {
-				if ($lastpostdate > $this->readthreads[$threadid]) {
+				if (!isset($this->readthreads[$threadid]) || $lastpostdate > $this->readthreads[$threadid]) {
 					$this->readthreads[$threadid] = $lastpostdate;
 				}
 			}
