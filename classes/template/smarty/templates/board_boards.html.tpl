@@ -1,15 +1,15 @@
 <table class="table table-striped">
 <tr>
- <th>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$subboard.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
+ <th>{if isset($boardid)}<a class="name" href="viewboard.php?boardid={$boardid|escape:url}" title="{$board.desc|escape:html}">{$name}</a>{else}{$name}{/if}</th>
  <th class="hidden-phone">Themen</th>
  <th class="hidden-phone">Beitr&auml;ge</th>
  <th>Letzte Antwort</th>
 </tr>
 {foreach from=$boards item=board name=counter}
-{if $zeigekategorien || $board.hasthreads}
+{if $zeigekategorien || (isset($board.hasthreads) && $board.hasthreads)}
  <tr class="clickable">
   <td>
-  <a class="name" id="board{$boardid}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$subboard.desc|escape:html}">{$board.name|escape:html}</a><br>
+  <a class="name" id="board{if isset($boardid)}{$boardid}{/if}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$board.desc|escape:html}">{$board.name|escape:html}</a><br>
     {if $board.unread}<a href="unread.php?markread={$board.boardid|escape:url}"><i class="icon-comments"></i></a>{/if}
     <span>{$board.desc}</span>
    </td>
