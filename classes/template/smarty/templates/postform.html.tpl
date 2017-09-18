@@ -57,23 +57,23 @@ function addAttachmentField() {
 			{else}
 				<label class="control-label" for="user">Benutzer*in</label>
 				<p class="controls">
-					<input type="text" name="user" id="user" value="{if isset($smarty.request.user)}{$smarty.request.user|escape:html}{else}{$user|escape:html}{/if}" />
+					<input type="text" name="user" id="user" value="{if isset($smarty.request.user)}{$smarty.request.user|escape:html}{elseif isset($user)}{$user|escape:html}{/if}" />
 				</p>
 
 				<label class="control-label" for="email">E-Mail</label>
 				<p class="controls">
-					<input type="text" name="email" id="email" value="{if isset($smarty.request.email)}{$smarty.request.email|escape:html}{else}{$email|escape:html}{/if}" />
+					<input type="text" name="email" id="email" value="{if isset($smarty.request.email)}{$smarty.request.email|escape:html}{elseif isset($email)}{$email|escape:html}{/if}" />
 				</p>
 			{/if}
 
 			<label class="control-label" for="subject">Betreff</label>
 			<p class="controls">
-				<input type="text" class="span7" name="subject" id="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|escape:html}{else}{$subject|escape:html}{/if}" />
+				<input type="text" class="span7" name="subject" id="subject" value="{if isset($smarty.request.subject)}{$smarty.request.subject|escape:html}{elseif isset($subject)}{$subject|escape:html}{/if}" />
 			</p>
 
 			<label class="control-label" for="body">Text</label>
 			<p class="controls">
-				<textarea name="body" id="body" class="span7" cols="80" rows="20">{if isset($smarty.request.body)}{$smarty.request.body|escape:html}{else}{$body|escape:html}{/if}</textarea>
+				<textarea name="body" id="body" class="span7" cols="80" rows="20">{if isset($smarty.request.body)}{$smarty.request.body|escape:html}{elseif isset($body)}{$body|escape:html}{/if}</textarea>
 			</p>
 
 			<label class="control-label" for="attachments">Anh&auml;nge:<br /> (Max. {$board.maxattachmentsize|calculateFileSize})</label>
