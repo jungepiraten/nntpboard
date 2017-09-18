@@ -1,6 +1,6 @@
-{include file=header.html.tpl title=$board.name}
+{include file="header.html.tpl" title=$board.name}
 
-<ul class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</li></ul>
+<ul class="breadcrumb">{include file="board_breadcrumb.html.tpl" board=$board}</li></ul>
 
 {if !empty($board.desc)}<p class="well">{$board.desc}</p>{/if}
 
@@ -9,12 +9,12 @@
 {capture assign=childboards}
 {foreach from=$board.childs item=child}
 {if isset($child.childs)}
-{include file=board_boards.html.tpl boardid=$child.boardid name=$child.name boards=$child.childs zeigekategorien=true}
+{include file="board_boards.html.tpl" boardid=$child.boardid name=$child.name boards=$child.childs zeigekategorien=true}
 {else}{assign var=restforen value=1}
 {/if}
 {/foreach}
 {/capture}
-{if $restforen == 1}{include file=board_boards.html.tpl name="Foren" boards=$board.childs zeigekategorien=false}{/if}
+{if $restforen == 1}{include file="board_boards.html.tpl" name="Foren" boards=$board.childs zeigekategorien=false}{/if}
 {$childboards}
 {/if}
 
@@ -61,11 +61,11 @@
   <span class="posts">{$thread.posts}</span>
   </td>
   <td class="poster hidden-phone">
-  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.author}</span>
+  <span class="info">von </span><span class="author">{include file="address.html.tpl" address=$thread.author}</span>
   <br /><span class="info">am </span><span class="date">{$thread.date|date_format:"%d.%m.%Y %H:%M"}</span>
   </td>
   <td class="lastpost">
-  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$thread.lastpostauthor}</span>
+  <span class="info">von </span><span class="author">{include file="address.html.tpl" address=$thread.lastpostauthor}</span>
   <br /><span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;messageid={$thread.lastpostmessageid|encodeMessageID|escape:url}">{$thread.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   </td>
  </tr>
@@ -106,4 +106,4 @@ $(function() {
 </script>
 {/literal}
 
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

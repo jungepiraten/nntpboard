@@ -1,4 +1,4 @@
-{include file=header.html.tpl title="Suchergebnisse"}
+{include file="header.html.tpl" title="Suchergebnisse"}
 
 <p class="well">{$term|escape:html}</p>
 
@@ -18,7 +18,7 @@
   <td class="board"><a class="board" href="viewboard.php?boardid={$result.board.boardid|escape:url}">{$result.board.name}</a></td>
   <td class="subject"><a class="subject" href="viewthread.php?boardid={$result.board.boardid|escape:url}&amp;messageid={$result.message.messageid|encodeMessageID|escape:url}">{$result.message.subject|escape:html}</a></td>
   <td class="poster hidden-phone">
-  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$result.message.author}</span>
+  <span class="info">von </span><span class="author">{include file="address.html.tpl" address=$result.message.author}</span>
   <br /><span class="info">am </span><span class="date">{$result.message.date|date_format:"%d.%m.%Y %H:%M"}</span>
   </td>
  </tr>

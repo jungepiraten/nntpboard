@@ -1,5 +1,5 @@
-{include file=header.html.tpl title=$ADDRESS}
+{include file="header.html.tpl" title=$ADDRESS}
 
 <p>Willkommen im Forum!</p>
 <a href="index.php">Zur Startseite</a>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

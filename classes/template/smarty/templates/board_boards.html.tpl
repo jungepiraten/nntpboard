@@ -30,7 +30,7 @@
   <td class="span4">
   {if isset($board.lastpostmessageid)}
   <a class="subject" href="viewthread.php?boardid={$board.lastpostboardid|escape:url}&amp;threadid={$board.lastpostthreadid|encodeMessageID|escape:url}">{$board.lastpostsubject|escape:html}</a>
-  <span class="info">von </span><span class="author">{include file=address.html.tpl address=$board.lastpostauthor}</span><br>
+  <span class="info">von </span><span class="author">{include file="address.html.tpl" address=$board.lastpostauthor}</span><br>
   <span class="info">am </span><a class="date" href="viewthread.php?boardid={$board.lastpostboardid|escape:url}&amp;messageid={$board.lastpostmessageid|encodeMessageID|escape:url}">{$board.lastpostdate|date_format:"%d.%m.%Y %H:%M"}</a>
   {else}
   <span> - </span>

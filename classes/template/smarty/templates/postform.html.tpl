@@ -1,6 +1,6 @@
-{include file=header.html.tpl title=$board.name}
+{include file="header.html.tpl" title=$board.name}
 
-<ul class="breadcrumb">{include file=board_breadcrumb.html.tpl board=$board}</li></ul>
+<ul class="breadcrumb">{include file="board_breadcrumb.html.tpl" board=$board}</li></ul>
 
 {literal}
 <script type="text/javascript">
@@ -38,7 +38,7 @@ function addAttachmentField() {
 {/literal}
 
 {if isset($preview)}
-{include file=message.html.tpl message=$preview first=1 id="post" hidecontrols=1}
+{include file="message.html.tpl" message=$preview first=1 id="post" hidecontrols=1}
 {/if}
 
 <form action="post.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8" class="form-horizontal">
@@ -101,10 +101,10 @@ function addAttachmentField() {
 {if isset($referencemessages)}
 <table class="table table-striped table-bordered">
  {foreach from=$referencemessages item=message name=counter}
-  {include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration hidecontrols=1}
+  {include file="message.html.tpl" message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration hidecontrols=1}
  {/foreach}
 </table>
 {/if}
 
 <br />
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

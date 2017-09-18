@@ -1,4 +1,4 @@
-{include file=header.html.tpl title="Suchen"}
+{include file="header.html.tpl" title="Suchen"}
 
 <form action="search.php" method="post" class="form-horizontal">
 	<fieldset>
@@ -14,4 +14,4 @@
 		</div>
 	</fieldset>
 </form>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

@@ -1,6 +1,6 @@
-{include file=header.html.tpl title=$thread.subject}
+{include file="header.html.tpl" title=$thread.subject}
 
-<ul class="breadcrumb">{include file=thread_breadcrumb.html.tpl board=$board thread=$thread}</ul>
+<ul class="breadcrumb">{include file="thread_breadcrumb.html.tpl" board=$board thread=$thread}</ul>
 
 {literal}
 <script type="text/javascript">
@@ -35,7 +35,7 @@ function toggleQuote(id) {
 {include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 {/if}
 {foreach from=$messages item=message name=counter}
-{include file=message.html.tpl message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
+{include file="message.html.tpl" message=$message first=$smarty.foreach.counter.first id=$smarty.foreach.counter.iteration}
 {/foreach}
 {if $pages > 1}
 {capture assign="baseurl"}viewthread.php?boardid={$board.boardid}&amp;threadid={$thread.threadid|encodeMessageID|escape:url}&amp;page={/capture}
@@ -67,4 +67,4 @@ $(".deletePost").click(function() {
 </script>
 {/literal}
 
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

@@ -1,4 +1,4 @@
-{include file=header.html.tpl title="Login"}
+{include file="header.html.tpl" title="Login"}
 
 {if $loginfailed}
 <p class="error">Login fehlgeschlagen!</p>
@@ -33,4 +33,4 @@
 		</div>
 	</fieldset>
 </form>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

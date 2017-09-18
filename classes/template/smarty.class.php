@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . "/../template.class.php");
 
-require_once("Smarty/Smarty.class.php");
+require_once("Smarty/SmartyBC.class.php");
 
 function parseFacEs($text, $host, &$cache) {
 	if (!isset($cache[$host])) {
@@ -34,11 +34,11 @@ class NNTPBoardSmarty extends AbstractTemplate implements Template {
 	public function __construct($config, $auth) {
 		parent::__construct($config, $auth);
 
-		$this->smarty = new Smarty;
+		$this->smarty = new SmartyBC;
 		$this->smarty->template_dir = dirname(__FILE__) . "/smarty/templates/";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/smarty/templates_c/";
-		$this->smarty->register_modifier("encodeMessageID", array($config, "encodeMessageID"));
-		$this->smarty->register_modifier("calculateFileSize", array($this, "calculateFileSize"));
+		$this->smarty->registerPlugin("modifier", "encodeMessageID", array($config, "encodeMessageID"));
+		$this->smarty->registerPlugin("modifier", "calculateFileSize", array($this, "calculateFileSize"));
 		$this->smarty->assign("ROOTBOARD", $this->parseBoard($config->getBoard()));
 		$this->smarty->assign("VERSION", $config->getVersion());
 		$this->smarty->assign("ISANONYMOUS", $this->getAuth()->isAnonymous());

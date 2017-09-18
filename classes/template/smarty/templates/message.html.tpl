@@ -7,7 +7,7 @@
  <span class="info">am</span>
  <time class="date" datetime="{$message.date|date_format:"%Y-%m-%dT%H:%M+01:00"}" pubdate>{$message.date|date_format:"%d.%m.%Y %H:%M"}</time>
  <span class="info">von</span>
- <span class="author">{include file=address.html.tpl address=$message.author}</span>
+ <span class="author">{include file="address.html.tpl" address=$message.author}</span>
 </header>
 <div class="body">
  <p class="body">{$message.body}</p>
@@ -33,13 +33,13 @@
  {if count($message.acknowledges) >= 1}
  <dl class="acknowledgebox">
  <dt>Zustimmungen</dt>
- {foreach from=$message.acknowledges item=acknowledge name=acks}{if !$smarty.foreach.acks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [+{$acknowledge.wertung}]{/foreach}
+ {foreach from=$message.acknowledges item=acknowledge name=acks}{if !$smarty.foreach.acks.first} &middot; {/if}{include file="address.html.tpl" address=$acknowledge.author} [+{$acknowledge.wertung}]{/foreach}
  </dl>
  {/if}
  {if count($message.nacknowledges) >= 1}
  <dl class="acknowledgebox">
  <dt>Ablehnungen</dt>
- {foreach from=$message.nacknowledges item=acknowledge name=nacks}{if !$smarty.foreach.nacks.first} &middot; {/if}{include file=address.html.tpl address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
+ {foreach from=$message.nacknowledges item=acknowledge name=nacks}{if !$smarty.foreach.nacks.first} &middot; {/if}{include file="address.html.tpl" address=$acknowledge.author} [{$acknowledge.wertung}]{/foreach}
  </dl>
  {/if}
 </div>
