@@ -110,7 +110,8 @@ class DynamicGroup extends AbstractGroup {
 		if (count($this->threadslastpost) == 0) {
 			return null;
 		}
-		return array_pop(array_keys($this->threadslastpost));
+		$threadids = array_keys($this->threadslastpost);
+		return array_pop($threadids);
 	}
 	public function getLastThread() {
 		return $this->getThread($this->getLastThreadID());
