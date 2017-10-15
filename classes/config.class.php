@@ -49,11 +49,11 @@ abstract class DefaultConfig {
 		return 15;
 	}
 
-	public function getMaxCronAddCount() {
+	public function getCronMaxAddCount() {
 		return 100;
 	}
 
-	public function getMaxCronDeleteCount() {
+	public function getCronMaxDeleteCount() {
 		return 200;
 	}
 
