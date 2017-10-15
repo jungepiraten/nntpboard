@@ -9,7 +9,7 @@
 {if $zeigekategorien || (isset($board.hasthreads) && $board.hasthreads)}
  <tr class="clickable">
   <td>
-  <a class="name" id="board{if isset($boardid)}{$boardid}{/if}.{$smarty.foreach.counter.iteration}" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$board.desc|escape:html}">{$board.name|escape:html}</a><br>
+  <a class="name" href="viewboard.php?boardid={$board.boardid|escape:url}" title="{$board.desc|escape:html}">{$board.name|escape:html}</a><br>
     {if $board.unread}<a href="unread.php?markread={$board.boardid|escape:url}"><i class="icon-comments"></i></a>{/if}
     <span>{$board.desc}</span>
    </td>
