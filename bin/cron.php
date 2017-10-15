@@ -42,7 +42,7 @@ foreach ($config->getBoardIDs() as $boardid) {
 		$cache->open(NULL);
 
 		// Versuche neue Nachrichten zu ergattern
-		$cache->updateCache();
+		$cache->updateCache($config->getCronMaxAddCount(), $config->getCronMaxDeleteCount());
 
 		$cache->close();
 	} catch (Exception $e) {

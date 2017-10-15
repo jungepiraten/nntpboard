@@ -49,6 +49,14 @@ abstract class DefaultConfig {
 		return 15;
 	}
 
+	public function getMaxCronAddCount() {
+		return 100;
+	}
+
+	public function getMaxCronDeleteCount() {
+		return 200;
+	}
+
 	/**
 	 * Erweiterte Optionen
 	 **/

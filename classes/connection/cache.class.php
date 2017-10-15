@@ -139,7 +139,7 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 		return true;
 	}
 
-	private function updateLocal() {
+	private function updateLocal($maxAddCount = 0, $maxDeleteCount = 0) {
 		$cachegroup = $this->getGroup();
 
 		try {
@@ -148,6 +148,10 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 
 			// Liste mit neuen Nachrichten aufstellen
 			$newmessages = array_diff($uplinkmessageids, $cachemessageids);
+			// Schutz vor Überlastung - verarbeite restliche Nachrichten später
+			if ($maxAddCount > 0) {
+				$newmessages = array_slice($newmessages, 0, $maxAddCount);
+			}
 			foreach ($newmessages as $messageid) {
 				$message = $this->uplink->getMessage($messageid);
 				$cachegroup->addMessage($message);
@@ -155,6 +159,10 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 
 			// Veraltete Nachrichten ausstreichen (z.b. Cancel)
 			$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
+			// Schutz vor Überlastung - verarbeite restliche Nachrichten später
+			if ($maxDeleteCount > 0) {
+				$oldmessages = array_slice($oldmessages, 0, $maxDeleteCount);
+			}
 			foreach ($oldmessages as $messageid) {
 				$cachegroup->removeMessage($messageid);
 			}
@@ -202,12 +210,12 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 	/**
 	 * Hole neue Daten vom Uplink / Cache-Update. Einsprungspunkt für bin/cron.php
 	 **/
-	public function updateCache() {
+	public function updateCache($maxAddCount = 0, $maxDeleteCount = 0) {
 		$this->postLocalMessages();
 
 		$this->uplink->open($this->auth);
 		if ($this->uplink->getGroupHash() != $this->getGroupHash()) {
-			$this->updateLocal();
+			$this->updateLocal($maxAddCount, $maxDeleteCount);
 		}
 		$this->uplink->close();
 	}
