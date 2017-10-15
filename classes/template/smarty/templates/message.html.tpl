@@ -3,7 +3,7 @@
  <a id="article{$message.messageid|encodeMessageID|escape:html}" class="anchor"></a>
  {if ! $message.isRead}<i class="icon-comments"></i>{/if}
  {if isset($message.author.image)}<img src="{$message.author.image|escape:html}" class="author thumbnail" alt="{$message.author.text|escape:html}" />{/if}
- <a class="subject" href="viewthread.php?boardid={$board.boardid}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a><br />
+ <a class="subject" href="viewthread.php?boardid={$board.boardid|escape:url}&amp;messageid={$message.messageid|encodeMessageID|escape:url}">{$message.subject|escape:html}</a><br />
  <span class="info">am</span>
  <time class="date" datetime="{$message.date|date_format:"%Y-%m-%dT%H:%M+01:00"}" pubdate>{$message.date|date_format:"%d.%m.%Y %H:%M"}</time>
  <span class="info">von</span>

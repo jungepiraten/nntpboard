@@ -23,7 +23,7 @@
 <div class="row-fluid">
 	<div class="span6">
 		{if $pages > 1}
-		{capture assign="baseurl"}viewboard.php?boardid={$board.boardid}&amp;page={/capture}
+		{capture assign="baseurl"}viewboard.php?boardid={$board.boardid|escape:url}&amp;page={/capture}
 		{include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 		{/if}
 		&nbsp;
@@ -31,8 +31,8 @@
 
 	<div class="btn-toolbar span6">
 		<div class="btn-group pull-right no-top-bottom-margin">
-			<a href="unread.php?markread={$board.boardid}" class="btn"><i class="icon-flag"></i> Forum als gelesen markieren</a>
-			{if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Neuer Thread</a>{/if}
+			<a href="unread.php?markread={$board.boardid|escape:url}" class="btn"><i class="icon-flag"></i> Forum als gelesen markieren</a>
+			{if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Neuer Thread</a>{/if}
 		</div>
 	</div>
 </div>
@@ -79,7 +79,7 @@
 <div class="row-fluid">
 	<div class="span6">
 		{if $pages > 1}
-		{capture assign="baseurl"}viewboard.php?boardid={$board.boardid}&amp;page={/capture}
+		{capture assign="baseurl"}viewboard.php?boardid={$board.boardid|escape:url}&amp;page={/capture}
 		{include file="pagination.html.tpl" baseurl=$baseurl page=$page pagecount=$pages}
 		{/if}
 		&nbsp;
@@ -87,8 +87,8 @@
 
 	<div class="btn-toolbar span6">
 		<div class="btn-group pull-right">
-			<a href="unread.php?markread={$board.boardid}" class="btn"><i class="icon-flag"></i> Forum als gelesen markieren</a>
-			{if ($mayPost)}<a href="post.php?boardid={$board.boardid}" class="btn btn-primary"><i class="icon-pencil icon-white"></i> Neuer Thread</a>{/if}
+			<a href="unread.php?markread={$board.boardid|escape:url}" class="btn"><i class="icon-flag"></i> Forum als gelesen markieren</a>
+			{if ($mayPost)}<a href="post.php?boardid={$board.boardid|escape:url}" class="btn btn-primary"><i class="icon-pencil icon-white"></i> Neuer Thread</a>{/if}
 		</div>
 	</div>
 </div>
