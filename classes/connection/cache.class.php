@@ -143,14 +143,17 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 		$cachegroup = $this->getGroup();
 
 		try {
+			$grouphash = $this->uplink->getGroupHash();
 			$uplinkmessageids = $this->uplink->getMessageIDs();
 			$cachemessageids  = $cachegroup->getMessageIDs();
 
 			// Liste mit neuen Nachrichten aufstellen
 			$newmessages = array_diff($uplinkmessageids, $cachemessageids);
 			// Schutz vor Überlastung - verarbeite restliche Nachrichten später
-			if ($maxAddCount > 0) {
+			if ($maxAddCount > 0 and count($newmessages) > $maxAddCount) {
 				$newmessages = array_slice($newmessages, 0, $maxAddCount);
+				// Starte cron in nächstem Durchlauf erneut
+				$grouphash = __CLASS__ . '$' . md5(microtime(true) . rand(100,999));
 			}
 			foreach ($newmessages as $messageid) {
 				$message = $this->uplink->getMessage($messageid);
@@ -160,14 +163,15 @@ abstract class AbstractCacheConnection extends AbstractConnection implements Cac
 			// Veraltete Nachrichten ausstreichen (z.b. Cancel)
 			$oldmessages = array_diff($cachemessageids, $uplinkmessageids);
 			// Schutz vor Überlastung - verarbeite restliche Nachrichten später
-			if ($maxDeleteCount > 0) {
+			if ($maxDeleteCount > 0 and count($oldmessages) > $maxDeleteCount) {
 				$oldmessages = array_slice($oldmessages, 0, $maxDeleteCount);
+				// Starte cron in nächstem Durchlauf erneut
+				$grouphash = __CLASS__ . '$' . md5(microtime(true) . rand(100,999));
 			}
 			foreach ($oldmessages as $messageid) {
 				$cachegroup->removeMessage($messageid);
 			}
 
-			$grouphash = $this->uplink->getGroupHash();
 			$this->setGroupHash($grouphash);
 			$cachegroup->setGroupHash($grouphash);
 		} catch (Exception $e) {
