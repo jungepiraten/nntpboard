@@ -107,7 +107,7 @@ class RFC5322Message {
 			$references = preg_split('$\\s$', $this->getHeader()->get("References")->getValue());
 			do {
 				$parentid = array_pop($references);
-			} while ($parentid != false && !$connection->hasMessage($parentid));
+			} while ($parentid != false && !$connection->hasMessage($parentid) && $parentid == $messageid);
 		}
 
 		// Fiese Fixes gegen dumme Clients, die kein References setzen
@@ -116,6 +116,9 @@ class RFC5322Message {
 			// TODO Themen nach Subject suchen und MessageID raussuchen
 		}
 
+		// Suche Letzte Nachricht im References-Baum die keine Zustimmung war (quasi die Ursprungsreferenz)
+		// Damit vermeiden wir, das die parentid auf ein Acknowledge zeigt und nicht auf ein Message-Objekt
+		// Hierbei muss stark aufgepasst werden, das keine Entlosschleife entstehen kann
 		try {
 			$message = $connection->getMessage($parentid);
 			while ($message instanceof Acknowledge) {
