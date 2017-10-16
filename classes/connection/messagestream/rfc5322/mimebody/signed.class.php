@@ -13,6 +13,10 @@ class RFC5322SignedMimeBody extends RFC5322MimeBody {
 			$mimetype = array($mimetype);
 		}
 		$part = $this->getContentPart();
+		if ($part == null) {
+			return null;
+		}
+
 		if ($part instanceof RFC5322MimeBody) {
 			return $part->getBodyPart($mimetype, $charset);
 		} else if (in_array($part->getMimeType(), $mimetype)) {

@@ -25,6 +25,10 @@ class RFC5322RelatedMimeBody extends RFC5322MimeBody {
 			$mimetype = array($mimetype);
 		}
 		$part = $this->getRootPart();
+		if ($part == null) {
+			return null;
+		}
+
 		if ($part instanceof RFC5322MimeBody) {
 			return $part->getBodyPart($mimetype, $charset);
 		} else if (in_array($part->getMimeType(), $mimetype)) {
