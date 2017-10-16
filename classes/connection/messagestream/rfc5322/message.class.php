@@ -136,13 +136,19 @@ class RFC5322Message {
 		// Nachrichteninhalt
 		$signature = null;
 		$textbody = $this->body->getBodyPart("text/plain");
-		if (strpos($textbody, "-- \n") === 0) {
-			$textbody = "";
-			$signature = substr($textbody, 4);
-		} else if (strpos($textbody, "\n-- \n") !== false) {
-			list($textbody, $signature) = explode("\n-- \n", $textbody, 2);
+		foreach (array("\r\n", "\n") as $lf) {
+			if ($signature == null) {
+				if (strpos($textbody, "-- " . $lf) === 0) {
+					$textbody = "";
+					$signature = substr($textbody, 4);
+				} else if (strpos($textbody, $lf . "-- " . $lf) !== false) {
+					list($textbody, $signature) = explode($lf . "-- " . $lf, $textbody, 2);
+				}
+			}
 		}
+
 		// Workaround fuer Mailman und andere Clients
+		// Mit \r?$ erreichen wir das gleiche verhalten wie in der obigen foreach-Schleife
 		if ($signature == null && preg_match('~^[-_]{2,}\r?$~m', $textbody) > 0) {
 			list($textbody, $signature) = preg_split('~^[-_]{2,}\r?$~m', $textbody, 2);
 		}
