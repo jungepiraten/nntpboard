@@ -30,7 +30,7 @@ class RFC5322SignedMimeBody extends RFC5322MimeBody {
 		if ($part instanceof RFC5322MimeBody) {
 			return $this->getContentPart()->getAttachmentParts();
 		}
-		return null;
+		return array();
 	}
 }
 
