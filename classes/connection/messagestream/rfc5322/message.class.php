@@ -107,7 +107,8 @@ class RFC5322Message {
 			$references = preg_split('$\\s$', $this->getHeader()->get("References")->getValue());
 			do {
 				$parentid = array_pop($references);
-			} while ($parentid != false && !$connection->hasMessage($parentid) && $parentid == $messageid);
+			} while (!( $parentid == false || ($parentid != $messageid && $connection->hasMessage($parentid)) ));
+			// do { ... } while (x) is the same as do { ... } until (!x)
 		}
 
 		// Fiese Fixes gegen dumme Clients, die kein References setzen
