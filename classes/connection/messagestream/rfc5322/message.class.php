@@ -109,10 +109,14 @@ class RFC5322Message {
 				$parentid = array_pop($references);
 			} while (!( $parentid == false || ($parentid != $messageid && $connection->hasMessage($parentid)) ));
 			// do { ... } while (x) is the same as do { ... } until (!x)
+
+			if ($parentid == false) {
+				$parentid = null;
+			}
 		}
 
 		// Fiese Fixes gegen dumme Clients, die kein References setzen
-		if ($parentid == null && strtolower(substr($subject,0,3)) == "re:") {
+		if ($parentid === null && strtolower(substr($subject,0,3)) == "re:") {
 			$topicsubject = ltrim(substr($subject,3));
 			// TODO Themen nach Subject suchen und MessageID raussuchen
 		}
@@ -120,17 +124,19 @@ class RFC5322Message {
 		// Suche Letzte Nachricht im References-Baum die keine Zustimmung war (quasi die Ursprungsreferenz)
 		// Damit vermeiden wir, das die parentid auf ein Acknowledge zeigt und nicht auf ein Message-Objekt
 		// Hierbei muss stark aufgepasst werden, das keine Entlosschleife entstehen kann
-		try {
-			$message = $connection->getMessage($parentid);
-			while ($message instanceof Acknowledge) {
-				$parentid = $message->getReference();
+		if ($parentid !== null) {
+			try {
 				$message = $connection->getMessage($parentid);
-			}
-		} catch (NotFoundMessageException $e) {}
+				while ($message instanceof Acknowledge) {
+					$parentid = $message->getReference();
+					$message = $connection->getMessage($parentid);
+				}
+			} catch (NotFoundMessageException $e) {}
 
-		if ($this->isAcknowledge()) {
-			preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain"), $match);
-			return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
+			if ($this->isAcknowledge()) {
+				preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain"), $match);
+				return new Acknowledge($messageid, $parentid, $date, $author, intval($match[0]) );
+			}
 		}
 
 		// Nachrichteninhalt
