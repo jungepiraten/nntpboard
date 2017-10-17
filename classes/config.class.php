@@ -50,11 +50,11 @@ abstract class DefaultConfig {
 	}
 
 	public function getCronMaxAddCount() {
-		return 100;
+		return 0;
 	}
 
 	public function getCronMaxDeleteCount() {
-		return 200;
+		return 0;
 	}
 
 	/**
