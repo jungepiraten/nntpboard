@@ -82,6 +82,10 @@ class RFC5322Message {
 		return $this->header;
 	}
 
+	public function getBody() {
+		return $this->body;
+	}
+
 	public function isAcknowledge() {
 		return preg_match('~^[+-][0-9]{1,4}~', $this->body->getBodyPart("text/plain"));
 	}

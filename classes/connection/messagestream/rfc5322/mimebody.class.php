@@ -2,6 +2,7 @@
 
 require_once(dirname(__FILE__) . "/header.class.php");
 require_once(dirname(__FILE__) . "/plainbody.class.php");
+require_once(dirname(__FILE__) . "/message.class.php");
 require_once(dirname(__FILE__) . "/mimebody/mixed.class.php");
 require_once(dirname(__FILE__) . "/mimebody/related.class.php");
 require_once(dirname(__FILE__) . "/mimebody/alternative.class.php");
@@ -12,12 +13,21 @@ abstract class RFC5322MimeBody {
 		$parts = array();
 		$mimetype = null;
 
-		if ($header->has("Content-Type")
-		 && substr($header->get("Content-Type")->getValue(),0,9) == "multipart"
-		 && $header->get("Content-Type")->hasExtra("boundary"))
+		if ($header->has("Content-Type")) {
+			$mimetype = $header->get("Content-Type")->getValue();
+		}
+
+		if ($mimetype == "message/rfc822") {
+			// Enthaltene Nachricht (z.B. DMARC-Encapsulation)
+			// TODO Die Header der enthaltenen Nachricht werden jetzt ignoriert, enthalten zumindest bei Mailman-encapsulation auch keinen Mehrwert
+
+			$message = RFC5322Message::parsePlain($body);
+			$parts = $message->getBody()->getParts();
+		} else if ($mimetype !== null
+		  && substr($mimetype,0,10) == "multipart/"
+		  && $header->get("Content-Type")->hasExtra("boundary"))
 		{
 			// Multipart-Nachricht
-			$mimetype = $header->get("Content-Type")->getValue();
 			$boundary = $header->get("Content-Type")->getExtra("boundary");
 			$mimeparts = explode("--" . $boundary, $body);
 			// Normalerweise bestehen der erste (This is an multipart ...) und letzte Teil (-- nur aus Sinnlosem Inhalt
@@ -33,7 +43,7 @@ abstract class RFC5322MimeBody {
 				$parts[] = self::parsePlain($partheader, $partbody);
 			}
 		} else {
-			// Singlepart-Nachricht
+			// Singlepart-Nachricht (oder keine tiefere Verzweigung vorhanden)
 			$parts[] = RFC5322PlainBody::parsePlain($header, $body);
 		}
 
